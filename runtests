@@ -1,0 +1,3 @@
+#!/bin/bash
+
+PYTHONPATH=./cotd:$PYTHONPATH COTD='TEST' nosetests --nologcapture --verbosity=2 

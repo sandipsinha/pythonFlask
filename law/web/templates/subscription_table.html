@@ -1,0 +1,15 @@
+{% extends 'subscription_base.html' %}
+{% block content %}
+$(document).ready(function() {
+    $('#example').dataTable( {
+        "ajax": 'subscription/subdomain/{{subdomain}}',
+        "columns": [
+            { "data" : "Date" },
+            { "data" : "Rate" },
+            { "data" : "Tier" },
+            { "data" : "Volume" },
+            { "data" : "Retention" },
+        ]
+    } );
+} );
+{% endblock %}
