@@ -16,7 +16,6 @@ from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm             import sessionmaker, relationship, backref
 
 Base = declarative_base()
-##Base = declarative_base( cls=DeferredReflection )
 
 db_url = '{dialect}://{user}:{passwd}@{host}:{port}/{dbname}'.format(
     dialect = config.get( 'adb', 'dialect' ),
@@ -32,11 +31,6 @@ engine = create_engine(
             echo=config.getboolean( 'adb', 'debug' ), 
             pool_recycle=3600 
          )
-
-#def reflect():
-#    """ Actually triggers the reflecting """
-#    Base.prepare( engine )
-#    return engine
 
 Session = sessionmaker( bind=engine )
 
@@ -145,9 +139,7 @@ class EventsDropped( Base ):
             self.events)
 
 @contextmanager
-def session_context( reflect=False ):
-#    if reflect:
-#        Session.configure( bind=reflect() )
+def session_context():
     session = Session()
     try:
         yield session
