@@ -19,9 +19,9 @@ def subd_acct_history( subd ):
                .all()
 
         fsubs = [{ 'Date':r.updated,
-                   'Rate':float(r.trate),
+                   'Rate':'${:.2f}/mo'.format( r.trate ),
                    'Tier':getattr( r.tplan, 'name', 'custom' ),
-                   'Volume':float(r.tGB),
+                   'Volume':'{:.2f}'.format( r.tGB ),
                    'Retention':r.tDays}
                 for r in subs ]
 
