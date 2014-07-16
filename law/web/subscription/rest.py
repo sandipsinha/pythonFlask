@@ -2,7 +2,7 @@
 " Copyright:    Loggly, Inc.
 " Author:       Scott Griffin
 " Email:        scott@loggly.com
-" Last Updated: 07/15/2014
+" Last Updated: 07/16/2014
 "
 """
 from flask              import Blueprint, jsonify, request
@@ -19,9 +19,9 @@ def subd_acct_history( subd ):
                .all()
 
         fsubs = [{ 'Date':r.updated,
-                   'Rate':'${:.2f}/mo'.format( r.trate ),
-                   'Tier':getattr( r.tplan, 'name', 'custom' ),
-                   'Volume':'{:.2f}'.format( r.tGB ),
+                   'Rate':r.tRate,
+                   'Tier':getattr( r.tPlan, 'name', 'custom' ),
+                   'Volume':r.tGB,
                    'Retention':r.tDays}
                 for r in subs ]
 

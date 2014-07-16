@@ -8,14 +8,33 @@ $(document).ready(function() {
         "paging": false,
         "order": [0, 'desc'],
         "ajax": '{{url}}',
-        "columns": [
-            { "title": "Date", "data" : "Date" },
-            { "title": "Rate", "data" : "Rate" },
-            { "title": "Tier", "data" : "Tier" },
-            { "title": "Volume (GB)", "data" : "Volume" },
-            { "title": "Retention", "data" : "Retention" },
+        "columns": [{ 
+            "title": "Date", 
+            "data" : "Date", 
+        },{ 
+            "title": "Rate", 
+            "data" : "Rate",
+            "render": function( data, type, row, meta ) { 
+                return "$" + Number( data ).toFixed( 2 ) + "/mo" ;
+            }
+        },{
+            "title": "Tier", 
+            "data" : "Tier" 
+        },{ 
+            "title": "Volume (GB)", 
+            "data" : "Volume",
+            "render": function( data, type, row, meta ) { 
+                return Number( data ).toFixed( 2 ) ;
+            }
+        },{
+            "title": "Retention", 
+            "data" : "Retention",
+            "render": function( data, type, row, meta ) { 
+                return data + " days" ;
+            }
+        }
         ]
-    } );
-} );
+    });
+});
 </script>
 {% endblock %}

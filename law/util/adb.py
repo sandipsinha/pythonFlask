@@ -2,7 +2,7 @@
 " Copyright:    Loggly, Inc.
 " Author:       Scott Griffin
 " Email:        scott@loggly.com
-" Last Updated: 07/15/2014
+" Last Updated: 07/16/2014
 "
 """
 from contextlib import contextmanager
@@ -11,7 +11,7 @@ from law                        import config
 from sqlalchemy                 import (create_engine, Column, 
                                         Integer, DateTime, 
                                         Boolean, String,
-                                        ForeignKey)
+                                        Float, Numeric, ForeignKey)
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm             import sessionmaker, relationship, backref
 
@@ -49,7 +49,7 @@ class Account( Base ):
     is_test     = Column( 'is_test_acct', Boolean )
              
     def __repr__(self):
-        return "<account({},{})>".foramt(
+        return "<account({},{})>".format(
             self.acct_id, 
             self.subdomain)
 
@@ -59,16 +59,16 @@ class AccountState( Base ):
     acct_id   = Column( Integer, primary_key=True )
     updated   = Column( Integer, primary_key=True )
     subdomain = Column( String )
-    trate     = Column( Integer )
+    tRate     = Column( 'trate', Float )
     tPlan_id  = Column( 'tPlan', Integer, ForeignKey( 'subscription_plan.id' ) )
-    tGB       = Column( Integer )
+    tGB       = Column( Numeric( asdecimal=False ) )
     tDays     = Column( Integer )
-    tplan     = relationship("Tier", 
+    tPlan     = relationship("Tier", 
                              lazy='joined',
                              backref=backref("AAWSC", uselist=False))
 
     def __repr__(self):
-        return "<AAWSC({},{})>".foramt(
+        return "<AAWSC({},{})>".format(
             self.acct_id, 
             self.updated)
 
