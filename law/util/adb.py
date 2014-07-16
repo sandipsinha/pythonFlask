@@ -59,17 +59,17 @@ class Account( Base ):
             self.acct_id, 
             self.subdomain)
 
-class AAWSC( Base ):
+class AccountState( Base ):
     __tablename__ = 'aawsc'
     
     acct_id   = Column( Integer, primary_key=True )
     updated   = Column( Integer, primary_key=True )
     subdomain = Column( String )
     trate     = Column( Integer )
-    tPlan     = Column( Integer, ForeignKey( 'subscription_plan.id' ) )
+    tPlan_id  = Column( 'tPlan', Integer, ForeignKey( 'subscription_plan.id' ) )
     tGB       = Column( Integer )
     tDays     = Column( Integer )
-    to_plan   = relationship("Tier", 
+    tplan     = relationship("Tier", 
                              lazy='joined',
                              backref=backref("AAWSC", uselist=False))
 
