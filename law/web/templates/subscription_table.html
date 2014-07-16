@@ -1,15 +1,21 @@
 {% extends 'subscription_base.html' %}
 {% block content %}
+<table id='sub_table' class='display'></table>
+<script>
 $(document).ready(function() {
-    $('#example').dataTable( {
-        "ajax": 'subscription/subdomain/{{subdomain}}',
+    $('#sub_table').dataTable( {
+        "searching": false,
+        "paging": false,
+        "order": [0, 'desc'],
+        "ajax": '{{url}}',
         "columns": [
-            { "data" : "Date" },
-            { "data" : "Rate" },
-            { "data" : "Tier" },
-            { "data" : "Volume" },
-            { "data" : "Retention" },
+            { "title": "Date", "data" : "Date" },
+            { "title": "Rate", "data" : "Rate" },
+            { "title": "Tier", "data" : "Tier" },
+            { "title": "Volume (GB)", "data" : "Volume" },
+            { "title": "Retention", "data" : "Retention" },
         ]
     } );
 } );
+</script>
 {% endblock %}

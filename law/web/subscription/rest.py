@@ -6,27 +6,22 @@
 "
 """
 from flask              import Blueprint, jsonify, request
-from util.adb           import session_context, AAWSC
+from law.util.adb       import session_context, AccountState
 
-blueprint = Blueprint( 'subscription', __name__ )
-
-
-@blueprint.route( '/table' )
-def subscription_table():
-    raise NotImplementedError
+blueprint = Blueprint( 'rest.subscription', __name__ )
 
 @blueprint.route( '/subdomain/<string:subd>' )
-def subscription_history( subd ):
+def subd_acct_history( subd ):
     with session_context() as s:
-        subs = s.query( AAWSC )\
-               .filter( AAWSC.subdomain == subd )\
-               .order_by( AAWSC.updated.desc )\
+        subs = s.query( AccountState )\
+               .filter( AccountState.subdomain == subd )\
+               .order_by( AccountState.updated.desc() )\
                .all()
 
         fsubs = [{ 'Date':r.updated,
-                   'Rate':r.trate, 
-                   'Tier':r.tPlan.name, 
-                   'Volume':r.tGB, 
+                   'Rate':float(r.trate),
+                   'Tier':getattr( r.tplan, 'name', 'custom' ),
+                   'Volume':float(r.tGB),
                    'Retention':r.tDays}
                 for r in subs ]
 
