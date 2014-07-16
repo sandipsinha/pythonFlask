@@ -2,7 +2,7 @@
 " Copyright:    Loggly, Inc.
 " Author:       Scott Griffin
 " Email:        scott@loggly.com
-" Last Updated: 07/14/2014
+" Last Updated: 07/15/2014
 "
 " Flask interface for the web module
 "
@@ -15,10 +15,11 @@ from flask.json          import JSONEncoder
 from law                 import config
 from law.web             import subscription
 
-app = Flask( config.get( 'web', 'appname' ) )
-app.debug = config.get( 'web', 'debug' )
+app = Flask( config.get( 'webapp', 'name' ) )
+app.debug = config.getboolean( 'webapp', 'debug' )
 
-app.register_blueprint( subscription.blueprint, url_prefix = '/subscription' )
+app.register_blueprint( subscription.views.blueprint, url_prefix = '/subscription' )
+app.register_blueprint( subscription.rest.blueprint, url_prefix = '/rest/subscription' )
 
 class JSONLawDEncoder( JSONEncoder ):
     def default( self, obj ):
@@ -28,8 +29,3 @@ class JSONLawDEncoder( JSONEncoder ):
             super( JSONLawDEncoder, self ).default( obj )
 
 app.json_encoder = JSONLawDEncoder
-
-if __name__ == '__main__':
-    if os.environ.get( 'LAW' ) == 'DEV':
-        app.debug = True
-    app.run()
