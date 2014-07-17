@@ -7,6 +7,7 @@ import sys
 #    <package install>/loggly-analytics-web/environment
 conf_dir = os.path.dirname(os.path.abspath(__file__))
 app_dir = os.path.dirname(conf_dir)
+sys.path.append( app_dir )
 
 # activate virtual python environment
 activate_this = os.path.join( app_dir, 'environment', 'bin', 'activate_this.py')
