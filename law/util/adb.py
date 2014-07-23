@@ -2,7 +2,7 @@
 " Copyright:    Loggly, Inc.
 " Author:       Scott Griffin
 " Email:        scott@loggly.com
-" Last Updated: 07/16/2014
+" Last Updated: 07/22/2014
 "
 """
 from contextlib import contextmanager
@@ -68,7 +68,7 @@ class AccountState( Base ):
                              backref=backref("AAWSC", uselist=False))
 
     def __repr__(self):
-        return "<AAWSC({},{})>".format(
+        return "<AccountState({},{})>".format(
             self.acct_id, 
             self.updated)
 
@@ -140,8 +140,14 @@ class EventsDropped( Base ):
 
 @contextmanager
 def session_context():
+    """ Because ADB is read only we do not need commit """
     session = Session()
     try:
+        # flask-sqlalchemy patches the session object and enforces
+        # This model changes dict for signaling purposes.  Because
+        # We don't want flask-sqlalchemy dealing with these models
+        # Lets just fake this shit.
+        session._model_changes = {}
         yield session
         session.commit()
     except:
