@@ -2,7 +2,7 @@
 " Copyright:    Loggly, Inc.
 " Author:       Scott Griffin
 " Email:        scott@loggly.com
-" Last Updated: 07/15/2014
+" Last Updated: 07/22/2014
 "
 """
 from contextlib import contextmanager
@@ -11,12 +11,11 @@ from law                        import config
 from sqlalchemy                 import (create_engine, Column, 
                                         Integer, DateTime, 
                                         Boolean, String,
-                                        ForeignKey)
+                                        Float, Numeric, ForeignKey)
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm             import sessionmaker, relationship, backref
 
 Base = declarative_base()
-##Base = declarative_base( cls=DeferredReflection )
 
 db_url = '{dialect}://{user}:{passwd}@{host}:{port}/{dbname}'.format(
     dialect = config.get( 'adb', 'dialect' ),
@@ -32,11 +31,6 @@ engine = create_engine(
             echo=config.getboolean( 'adb', 'debug' ), 
             pool_recycle=3600 
          )
-
-#def reflect():
-#    """ Actually triggers the reflecting """
-#    Base.prepare( engine )
-#    return engine
 
 Session = sessionmaker( bind=engine )
 
@@ -55,26 +49,26 @@ class Account( Base ):
     is_test     = Column( 'is_test_acct', Boolean )
              
     def __repr__(self):
-        return "<account({},{})>".foramt(
+        return "<account({},{})>".format(
             self.acct_id, 
             self.subdomain)
 
-class AAWSC( Base ):
+class AccountState( Base ):
     __tablename__ = 'aawsc'
     
     acct_id   = Column( Integer, primary_key=True )
     updated   = Column( Integer, primary_key=True )
     subdomain = Column( String )
-    trate     = Column( Integer )
-    tPlan     = Column( Integer, ForeignKey( 'subscription_plan.id' ) )
-    tGB       = Column( Integer )
+    tRate     = Column( 'trate', Float )
+    tPlan_id  = Column( 'tPlan', Integer, ForeignKey( 'subscription_plan.id' ) )
+    tGB       = Column( Numeric( asdecimal=False ) )
     tDays     = Column( Integer )
-    to_plan   = relationship("Tier", 
+    tPlan     = relationship("Tier", 
                              lazy='joined',
                              backref=backref("AAWSC", uselist=False))
 
     def __repr__(self):
-        return "<AAWSC({},{})>".foramt(
+        return "<AccountState({},{})>".format(
             self.acct_id, 
             self.updated)
 
@@ -145,11 +139,15 @@ class EventsDropped( Base ):
             self.events)
 
 @contextmanager
-def session_context( reflect=False ):
-#    if reflect:
-#        Session.configure( bind=reflect() )
+def session_context():
+    """ Because ADB is read only we do not need commit """
     session = Session()
     try:
+        # flask-sqlalchemy patches the session object and enforces
+        # This model changes dict for signaling purposes.  Because
+        # We don't want flask-sqlalchemy dealing with these models
+        # Lets just fake this shit.
+        session._model_changes = {}
         yield session
         session.commit()
     except:
