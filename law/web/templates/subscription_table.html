@@ -7,7 +7,7 @@ $(document).ready(function() {
         "searching": false,
         "paging": false,
         "order": [0, 'desc'],
-        "ajax": '{{url}}',
+        "data": {{data|tojson|safe}},
         "columns": [{ 
             "title": "Date", 
             "data" : "Date", 

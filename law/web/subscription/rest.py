@@ -2,16 +2,16 @@
 " Copyright:    Loggly, Inc.
 " Author:       Scott Griffin
 " Email:        scott@loggly.com
-" Last Updated: 07/16/2014
+" Last Updated: 07/23/2014
 "
 """
 from flask              import Blueprint, jsonify, request
+from flask.ext.security import login_required
 from law.util.adb       import session_context, AccountState
 
 blueprint = Blueprint( 'rest.subscription', __name__ )
 
-@blueprint.route( '/subdomain/<string:subd>' )
-def subd_acct_history( subd ):
+def account_history( subd ):
     with session_context() as s:
         subs = s.query( AccountState )\
                .filter( AccountState.subdomain == subd )\
@@ -25,4 +25,8 @@ def subd_acct_history( subd ):
                    'Retention':r.tDays}
                 for r in subs ]
 
-        return jsonify({ 'data':fsubs })
+        return fsubs
+
+@blueprint.route( '/subdomain/<string:subd>' )
+def rest_account_history( subd ):
+    return jsonify({ 'data':account_history( subd ) })

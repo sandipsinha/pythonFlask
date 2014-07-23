@@ -2,10 +2,11 @@
 " Copyright:    Loggly, Inc.
 " Author:       Scott Griffin
 " Email:        scott@loggly.com
-" Last Updated: 07/15/2014
+" Last Updated: 07/23/2014
 "
 """
-from flask import Blueprint, request, render_template, url_for
+from flask                import Blueprint, render_template, request
+from law.web.subscription import rest
 
 blueprint = Blueprint( 'subscription', __name__, 
                         template_folder = '../templates',
@@ -14,10 +15,12 @@ blueprint = Blueprint( 'subscription', __name__,
 @blueprint.route( '/table' )
 def subscription_table():
     subd = request.args['subdomain']
+    data = rest.account_history( subd )
     return render_template( 'subscription_table.html', **{
-        'url': url_for( 'rest.subscription.subd_acct_history', subd=subd)
+        'data': data
     })
 
-@blueprint.route( '/' )
+
+@blueprint.route( '/login_check' )
 def index():
-    return 'hello'
+    return ''
