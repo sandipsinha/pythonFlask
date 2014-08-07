@@ -2,7 +2,7 @@
     <svg height='300px'></svg>
 </div>
 <script type='text/javascript'>
-    var c = nv.addGraph( function() {
+    nv.addGraph( function() {
         var utc_offset = new Date().getTimezoneOffset() * 60 * 1000 ;
         var chart = nv.models.stackedAreaChart()
                         .margin( {right:150} )

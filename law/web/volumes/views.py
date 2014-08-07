@@ -2,7 +2,7 @@
 " Copyright:    Loggly, Inc.
 " Author:       Scott Griffin
 " Email:        scott@loggly.com
-" Last Updated: 08/06/2014
+" Last Updated: 08/07/2014
 "
 "
 """
@@ -15,15 +15,16 @@ from scry.preprocessing import ChargedVolume, ChargedVolumeDropped
 
 cb_config = ('localhost', 7999, 0)
 cb_staging = ('localhost', 7998, 0)
+CB_BIRTH = datetime( 2014, 5, 15 )
 
 blueprint = Blueprint( 'volumes', __name__, 
                         template_folder = 'templates',
                         static_folder   = 'static' )
 
 def to_js_time( d ):
-    return int(time.mktime(d.timetuple())) * 1000 + 1
+    return int(time.mktime(d.timetuple())) * 1000
 
-def ts_to_date( date ):
+def iso8601_to_date( date ):
     if date:
         return datetime.strptime( date, '%Y-%m-%d' )
     return None
@@ -47,11 +48,11 @@ def qtime( model, subd, start, end ):
 
         return {item.date:item.bytes for item in res}
 
-@blueprint.route( '/crystalball/chart' )
-def cb_volume_graph():
+@blueprint.route( '/chart/cb/line' )
+def cb_volume_line():
     cid   = request.args['cid']
-    start = datetime.strptime( request.args['start'], '%Y-%m-%d' )
-    end   = request.args.get('end', 'now') 
+    start = iso8601_to_date( request.args.get( 'start' ) ) or CB_BIRTH
+    end   = iso8601_to_date( request.args.get( 'end' ) ) or 'now'
 
     if request.args.get('env') == 'chipper':
         cv = ChargedVolume( *cb_staging )
@@ -72,12 +73,11 @@ def cb_volume_graph():
     
     return render_template( 'chart.html', keys=keys, series=series )
 
-@blueprint.route( '/chart' )
-def volume_graph():
+@blueprint.route( '/chart/line' )
+def volume_line():
     subd  = request.args['subdomain']
-    start = ts_to_date( request.args.get( 'start' ) )
-    end   = ts_to_date( request.args.get( 'end' ) )
-
+    start = iso8601_to_date( request.args.get( 'start' ) )
+    end   = iso8601_to_date( request.args.get( 'end' ) )
 
     avols = qtime( VolumeAccepted, subd, start, end )
     dvols = qtime( VolumeDropped, subd, start, end )
@@ -90,11 +90,11 @@ def volume_graph():
     
     return render_template( 'chart.html', keys=keys, series=series )
 
-@blueprint.route( '/chart/nvd3' )
-def volume_graph_nvd3():
+@blueprint.route( '/chart/stackedarea' )
+def volume_stacked_area():
     subd  = request.args['subdomain']
-    start = ts_to_date( request.args.get( 'start' ) )
-    end   = ts_to_date( request.args.get( 'end' ) )
+    start = iso8601_to_date( request.args.get( 'start' ) )
+    end   = iso8601_to_date( request.args.get( 'end' ) )
 
     avols = qtime( VolumeAccepted, subd, start, end )
     dvols = qtime( VolumeDropped, subd, start, end )
