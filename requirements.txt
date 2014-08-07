@@ -7,3 +7,4 @@ Flask-Security==1.7.3
 Flask-SQLAlchemy==1.0
 
 -e git+git://github.com/sirsgriffin/conman.git@v0.3#egg=conman
+-e git+git://github.com/loggly/scry.git@v1.4#egg=scry
