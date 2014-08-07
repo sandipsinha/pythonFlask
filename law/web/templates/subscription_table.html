@@ -6,8 +6,10 @@ $(document).ready(function() {
     $('#sub_table').dataTable( {
         "searching": false,
         "paging": false,
+        "scrollY": "150px", 
         "order": [0, 'desc'],
         "data": {{data|tojson|safe}},
+        "bInfo": false,
         "columns": [{ 
             "title": "Date", 
             "data" : "Date", 
