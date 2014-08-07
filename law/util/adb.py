@@ -2,7 +2,7 @@
 " Copyright:    Loggly, Inc.
 " Author:       Scott Griffin
 " Email:        scott@loggly.com
-" Last Updated: 07/22/2014
+" Last Updated: 08/06/2014
 "
 """
 from contextlib import contextmanager
@@ -99,7 +99,7 @@ class VolumeAccepted( Base ):
             self.bytes)
 
 class VolumeDropped( Base ):
-    __tablename__ = 'chopper_account_volumes_denied'
+    __tablename__ = 'chopper_account_volumes_dropped'
 
     acct_id = Column( Integer, primary_key=True )
     date    = Column( 'vol_date', DateTime, primary_key=True )
