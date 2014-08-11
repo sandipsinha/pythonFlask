@@ -2,13 +2,13 @@
 " Copyright:    Loggly, Inc.
 " Author:       Scott Griffin
 " Email:        scott@loggly.com
-" Last Updated: 08/07/2014
+" Last Updated: 08/11/2014
 "
 " Flask interface for the web module
 "
 """
 from datetime            import datetime, date
-from flask               import Flask, render_template
+from flask               import Flask, url_for
 from flask.json          import JSONEncoder
 from law                 import config
 from law.web             import views, subscription, volumes
@@ -30,6 +30,7 @@ app.register_blueprint( volumes.views.blueprint, url_prefix = '/volumes' )
 app.config['SECRET_KEY']              = config.get( 'flask-security', 'secret_key' )
 app.config['SECURITY_PASSWORD_HASH']  = config.get( 'flask-security', 'password_hash' )
 app.config['SECURITY_PASSWORD_SALT']  = config.get( 'flask-security', 'password_salt' )
+app.config['SECURITY_LOGIN_USER_TEMPLATE'] = 'security/login.html'
 app.config['SECURITY_TRACKABLE']      = True
 
 app.config['SQLALCHEMY_ECHO' ]        = config.getboolean( 'lawdb', 'debug' )
