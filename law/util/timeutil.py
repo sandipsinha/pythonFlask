@@ -4,8 +4,10 @@
 " Email:        scott@loggly.com
 "
 """
-from operator import attrgetter
-from datetime import datetime
+import calendar
+from operator    import attrgetter
+from collections import defaultdict
+from datetime    import datetime, timedelta
 
 
 class Timebucket( object ):
@@ -38,38 +40,53 @@ class Timebucket( object ):
         pass
 
     def quarter( self ):
-        years         = self.end.year - self.start.year
+        """ Returns a dictionary of items that are grouped by Year-Quarter key names. """
         segmented     = {}
-        num_rows      = len( self.rows )
         segment_start = 0
-        segment_end   = 0
 
         for year in range( self.start.year, self.end.year + 1):
             for quarter in ('Q1', 'Q2', 'Q3', 'Q4'):
                 start_date = datetime( year, *self._QUARTER[quarter]['start'] )
                 end_date   = datetime( year, *self._QUARTER[quarter]['end'] )
-
                 sname      = '{}-{}'.format( year, quarter )
 
-                for i, row in enumerate( self.rows[segment_start:] ):
-                    if self._getter( row ) > end_date:
-                        segment_end = segment_start + i
-                        break
-                    elif num_rows == segment_end+1:
-                        segment_end = None
-                        break
+                segmented[sname] = []
 
-                segmented[ sname ] = self.rows[ segment_start:segment_end ]
-                segment_start = segment_end
+                for i, row in enumerate( self.rows[segment_start:], segment_start ):
+                    if self._getter( row ) >= start_date and self._getter(row) <= end_date:
+                        segmented[sname].append( row )
+                    elif self._getter( row ) > end_date:
+                        segment_start = i
+                        break
 
         return segmented
     
     def month( self ):
-        years = self.end.year - self.start.year
-        segmented = {}
+        """ Returns a dictionary of items that are grouped by date (to month granularity)
+        key names. 
+        """
+        segmented     = {}
         segment_start = 0
-        for year in range( self.start.year, years ):
-            pass
+
+        for year in range( self.start.year, self.end.year + 1):
+            start_month = datetime( year, 1, 1 ) if year != self.start.year else datetime( *self.start.timetuple()[:3] )
+            end_month   = datetime( year, 12, 31 ) if year != self.end.year else datetime( *self.end.timetuple()[:3] )
+
+            for month in range( start_month.month, end_month.month + 1 ):
+                start_date = datetime( year, month, 1 )
+                end_date   = datetime( year, month, calendar.monthrange( year, month )[-1] )
+                sname      = start_date.strftime( '%Y-%m' )
+
+                segmented[ sname ] = []
+
+                for i, row in enumerate( self.rows[segment_start:], segment_start ):
+                    if self._getter( row ) >= start_date and self._getter(row) <= end_date:
+                        segmented[ sname ].append( row )
+                    elif self._getter( row ) > end_date:
+                        segment_start = i
+                        break
+
+        return segmented
     
     def week( self ):
         pass
