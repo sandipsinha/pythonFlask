@@ -1,0 +1,10 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <script src={{ url_for( 'salesdash.static', filename='js/require.js' ) }} data-main={{ url_for( 'salesdash.static', filename='js/app' ) }} charset='utf-8'></script>
+    <link href={{ url_for( 'salesdash.static', filename='stylesheets/nv.d3.css' ) }} rel='stylesheet' type='text/css'/>
+</head>
+<body>
+    {% block content %}{% endblock %}
+</body>
+</html>
