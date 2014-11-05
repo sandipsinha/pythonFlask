@@ -2,7 +2,7 @@
 " Copyright:    Loggly, Inc.
 " Author:       Scott Griffin
 " Email:        scott@loggly.com
-" Last Updated: 08/07/2014
+" Last Updated: 08/12/2014
 "
 "
 """
@@ -111,3 +111,25 @@ def volume_stacked_area():
     })
     
     return render_template( 'area_chart.html', series=series )
+
+@blueprint.route( '/chart/stackedbar' )
+def stacked_bar():
+    subd  = request.args['subdomain']
+    start = iso8601_to_date( request.args.get( 'start' ) )
+    end   = iso8601_to_date( request.args.get( 'end' ) )
+
+    avols = qtime( VolumeAccepted, subd, start, end )
+    dvols = qtime( VolumeDropped, subd, start, end )
+    
+    keys = sorted( avols.keys() )
+    series = []
+    series.append({ 
+        'key':'allowed', 
+        'values':[(to_js_time( key ), avols[key]) for key in keys] 
+    })
+    series.append({ 
+        'key':'dropped', 
+        'values':[(to_js_time( key ), dvols.get( key, 0 )) for key in keys] 
+    })
+    
+    return render_template( 'stacked_bar.html', series=series )
