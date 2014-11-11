@@ -5,9 +5,43 @@
 "
 """
 import calendar
+import itertools
 from operator    import attrgetter
 from collections import defaultdict
 from datetime    import datetime, timedelta
+
+
+class BucketedList( dict ):
+
+    @classmethod
+    def period_set( klass, *bucketed_lists ):
+        """ Returns all period keys that exist in the supplied BucketedList list """
+        # Flatten the list and make it a set
+        return set( itertools.chain.from_iterable( [ bl.periods for bl in bucketed_lists ] ) )
+
+    def __init__( self, *args, **kwargs ):
+        super( BucketedList, self ).__init__( *args, **kwargs )
+
+    @property
+    def periods( self ):
+        return self.keys()
+
+    def period_map( self, mapfunc ):
+        """ Applies the mapfunc to the list in each bucket """
+        for period in self.periods:
+            self[period] = mapfunc(self[period])
+        
+    def fill_missing_periods( self, pset, fillval=None):
+        """ Sets period that exist in pset with the value of fillval.  If no fillval
+        is supplied then an empty list is used 
+        """
+        if fillval is None:
+            fillval = []
+
+        periods = self.periods
+        for period in pset:
+            if period not in periods:
+                self[period] = fillval
 
 
 class Timebucket( object ):
@@ -37,7 +71,7 @@ class Timebucket( object ):
         return self._getter( self.rows[-1] )
 
     def year( self ):
-        segmented     = {}
+        segmented     = BucketedList()
         segment_start = 0
 
         for year in range( self.start.year, self.end.year + 1):
@@ -58,7 +92,7 @@ class Timebucket( object ):
 
     def quarter( self ):
         """ Returns a dictionary of items that are grouped by Year-Quarter key names. """
-        segmented     = {}
+        segmented     = BucketedList()
         segment_start = 0
 
         for year in range( self.start.year, self.end.year + 1):
@@ -82,7 +116,7 @@ class Timebucket( object ):
         """ Returns a dictionary of items that are grouped by date (to month granularity)
         key names. 
         """
-        segmented     = {}
+        segmented     = BucketedList()
         segment_start = 0
 
         for year in range( self.start.year, self.end.year + 1):

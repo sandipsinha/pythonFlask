@@ -5,12 +5,77 @@
 "
 """
 import unittest
+from functools   import partial
 from collections import namedtuple
 from datetime    import datetime
 
-from law.util.timeutil import Timebucket
+from law.util.timeutil import Timebucket, BucketedList
 
 DatedItem = namedtuple( 'DatedItem', ['value', 'created'] )
+
+class TestBucketedList( unittest.TestCase ):
+
+    def test_construction( self ):
+        bl = BucketedList()
+        self.assertEqual( isinstance( bl, (dict, BucketedList) ), True )
+        
+        bl['2014'] = [1,2,3]
+        bl['2013'] = [4,5,6]
+
+        self.assertEqual( bl['2014'], [1,2,3] )
+        self.assertEqual( bl['2013'], [4,5,6] )
+
+    def test_periods( self ):
+        bl = BucketedList({
+            '2014' : [1,2,3],
+            '2013' : [4,5,6],
+        })
+
+        self.assertEqual( bl.periods, bl.keys() )
+        self.assertEqual( bl.periods, ['2014', '2013'] )
+
+    def test_get_period_set( self ):
+        bl1 = BucketedList( {'2014':[1,2], '2013':[3,4], '1999':[5,6]} )
+        bl2 = BucketedList( {'2014':[1,2], '2013':[3,4], '2011':[5,6]} )
+        pset = BucketedList.period_set( bl1, bl2 )
+
+        self.assertEqual( pset, set(( '2014', '2013', '2011', '1999' )) )
+
+    def test_period_map( self ):
+        bl1 = BucketedList( {'2014':[1,2], '2013':[3,4], '1999':[5,6]} )
+        bl1.period_map( sum )
+
+        self.assertEqual( bl1['2014'], 3 )
+        self.assertEqual( bl1['2013'], 7 )
+        self.assertEqual( bl1['1999'], 11 )
+        
+        bl1 = BucketedList( {'2014':[1,2], '2013':[3,4], '1999':[5,6]} )
+        bl1.period_map( partial( map, lambda x: x+1 ) )
+        self.assertEqual( bl1['2014'], [2,3] )
+        self.assertEqual( bl1['2013'], [4,5] )
+        self.assertEqual( bl1['1999'], [6,7] )
+
+
+    def test_fill_empty_periods( self ):
+        bl1 = BucketedList( {'2014':[1,2], '2013':[3,4], '1999':[5,6]} )
+        bl2 = BucketedList( {'2014':[1,2], '2013':[3,4], '2011':[5,6]} )
+        pset = BucketedList.period_set( bl1, bl2 )
+
+        bl1.fill_missing_periods( pset )
+        self.assertEqual( set( bl1.periods ), set(( '2014', '2013', '2011', '1999' )) )
+        self.assertEqual( bl1['2014'], [ 1, 2 ] )
+        self.assertEqual( bl1['2013'], [ 3, 4 ] )
+        self.assertEqual( bl1['2011'], [] )
+        self.assertEqual( bl1['1999'], [ 5, 6 ] )
+
+        
+        bl2.fill_missing_periods( pset, 0 )
+        self.assertEqual( set( bl2.periods ), set(( '2014', '2013', '2011', '1999' )) )
+        self.assertEqual( bl2['2014'], [ 1, 2 ] )
+        self.assertEqual( bl2['2013'], [ 3, 4 ] )
+        self.assertEqual( bl2['2011'], [ 5, 6 ] )
+        self.assertEqual( bl2['1999'], 0 )
+
 
 class TestTimebucket( unittest.TestCase ):
 
