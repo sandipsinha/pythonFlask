@@ -5,7 +5,7 @@
 //
 //
 define( ['d3', 'nvd3'], function( d3, nv ) {
-    var barChart = function( selector, data ) {
+    var barChart = function( selector, data, timestamped ) {
             return nv.addGraph(function() {
             var utc_offset = new Date().getTimezoneOffset() * 60 * 1000 ;
             var chart = nv.models.multiBarChart()
@@ -17,20 +17,24 @@ define( ['d3', 'nvd3'], function( d3, nv ) {
                         .reduceXTicks(true)
                         .rotateLabels(0)
                         .showControls(true)
+                        .tooltips(true)
                         .groupSpacing(0.1) ;
 //                        .color( ['#236B9E', '#9E5623'] ) ;
+//                        .color( ['#E5975F', '#DA5FE4', '#69E45F', '#5FACE4'] );
 
-            chart.xAxis.tickFormat( function( d ) {
-                return d3.time.format( '%Y-%m-%d' )(new Date(d + utc_offset ) ) ;
+            if( timestamped ) {
+                chart.xAxis.tickFormat( function( d ) {
+                    return d3.time.format( '%Y-%m-%d' )(new Date(d + utc_offset ) ) ;
+                });
+            } 
+
+            chart.yAxis.tickFormat( function( d ) {
+                return ' $' + d3.format( ',.2f' )( d ) ;
             });
 
-    //        chart.yAxis.tickFormat( function( d ) {
-    //            return d3.format( ',.2f' )( d / 1000 / 1000 / 1000 ) + ' GB' ;
-    //        });
-
-            chart.tooltip( function( key, x, y, e, chart ) {
-                return key + ' ' + chart.yAxis.tickFormat()( e.value ) + ' (' + e.value + ' bytes)';
-            }) ;
+//            chart.tooltip( function( key, x, y, e, chart ) {
+//                return key + chart.yAxis.tickFormat()( e.value ) ;
+//            }) ;
 
             d3.select( selector )
                 .datum( data )
