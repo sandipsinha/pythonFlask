@@ -5,7 +5,7 @@
 </div>
 <script>
 require( ['charts'], function( charts ) {
-    charts.barChart( '.chart svg', {{series|tojson|safe}} ) ;
+    charts.barChart( '.chart svg', {{series|tojson|safe}}, true ) ;
 });
 </script>
 {% endblock %}
