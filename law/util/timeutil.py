@@ -25,8 +25,8 @@ class Timebucket( object ):
         each row """
 
         self._getter = attrgetter( key )
-        self.rows   = sorted( rows, key=self._getter )
-        self.key    = key
+        self.rows    = sorted( rows, key=self._getter )
+        self.key     = key
 
     @property 
     def start(self):
@@ -37,7 +37,24 @@ class Timebucket( object ):
         return self._getter( self.rows[-1] )
 
     def year( self ):
-        pass
+        segmented     = {}
+        segment_start = 0
+
+        for year in range( self.start.year, self.end.year + 1):
+            start_date = datetime( year, 1, 1 ) if year != self.start.year else datetime( *self.start.timetuple()[:3] )
+            end_date   = datetime( year, 12, 31 ) if year != self.end.year else datetime( *self.end.timetuple()[:3] )
+            sname      = str(year)
+
+            segmented[sname] = []
+
+            for i, row in enumerate( self.rows[segment_start:], segment_start ):
+                if self._getter( row ) >= start_date and self._getter(row) <= end_date:
+                    segmented[sname].append( row )
+                elif self._getter( row ) > end_date:
+                    segment_start = i
+                    break
+
+        return segmented
 
     def quarter( self ):
         """ Returns a dictionary of items that are grouped by Year-Quarter key names. """

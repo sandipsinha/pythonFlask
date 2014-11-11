@@ -32,7 +32,47 @@ class TestTimebucket( unittest.TestCase ):
             DatedItem( 4, datetime(2014, 12, 31) )
         ])
     def test_year( self ):
-        pass
+        rows = [
+            DatedItem( 2, datetime(2014, 6, 9) ),
+        ]
+        bucketer  = Timebucket( rows, 'created' )
+        yearly = bucketer.year()
+
+        self.assertEqual( yearly['2014'], [ DatedItem( 2, datetime( 2014, 6, 9 ) ) ] )
+        
+        rows = [
+            DatedItem( 2, datetime(2014, 6, 9) ),
+            DatedItem( 3, datetime(2014, 12, 31) ),
+            DatedItem( 1, datetime(2014, 1, 1) ),
+        ]
+        bucketer  = Timebucket( rows, 'created' )
+        yearly = bucketer.year()
+
+        self.assertEqual( 
+            yearly['2014'], 
+            [ 
+              DatedItem( 1, datetime( 2014, 1, 1 ) ),
+              DatedItem( 2, datetime( 2014, 6, 9 ) ),
+              DatedItem( 3, datetime( 2014, 12, 31 ) )
+            ]
+        )
+
+        rows = [
+            DatedItem( 1, datetime(2010, 6, 9) ),
+            DatedItem( 4, datetime(2014, 12, 31) ),
+            DatedItem( 2, datetime(2012, 12, 31) ),
+            DatedItem( 3, datetime(2014, 1, 1) ),
+        ]
+        bucketer  = Timebucket( rows, 'created' )
+        yearly = bucketer.year()
+
+        self.assertEqual( yearly['2010'], [ DatedItem( 1, datetime( 2010, 6, 9 ) )] )
+        self.assertEqual( yearly['2011'], [] )
+        self.assertEqual( yearly['2012'], [ DatedItem( 2, datetime( 2012, 12, 31 ) )] )
+        self.assertEqual( yearly['2013'], [] )
+        self.assertEqual( yearly['2014'], [ DatedItem( 3, datetime( 2014, 1, 1 ) ), 
+                                            DatedItem( 4, datetime( 2014, 12, 31 ) ), 
+                                        ] )
 
     def test_quarter( self ):
         rows = [
