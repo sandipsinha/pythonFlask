@@ -55,6 +55,18 @@ class TestBucketedList( unittest.TestCase ):
         self.assertEqual( bl1['2013'], [4,5] )
         self.assertEqual( bl1['1999'], [6,7] )
 
+    def test_extend( self ):
+        bl1 = BucketedList( {'2014':[1,2], '2013':[3,4], '1999':[5,6]} )
+        bl2 = BucketedList( {'2014':[1,2], '2013':[3,4], '2011':[5,6]} )
+
+        bl1.extend( bl2 )
+
+        self.assertEqual( bl1, {
+            '2014':[1,2,1,2],
+            '2013':[3,4,3,4],
+            '2011':[5,6],
+            '1999':[5,6],
+        })
 
     def test_fill_empty_periods( self ):
         bl1 = BucketedList( {'2014':[1,2], '2013':[3,4], '1999':[5,6]} )

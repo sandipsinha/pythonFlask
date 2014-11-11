@@ -43,6 +43,15 @@ class BucketedList( dict ):
             if period not in periods:
                 self[period] = fillval
 
+    def extend( self, bucketed_list ):
+        for period in bucketed_list.periods:
+            if period in self:
+                self[period].extend( list( bucketed_list[period] ) )
+            else:
+                self[period] = list( bucketed_list[period] )
+
+        return self
+
 
 class Timebucket( object ):
     """ Performs datetime based segmentation of the dataset """
