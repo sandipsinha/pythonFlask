@@ -266,7 +266,14 @@ class TestTimebucket( unittest.TestCase ):
         self.assertEqual( monthed['2014-12'], [ DatedItem( 4, datetime( 2014, 12, 31 ) ) ] )
 
     def test_week( self ):
-        pass
+        rows = [
+            DatedItem( 2, datetime(2014, 6, 9) ),
+        ]
+        bucketer  = Timebucket( rows, 'created' )
+        week = bucketer.week()
+        
+        self.assertEqual( week['2014-W24'], [ DatedItem( 2, datetime( 2014, 6, 9 ) ) ] )
+
 
     def test_day( self ):
         pass
