@@ -13,9 +13,10 @@ define( ['d3', 'nvd3'], function( d3, nv ) {
                         .x( function(d) { return d[0] })
                         .y( function(d) { return d[1] })
                         .rightAlignYAxis(true) 
-                        .transitionDuration(350)
+                        .transitionDuration(150)
                         .reduceXTicks(true)
                         .rotateLabels(0)
+                        .stacked( true )
                         .showControls(true)
                         .tooltips(true)
                         .groupSpacing(0.1) ;
