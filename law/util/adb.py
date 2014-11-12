@@ -2,7 +2,7 @@
 " Copyright:    Loggly, Inc.
 " Author:       Scott Griffin
 " Email:        scott@loggly.com
-" Last Updated: 11/10/2014
+" Last Updated: 11/11/2014
 "
 """
 from contextlib import contextmanager
@@ -68,6 +68,10 @@ class AccountState( Base ):
     tPlan     = relationship("Tier", 
                              lazy='joined',
                              backref=backref("AAWSC", uselist=False))
+
+    @property
+    def rate_delta( self ):
+        return self.tRate - self.fRate 
 
     def __repr__(self):
         return "<AccountState({},{})>".format(
@@ -174,3 +178,5 @@ def session_context():
         raise
     finally:
         session.close()
+
+
