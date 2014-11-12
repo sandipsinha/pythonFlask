@@ -7,14 +7,13 @@
 import random
 from datetime    import datetime, timedelta
 from operator    import attrgetter
-from collections import defaultdict
+from collections import OrderedDict
 from functools   import partial
 
-from flask               import Blueprint, render_template, request
-from sqlalchemy          import and_, or_
+from flask               import Blueprint, render_template, request, jsonify
 from law.util.conversion import to_js_time
-from law.util.timeutil   import Timebucket
-from law.util.adb        import session_context, AccountState, Owners
+from law.util.timeutil   import Timebucket, BucketedList
+from law.util.queries    import query_state, QueryOwners
 
 blueprint = Blueprint( 'salesdash', __name__, 
                         template_folder = 'templates',
@@ -58,87 +57,35 @@ def chartest():
     })
     return render_template( 'sum_mrr.html', series=series )
 
-def fill_empty_periods( fillval, *args ):
-    """ This makes sure that all dictionaries supplied in args contain the same
-    keys.  If a key is missing then it will be inserted and fillval will be used
-    as it's value.  This function MUTATES the supplied args values in place.
-    """
-    period_lists = [set( periods.keys() ) for periods in args]
-    periods = set()
-    for period_set in period_lists:
-        periods = periods.union( period_set )
 
-    for period in periods:
-        for arg in args:
-            if period not in arg:
-                arg[period]=fillval
-   
-zero_empty_periods = partial( fill_empty_periods, 0 )
-
-def sum_periods( periods, value_prop ):
-    sums = {}
-    for period in periods:
-        sums[ period ] = sum(( getattr( entry, value_prop, 0 ) for entry in periods[period] ))
-
-    return sums
+#def sum_periods( value_prop, periods ):
+#    sums = {}
+#    for period in periods:
+#        sums[ period ] = sum(( getattr( entry, value_prop, 0 ) for entry in periods[period] ))
+#
+#    return sums
+#    
+#def sum_periods_delta( base_prop, delta_prop, periods ):
+#    sums = {}
+#    for period in periods:
+#        sums[ period ] = sum(( getattr( entry, base_prop, 0 ) - getattr( entry, delta_prop, 0 ) for entry in periods[period] ))
+#
+#    return sums
     
-def sum_periods_delta( periods, base_prop, delta_prop ):
-    sums = {}
-    for period in periods:
-        sums[ period ] = sum(( getattr( entry, base_prop, 0 ) - getattr( entry, delta_prop, 0 ) for entry in periods[period] ))
+def sum_states( value_prop, items ):
+    return sum(( getattr( entry, value_prop, 0 ) for entry in items ))
 
-    return sums
+sum_rate         = partial( sum_states, 'tRate' ) 
+sum_rate_change  = partial( sum_states, 'rate_delta' )
 
-class QueryOwners(object):
+query_newbiz     = partial( query_state, ['CTP', '%WP'] )
+query_lostbiz    = partial( query_state, ['%WF'] )
+query_upsell     = partial( query_state, ['%WU'] )
+query_downgrades = partial( query_state, ['%WD'] )
 
-    def __init__( self, states, start, end, owners=None ):
-        self.states = states
-        self.start  = start
-        self.end    = end
-        self.names  = owners
-
-    def _query_owners( self, states, start, end, owners=None):
-        with session_context() as s:
-            subq = state_query( s, states, start, end ).subquery()
-            q = s.query( Owners, subq )\
-                .join( subq, and_( Owners.acct_id == subq.c.acct_id,
-                                    subq.c.updated >= Owners.start_date,
-                                    subq.c.updated <  Owners.end_date ))
-
-            # If we're only querying for specific users then apply the or'd constraints
-            if owners != None:
-                q.filter( reduce( lambda query, func: query | func, [ Owners.owner == owner for owner in owners] ) ) \
-
-            subs = q.all()
-            s.expunge_all()
-
-        return subs
-
-    @property
-    def subs( self ):
-        return self._query_owners( self.states, self.start, self.end, self.names )
-
-    @property
-    def owners( self ):
-        owners = defaultdict( list )
-        for row in self.subs:
-            owners[ row.Owners.owner ].append( row )
-
-        return owners
-
-    def bucketed( self, bucket ):
-        bucket_func = attrgetter( bucket )
-
-        owners = self.owners
-        for name in owners:
-            owners[name] = bucket_func( Timebucket( owners[name], 'updated' ) )()
-
-        return owners
-
-
-@blueprint.route( '/mrr' )
-def mrr():
-    start = datetime( 2013, 9, 1 )
+def _mrr():
+#    start = datetime( 2013, 9, 1 )
+    start = datetime( 2014, 6, 1 )
     end   = datetime( 2014, 12, 31 )
     
     bucket = request.args.get( 'bucketed', 'quarter' )
@@ -146,79 +93,84 @@ def mrr():
 
     # This will essentially zero any periods that do not exist but are in our
     # time range of the other series
-    fill_empty_periods( [], *[owners[name] for name in owners] )
+    pset = BucketedList.period_set( *owners.values() )
+    map( lambda bl: bl.fill_missing_periods( pset ), owners.values() )
+
+    # Used as a map across bucketed lists to sum each period
+    sum_to_rate = partial( sum_states, 'trate' )
 
     series = []
     for name in owners:
-        rows = owners[name]
-        sum_newbiz = sum_periods( rows, 'trate' )
+        bucketed_list = owners[name]
+        bucketed_list.period_map( sum_to_rate )
         series.append({
             'key'    : name,
-            'values' : [ (key, sum_newbiz[key]) for key in sorted( sum_newbiz ) ],
+            'values' : [ (key, bucketed_list[key]) for key in sorted( bucketed_list ) ],
         })
+
+    return series
    
+@blueprint.route( '/apiv1/mrr' )
+def api_mrr():
+    series = _mrr()
+    return jsonify({'series':series})
+
+@blueprint.route( '/mrr' )
+def mrr():
+    series = _mrr()
     return render_template( 'upsell_newbiz.html', series=series )
-   
-def state_query( s, states, start, end ):
-    # operator | or's the states together ( | is overloaded in SQLAlchemy query construction)
-    q = s.query( AccountState ) \
-         .filter( AccountState.updated >= start ) \
-         .filter( AccountState.updated <= end ) \
-         .filter( reduce( lambda query, func: query | func, [ AccountState.state.like( state ) for state in states] ) ) \
 
-    return q
-
-def query_state( states, start, end ):
-    with session_context() as s:
-        subs = state_query( s, states, start, end ).all()
-        s.expunge_all()
-    return subs
-
-query_newbiz     = partial( query_state, ['CTP', '%WP'] )
-query_lostbiz    = partial( query_state, ['%WF'] )
-query_upsell     = partial( query_state, ['%WU'] )
-query_downgrades = partial( query_state, ['%WD'] )
-
-@blueprint.route( '/newbiz_plus_upsell' )
-def new_biz_plus_upsell():
+def _new_biz_plus_upsell():
+#    start = datetime( 2013, 9, 1 )
     start = datetime( 2014, 1, 1 )
     end   = datetime( 2014, 12, 31 )
 
     bucket_func = attrgetter( request.args.get( 'bucketed', 'quarter' ) )
-
     
     newbiz     = query_upsell( start, end )
-    sum_newbiz = sum_periods( bucket_func( Timebucket( newbiz, 'updated' ) )(), 'tRate' )
+    sum_newbiz = bucket_func( Timebucket( newbiz, 'updated' ) )()
     
     upsell     = query_newbiz( start, end )
-    sum_upsell = sum_periods_delta( bucket_func( Timebucket( upsell, 'updated' ) )(), 'tRate', 'fRate' )
-
+    sum_upsell = bucket_func( Timebucket( upsell, 'updated' ) )()
     
     downgrade      = query_downgrades( start, end )
-    sum_downgrades = sum_periods( bucket_func( Timebucket( downgrade, 'updated' ) )(), 'tRate' )
+    sum_downgrades = bucket_func( Timebucket( downgrade, 'updated' ) )()
     
-    lostbiz        = query_lostbiz( start, end )
-    sum_lostbiz    = sum_periods_delta( bucket_func( Timebucket( lostbiz, 'updated' ) )(), 'fRate', 'tRate' )
+    lostbiz     = query_lostbiz( start, end )
+    sum_lostbiz = bucket_func( Timebucket( lostbiz, 'updated' ) )()
+
+    bucketed_lists = OrderedDict({
+        'newbiz'    : sum_newbiz, 
+        'upsell'    : sum_upsell, 
+        'downgrades': sum_downgrades, 
+        'lostbiz'   : sum_lostbiz 
+    })
+
+    # Make all bucketed list contain a single value summation of their rate change
+    for bl in bucketed_lists.values():
+        bl.period_map( sum_rate_change )
 
     # Zero out any bucketed timeperiod that does not have a key that the other bucketed periods do
-    fill_empty_periods( [], *[ sum_newbiz, sum_upsell, sum_downgrades, sum_lostbiz] )
+    pset = BucketedList.period_set( *(bucketed_lists.values()) )
+    map( lambda bl: bl.fill_missing_periods( pset ), bucketed_lists.values() )
 
     series = []
-    series.append({
-        'key'    : 'Upsell',
-        'values' : [ (key, sum_upsell[key]) for key in sorted( sum_upsell ) ],
-    })
-    series.append({
-        'key'    : 'Newbiz',
-        'values' : [ (key, sum_newbiz[key]) for key in sorted( sum_newbiz ) ],
-    })
-    series.append({
-        'key'    : 'Downgrades',
-        'values' : [ (key, -sum_downgrades[key]) for key in sorted( sum_downgrades ) ],
-    })
-    series.append({
-        'key'    : 'Lostbiz',
-        'values' : [ (key, -sum_lostbiz[key]) for key in sorted( sum_lostbiz ) ],
-    })
 
+    for name, bl in bucketed_lists.items():
+        series.append({
+            'key'    : name,
+            'values' : [ (key, bl[key]) for key in sorted( bl ) ],
+        })
+
+    return series
+
+@blueprint.route( '/apiv1/newbiz_plus_upsell' )
+def api_new_biz_plus_upsell():
+    series = _new_biz_plus_upsell()
+    return jsonify( {'series':series} )
+
+@blueprint.route( '/newbiz_plus_upsell' )
+def new_biz_plus_upsell():
+    series = _new_biz_plus_upsell()
     return render_template( 'upsell_newbiz.html', series=series )
+
