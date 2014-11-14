@@ -9,7 +9,7 @@ from functools   import partial
 from collections import namedtuple
 from datetime    import datetime
 
-from law.util.timeutil import Timebucket, BucketedList
+from law.util.timeutil import Timebucket, BucketedList, iso8601_to_dt
 
 DatedItem = namedtuple( 'DatedItem', ['value', 'created'] )
 
@@ -277,3 +277,13 @@ class TestTimebucket( unittest.TestCase ):
 
     def test_day( self ):
         pass
+
+class TestISO8601( unittest.TestCase ):
+
+    def test_iso8601_to_dt( self ):
+        self.assertEqual( iso8601_to_dt( '2014-04-08' ),          datetime( 2014, 4, 8 ) )
+        self.assertEqual( iso8601_to_dt( '2014-04-08T01' ),       datetime( 2014, 4, 8, 1 ) )
+        self.assertEqual( iso8601_to_dt( '2014-04-08T01:02' ),    datetime( 2014, 4, 8, 1, 2 ) )
+        self.assertEqual( iso8601_to_dt( '2014-04-08T01:02:03' ), datetime( 2014, 4, 8, 1, 2, 3 ) )
+
+

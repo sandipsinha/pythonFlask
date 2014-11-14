@@ -10,6 +10,25 @@ from operator    import attrgetter
 from collections import defaultdict
 from datetime    import datetime, timedelta
 
+def iso8601_to_dt( iso_8601 ):
+    """ Timzone unaware ISO8601 parsing """
+    time_comps = tuple()
+    if 'T' in iso_8601:
+        date_part, time_part = iso_8601.split( 'T' )
+        
+        #timezone exists
+        if 'Z' in time_part:
+            time_part, timezone  = time_part.split( 'Z' )
+
+        time_comps = map( int, time_part.split( ':' ) )
+    else:
+        date_part = iso_8601
+        
+    date_comps = map( int, date_part.split( '-' ) )
+
+    timetuple = tuple( date_comps ) + tuple( time_comps )
+
+    return datetime( *timetuple )
 
 class BucketedList( dict ):
 

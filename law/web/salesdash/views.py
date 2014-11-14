@@ -5,72 +5,33 @@
 "
 """
 import random
+import calendar
 from datetime    import datetime, timedelta
 from operator    import attrgetter
 from collections import OrderedDict
 from functools   import partial
 
-from flask               import Blueprint, render_template, request, jsonify
+from flask               import Blueprint, render_template, request, jsonify, url_for
 from law.util.conversion import to_js_time
-from law.util.timeutil   import Timebucket, BucketedList
+from law.util.timeutil   import Timebucket, BucketedList, iso8601_to_dt
 from law.util.queries    import query_state, QueryOwners
 
 blueprint = Blueprint( 'salesdash', __name__, 
                         template_folder = 'templates',
                         static_folder   = 'static' )
 
+TODAY         = datetime.today()
+DEFAULT_START = datetime( TODAY.year, 1, 1 ).strftime( '%Y-%m-%d' )
+DEFAULT_END   = datetime( TODAY.year, TODAY.month, calendar.monthrange(TODAY.year, TODAY.month)[-1] )\
+                .strftime( '%Y-%m-%d' )
 
 @blueprint.route( '/' )
 def index():
     return 'Yep, you found it'
 
-def random_values( numvals ):
-    start = datetime( 2014, 4, 8 )
-    keys = {}
-    for i in range( numvals ):
-        keys[ start + timedelta( days=i ) ] = random.randint( 0, 100 ) * i
-
-    return keys
-
-@blueprint.route( '/chartest' )
-def chartest():
-    series = []
-    keys = random_values( 40 )
-    series.append({
-        'key'    : 'Travis',
-        'values' : [(to_js_time( key ),  keys[key] ) for key in sorted( keys )]
-    })
-    keys = random_values( 40 )
-    series.append({
-        'key'    : 'Angela',
-        'values' : [(to_js_time( key ),  keys[key] ) for key in sorted( keys )]
-    })
-    keys = random_values( 40 )
-    series.append({
-        'key'    : 'Stephanie',
-        'values' : [(to_js_time( key ),  keys[key] ) for key in sorted( keys )]
-    })
-    keys = random_values( 40 )
-    series.append({
-        'key'    : 'Kati',
-        'values' : [(to_js_time( key ),  keys[key] ) for key in sorted( keys )]
-    })
-    return render_template( 'sum_mrr.html', series=series )
-
-
-#def sum_periods( value_prop, periods ):
-#    sums = {}
-#    for period in periods:
-#        sums[ period ] = sum(( getattr( entry, value_prop, 0 ) for entry in periods[period] ))
-#
-#    return sums
-#    
-#def sum_periods_delta( base_prop, delta_prop, periods ):
-#    sums = {}
-#    for period in periods:
-#        sums[ period ] = sum(( getattr( entry, base_prop, 0 ) - getattr( entry, delta_prop, 0 ) for entry in periods[period] ))
-#
-#    return sums
+@blueprint.route( '/slider' )
+def test_slider():
+    return render_template( 'slider.html', start='2014-04-08', end='2014-09-01' )
     
 def sum_states( value_prop, items ):
     return sum(( getattr( entry, value_prop, 0 ) for entry in items ))
@@ -83,11 +44,7 @@ query_lostbiz    = partial( query_state, ['%WF'] )
 query_upsell     = partial( query_state, ['%WU'] )
 query_downgrades = partial( query_state, ['%WD'] )
 
-def _mrr():
-#    start = datetime( 2013, 9, 1 )
-    start = datetime( 2014, 6, 1 )
-    end   = datetime( 2014, 12, 31 )
-    
+def _mrr( start, end ):
     bucket = request.args.get( 'bucketed', 'quarter' )
     owners = QueryOwners( ['CTP','FWP'], start, end, owners=None ).bucketed( bucket )
 
@@ -112,18 +69,26 @@ def _mrr():
    
 @blueprint.route( '/apiv1/mrr' )
 def api_mrr():
-    series = _mrr()
+    start = iso8601_to_dt( request.args.get( 'start', DEFAULT_START) )
+    end   = iso8601_to_dt( request.args.get( 'end', DEFAULT_END) )
+    series = _mrr( start, end )
     return jsonify({'series':series})
 
 @blueprint.route( '/mrr' )
 def mrr():
-    series = _mrr()
-    return render_template( 'upsell_newbiz.html', series=series )
+    start = iso8601_to_dt( request.args.get( 'start', DEFAULT_START) )
+    end   = iso8601_to_dt( request.args.get( 'end', DEFAULT_END) )
 
-def _new_biz_plus_upsell():
-#    start = datetime( 2013, 9, 1 )
-    start = datetime( 2014, 1, 1 )
-    end   = datetime( 2014, 12, 31 )
+    series = _mrr( start, end )
+    return render_template( 
+        'upsell_newbiz.html', 
+        series=series, 
+        data_url=url_for( '.api_mrr' ),
+        start=start, 
+        end=end 
+    )
+
+def _new_biz_plus_upsell( start, end ):
 
     bucket_func = attrgetter( request.args.get( 'bucketed', 'quarter' ) )
     
@@ -133,17 +98,17 @@ def _new_biz_plus_upsell():
     upsell     = query_newbiz( start, end )
     sum_upsell = bucket_func( Timebucket( upsell, 'updated' ) )()
     
-    downgrade      = query_downgrades( start, end )
-    sum_downgrades = bucket_func( Timebucket( downgrade, 'updated' ) )()
-    
-    lostbiz     = query_lostbiz( start, end )
-    sum_lostbiz = bucket_func( Timebucket( lostbiz, 'updated' ) )()
+#    downgrade      = query_downgrades( start, end )
+#    sum_downgrades = bucket_func( Timebucket( downgrade, 'updated' ) )()
+#    
+#    lostbiz     = query_lostbiz( start, end )
+#    sum_lostbiz = bucket_func( Timebucket( lostbiz, 'updated' ) )()
 
     bucketed_lists = OrderedDict({
-        'newbiz'    : sum_newbiz, 
         'upsell'    : sum_upsell, 
-        'downgrades': sum_downgrades, 
-        'lostbiz'   : sum_lostbiz 
+        'newbiz'    : sum_newbiz, 
+#        'downgrades': sum_downgrades, 
+#        'lostbiz'   : sum_lostbiz 
     })
 
     # Make all bucketed list contain a single value summation of their rate change
@@ -164,13 +129,25 @@ def _new_biz_plus_upsell():
 
     return series
 
-@blueprint.route( '/apiv1/newbiz_plus_upsell' )
+@blueprint.route( '/apiv1/newbiz+upsell' )
 def api_new_biz_plus_upsell():
-    series = _new_biz_plus_upsell()
+    start = iso8601_to_dt( request.args.get( 'start', DEFAULT_START) )
+    end   = iso8601_to_dt( request.args.get( 'end', DEFAULT_END) )
+
+    series = _new_biz_plus_upsell( start, end )
     return jsonify( {'series':series} )
 
-@blueprint.route( '/newbiz_plus_upsell' )
+@blueprint.route( '/newbiz+upsell' )
 def new_biz_plus_upsell():
-    series = _new_biz_plus_upsell()
-    return render_template( 'upsell_newbiz.html', series=series )
+    start = iso8601_to_dt( request.args.get( 'start', DEFAULT_START) )
+    end   = iso8601_to_dt( request.args.get( 'end', DEFAULT_END) )
+
+    series = _new_biz_plus_upsell( start, end )
+    return render_template( 
+            'upsell_newbiz.html', 
+            series=series, 
+            data_url=url_for( '.api_new_biz_plus_upsell' ),
+            start=start, 
+            end=end 
+    )
 
