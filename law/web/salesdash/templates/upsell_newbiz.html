@@ -1,11 +1,21 @@
 {% extends 'base.html' %}
 {% block content %}
+<div class='slider' style='margin-left: auto; margin-right: auto; width: 90%;'></div>
 <div class='chart' width='90%'>
     <svg height='300px'></svg>
 </div>
 <script>
-require( ['charts'], function( charts ) {
-    charts.barChart( '.chart svg', {{series|tojson|safe}} ) ;
+require( ['charts', 'slider'], function( charts, slider ) {
+    ds = slider.dateSlider( '.slider', '{{start}}', '{{end}}' ) ;
+    charts.barChart( 
+        '.chart svg', 
+        {{series|tojson|safe}}, 
+        { 
+            dateSlider: ds, 
+            timeBuckets: ['day','week','month','quarter','year'],
+            dataUrl: '{{data_url}}' 
+        } 
+    ) ;
 });
 </script>
 {% endblock %}
