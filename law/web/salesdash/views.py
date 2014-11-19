@@ -14,7 +14,7 @@ from functools   import partial
 from flask               import Blueprint, render_template, request, jsonify, url_for
 from law.util.conversion import to_js_time
 from law.util.timeutil   import Timebucket, BucketedList, iso8601_to_dt
-from law.util.queries    import query_state, QueryOwners
+from law.util.queries    import query_state, query_product_state, QueryOwners
 
 blueprint = Blueprint( 'salesdash', __name__, 
                         template_folder = 'templates',
@@ -25,14 +25,14 @@ DEFAULT_START = datetime( TODAY.year, 1, 1 ).strftime( '%Y-%m-%d' )
 DEFAULT_END   = datetime( TODAY.year, TODAY.month, calendar.monthrange(TODAY.year, TODAY.month)[-1] )\
                 .strftime( '%Y-%m-%d' )
 
-@blueprint.route( '/' )
-def index():
-    return 'Yep, you found it'
 
 @blueprint.route( '/slider' )
 def test_slider():
     return render_template( 'slider.html', start='2014-04-08', end='2014-09-01' )
     
+def sum_delta( value_prop1, value_prop2, items ):
+    return sum(( getattr( entry, value_prop1, 0 ) - getattr( entry, value_prop2, 0 ) for entry in items ))
+
 def sum_states( value_prop, items ):
     return sum(( getattr( entry, value_prop, 0 ) for entry in items ))
 
@@ -44,9 +44,14 @@ query_lostbiz    = partial( query_state, ['%WF'] )
 query_upsell     = partial( query_state, ['%WU'] )
 query_downgrades = partial( query_state, ['%WD'] )
 
+query_std_newbiz = partial( query_product_state, ['CTP', '%WP'], ['development'] )
+query_std_upsell = partial( query_product_state, ['%WU'], ['development'] )
+query_pro_newbiz = partial( query_product_state, ['CTP', '%WP'], ['production'] )
+query_pro_upsell = partial( query_product_state, ['%WU'], ['production'] )
+
 def _mrr( start, end ):
     bucket = request.args.get( 'bucketed', 'quarter' )
-    owners = QueryOwners( ['CTP','FWP'], start, end, owners=None ).bucketed( bucket )
+    owners = QueryOwners( ['CTP', '%WP', '%WU'], start, end, owners=None ).bucketed( bucket )
 
     # This will essentially zero any periods that do not exist but are in our
     # time range of the other series
@@ -54,12 +59,16 @@ def _mrr( start, end ):
     map( lambda bl: bl.fill_missing_periods( pset ), owners.values() )
 
     # Used as a map across bucketed lists to sum each period
-    sum_to_rate = partial( sum_states, 'trate' )
+#    sum_to_rate = partial( sum_delta, 'trate' )
+    sum_rate_delta= partial( sum_delta, 'trate', 'frate' )
+#    states = partial( map, lambda x: x[1] ) 
 
     series = []
     for name in owners:
         bucketed_list = owners[name]
-        bucketed_list.period_map( sum_to_rate )
+        bucketed_list.period_map( sum_rate_delta )
+#        bucketed_list.period_map( states )
+#        bucketed_list.period_map( sum_rate_change )
         series.append({
             'key'    : name,
             'values' : [ (key, bucketed_list[key]) for key in sorted( bucketed_list ) ],
@@ -104,12 +113,10 @@ def _new_biz_plus_upsell( start, end ):
 #    lostbiz     = query_lostbiz( start, end )
 #    sum_lostbiz = bucket_func( Timebucket( lostbiz, 'updated' ) )()
 
-    bucketed_lists = OrderedDict({
-        'upsell'    : sum_upsell, 
-        'newbiz'    : sum_newbiz, 
-#        'downgrades': sum_downgrades, 
-#        'lostbiz'   : sum_lostbiz 
-    })
+    bucketed_lists = OrderedDict((
+        ('newbiz',  sum_newbiz),
+        ('upsell',  sum_upsell),
+    ))
 
     # Make all bucketed list contain a single value summation of their rate change
     for bl in bucketed_lists.values():
