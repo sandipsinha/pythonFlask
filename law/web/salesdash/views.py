@@ -158,3 +158,81 @@ def new_biz_plus_upsell():
             end=end 
     )
 
+def _product_mrr( start, end ):
+
+    bucket_func = attrgetter( request.args.get( 'bucketed', 'quarter' ) )
+    
+    std_newbiz     = query_std_newbiz( start, end )
+    std_sum_newbiz = bucket_func( Timebucket( std_newbiz, 'updated' ) )()
+    
+    std_upsell     = query_std_upsell( start, end )
+    std_sum_upsell = bucket_func( Timebucket( std_upsell, 'updated' ) )()
+    
+    pro_newbiz     = query_pro_newbiz( start, end )
+    pro_sum_newbiz = bucket_func( Timebucket( pro_newbiz, 'updated' ) )()
+    
+    pro_upsell     = query_pro_upsell( start, end )
+    pro_sum_upsell = bucket_func( Timebucket( pro_upsell, 'updated' ) )()
+
+    bucketed_lists = OrderedDict((
+        ('dev newbiz',  std_sum_newbiz), 
+        ('dev upsell',  std_sum_upsell), 
+        ('pro newbiz',  pro_sum_newbiz),
+        ('pro upsell',  pro_sum_upsell), 
+    ))
+
+    # Make all bucketed list contain a single value summation of their rate change
+    for bl in bucketed_lists.values():
+        bl.period_map( sum_rate_change )
+
+    # Zero out any bucketed timeperiod that does not have a key that the other bucketed periods do
+    pset = BucketedList.period_set( *(bucketed_lists.values()) )
+    map( lambda bl: bl.fill_missing_periods( pset ), bucketed_lists.values() )
+
+    series = []
+
+    for name, bl in bucketed_lists.items():
+        series.append({
+            'key'    : name,
+            'values' : [ (key, bl[key]) for key in sorted( bl ) ],
+        })
+
+    return series
+
+@blueprint.route( '/apiv1/product_mrr' )
+def api_product_mrr():
+    start = iso8601_to_dt( request.args.get( 'start', DEFAULT_START) )
+    end   = iso8601_to_dt( request.args.get( 'end', DEFAULT_END) )
+
+    series = _product_mrr( start, end )
+    return jsonify( {'series':series} )
+
+@blueprint.route( '/product_mrr' )
+def product_mrr():
+    start = iso8601_to_dt( request.args.get( 'start', DEFAULT_START) )
+    end   = iso8601_to_dt( request.args.get( 'end', DEFAULT_END) )
+
+    series = _product_mrr( start, end )
+    return render_template( 
+            'upsell_newbiz.html', 
+            series=series, 
+            data_url=url_for( '.api_product_mrr' ),
+            start=start, 
+            end=end 
+    )
+
+
+@blueprint.route( '/' )
+@blueprint.route( '/salesdash' )
+def salesdash():
+    start = iso8601_to_dt( request.args.get( 'start', DEFAULT_START) )
+    end   = iso8601_to_dt( request.args.get( 'end', DEFAULT_END) )
+
+    return render_template( 
+            'dashboard.html', 
+            start=start, 
+            end=end,
+            upsell_newbiz_data_url=url_for( '.api_new_biz_plus_upsell' ),
+            mrr_data_url=url_for( '.api_mrr' ),
+            product_mrr_data_url=url_for( '.api_product_mrr' ),
+    )
