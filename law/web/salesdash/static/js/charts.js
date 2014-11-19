@@ -23,7 +23,7 @@ define( ['jquery', 'd3', 'nvd3'], function( $, d3, nv ) {
 //                           .color( ['#236B9E', '#9E5623'] ) ;
 //                           .color( ['#E5975F', '#DA5FE4', '#69E45F', '#5FACE4'] );
         var _dataUrl   = config.dataUrl ;
-        var _d3Obj     = null;
+        var _selector  = selector;
         var _bucketed  = 'quarter' ;
         var _start     = null;
         var _end       = null;
@@ -38,32 +38,24 @@ define( ['jquery', 'd3', 'nvd3'], function( $, d3, nv ) {
             return ' $' + d3.format( ',.2f' )( d ) ;
         });
 
-        // Set the data for the chart and render
-        _d3Obj = d3.select( selector )
-                   .datum( data )
-                   .call(_chart);
         
-        // Bind the D3 data store to this chart object for easy updating
-//        _chart.datum = function( data ) {
-//            d3Obj.datum( data );
-//            return _chart
-//        }
-
         nv.utils.windowResize(_chart.update);
         nv.addGraph(function() { return _chart } ) ;
 
         if( config.timeBuckets ) {
-            var buttons = $( '<div id="bucket-control" align="center"></div>' )
+            var namespace = _selector.split( ' ' )[0]
+            var buttons = $( '<div align="center"></div>' )
 
             $( config.timeBuckets ).each( function( i, val ) {
                 var html ;
-                if( _bucketed === val ) { 
-                     html = '<input type="radio" data-bucket="' + val + '" id="' + val + '" name="project" checked="checked">' ;
-                } else {
-                     html = '<input type="radio" data-bucket="' + val + '" id="' + val + '" name="project">' ;
+                var ns_id = namespace + '_' + val ;
+                html = '<input type="radio" data-bucket="' + val + '" id="' + ns_id + '" name="' + namespace + '">' +
+                       '<label for="' + ns_id + '">' + val + '</label>' ;
+                var node = $( html ) ;
+                if( _bucketed === val ) {
+                    node.attr( 'checked', 'checked' );
                 }
-                html += '<label for="' + val + '">' + val + '</label>' ;
-                $( buttons ).append( html );
+                $( buttons ).append( node );
             });
 
             buttons.buttonset()
@@ -98,13 +90,28 @@ define( ['jquery', 'd3', 'nvd3'], function( $, d3, nv ) {
                 if( error ) {
                     return;
                 }
-                _d3Obj.datum(json.series) ;
+                d3.select( _selector )
+                  .datum( json.series )
+                  .call(_chart);
                 _chart.update() ;
-//                _start = json.series[0][0] ;
-//                _end   = json.series[0][0] ;
             });
         };
                 
+        if( data !== null ) {
+            // Set the data for the chart and render
+            _d3Obj = d3.select( selector )
+                    .datum( data )
+                    .call(_chart);
+        } else if( config.dataUrl ) {
+            // If no data was supplied then try to do the initial load from
+            // the data url.
+            updatePeriod( _start, _end, _bucketed ) ;
+        } else {
+            _d3Obj = d3.select( selector )
+                    .datum( [] )
+                    .call(_chart);
+        }
+
    
         return {
             updatePeriod : updatePeriod,
