@@ -28,7 +28,7 @@ DEFAULT_END   = datetime( TODAY.year, TODAY.month, calendar.monthrange(TODAY.yea
 
 @blueprint.route( '/slider' )
 def test_slider():
-    return render_template( 'slider.html', start='2014-04-08', end='2014-09-01' )
+    return render_template( 'salesdash/slider.html', start='2014-04-08', end='2014-09-01' )
     
 def sum_delta( value_prop1, value_prop2, items ):
     return sum(( getattr( entry, value_prop1, 0 ) - getattr( entry, value_prop2, 0 ) for entry in items ))
@@ -90,7 +90,7 @@ def mrr():
 
     series = _mrr( start, end )
     return render_template( 
-        'upsell_newbiz.html', 
+        'salesdash/upsell_newbiz.html', 
         series=series, 
         data_url=url_for( '.api_mrr' ),
         start=start, 
@@ -151,7 +151,7 @@ def new_biz_plus_upsell():
 
     series = _new_biz_plus_upsell( start, end )
     return render_template( 
-            'upsell_newbiz.html', 
+            'salesdash/upsell_newbiz.html', 
             series=series, 
             data_url=url_for( '.api_new_biz_plus_upsell' ),
             start=start, 
@@ -214,7 +214,7 @@ def product_mrr():
 
     series = _product_mrr( start, end )
     return render_template( 
-            'upsell_newbiz.html', 
+            'salesdash/upsell_newbiz.html', 
             series=series, 
             data_url=url_for( '.api_product_mrr' ),
             start=start, 
@@ -229,7 +229,7 @@ def salesdash():
     end   = iso8601_to_dt( request.args.get( 'end', DEFAULT_END) )
 
     return render_template( 
-            'dashboard.html', 
+            'salesdash/dashboard.html', 
             start=start, 
             end=end,
             upsell_newbiz_data_url=url_for( '.api_new_biz_plus_upsell' ),

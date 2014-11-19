@@ -2,7 +2,7 @@
 " Copyright:    Loggly, Inc.
 " Author:       Scott Griffin
 " Email:        scott@loggly.com
-" Last Updated: 08/12/2014
+" Last Updated: 11/19/2014
 "
 "
 """
@@ -71,7 +71,7 @@ def cb_volume_line():
     series.append( ['total'] + [(avols[key] + dvols[key]) for key in keys] )
     keys = [key.strftime( '%Y-%m-%d' ) for key in keys]
     
-    return render_template( 'chart.html', keys=keys, series=series )
+    return render_template( 'volumes/chart.html', keys=keys, series=series )
 
 @blueprint.route( '/chart/line' )
 def volume_line():
@@ -88,7 +88,7 @@ def volume_line():
     series.append( ['dropped'] + [dvols.get( key, 0 ) for key in keys] )
     keys = [key.strftime( '%Y-%m-%d' ) for key in keys]
     
-    return render_template( 'chart.html', keys=keys, series=series )
+    return render_template( 'volumes/chart.html', keys=keys, series=series )
 
 @blueprint.route( '/chart/stackedarea' )
 def volume_stacked_area():
@@ -110,7 +110,7 @@ def volume_stacked_area():
         'values':[(to_js_time( key ), dvols.get( key, 0 )) for key in keys] 
     })
     
-    return render_template( 'area_chart.html', series=series )
+    return render_template( 'volumes/area_chart.html', series=series )
 
 @blueprint.route( '/chart/stackedbar' )
 def stacked_bar():
@@ -132,4 +132,4 @@ def stacked_bar():
         'values':[(to_js_time( key ), dvols.get( key, 0 )) for key in keys] 
     })
     
-    return render_template( 'stacked_bar.html', series=series )
+    return render_template( 'volumes/stacked_bar.html', series=series )
