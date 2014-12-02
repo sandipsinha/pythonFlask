@@ -13,19 +13,21 @@ from sqlalchemy         import and_, or_, not_, func
 from law.util.timeutil  import Timebucket
 from law.util.adb       import session_context, AccountState, Owners, Tier
 
-def state_query( s, states, start, end ):
+def state_query( s, states, start, end, g2only=True):
     # operator | or's the states together ( | is overloaded in SQLAlchemy query construction)
     q = s.query( AccountState ) \
          .filter( AccountState.updated >= start ) \
          .filter( AccountState.updated < end ) \
-         .filter( AccountState.tPlan_id < 100 ) \
          .filter( reduce( lambda query, func: query | func, [ AccountState.state.like( state ) for state in states] ) ) \
+
+    if g2only:
+        q = q.filter( AccountState.tPlan_id < 100 ) 
 
     return q
 
-def query_state( states, start, end ):
+def query_state( states, start, end, g2only=True ):
     with session_context() as s:
-        subs = state_query( s, states, start, end ).all()
+        subs = state_query( s, states, start, end, g2only=g2only ).all()
         s.expunge_all()
     return subs
 
