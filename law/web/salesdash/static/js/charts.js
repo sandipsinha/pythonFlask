@@ -59,9 +59,8 @@ define( ['jquery', 'd3', 'nvd3', 'underscore'], function( $, d3, nv, _ ) {
                     .margin( {right:150} )
                     .x( function(d) { return d.x })
                     .y( function(d) { return d.y });
-//                    .showControls(true)
-//                    .tooltips(true)
-//                    .clipEdge( true ); 
+
+            _chart.lines.forceY( [0,0.2] );
             _chart.y1Axis.tickFormat( function( d ) {
                 return d3.format( 'd' )( d ) ;
             });

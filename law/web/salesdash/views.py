@@ -203,7 +203,7 @@ def _product_mrr( start, end ):
 
     return series
 
-@blueprint.route( '/apiv1/product_mrr' )
+@blueprint.route( '/apiv1/product-mrr' )
 def api_product_mrr():
     start = iso8601_to_dt( request.args.get( 'start', DEFAULT_START) )
     end   = iso8601_to_dt( request.args.get( 'end', DEFAULT_END) )
@@ -211,7 +211,7 @@ def api_product_mrr():
     series = _product_mrr( start, end )
     return jsonify( {'series':series} )
 
-@blueprint.route( '/product_mrr' )
+@blueprint.route( '/product-mrr' )
 def product_mrr():
     start = iso8601_to_dt( request.args.get( 'start', DEFAULT_START) )
     end   = iso8601_to_dt( request.args.get( 'end', DEFAULT_END) )
@@ -240,6 +240,10 @@ def _average_deal_size( start, end ):
         ('avg newbiz',  avg_newbiz), 
         ('avg upsell',  avg_upsell), 
     ))
+    
+    # Zero out any bucketed timeperiod that does not have a key that the other bucketed periods do
+    pset = BucketedList.period_set( *(bucketed_lists.values()) )
+    map( lambda bl: bl.fill_missing_periods( pset ), bucketed_lists.values() )
 
     def average( alist ):
         num_items = len( alist )
@@ -252,10 +256,6 @@ def _average_deal_size( start, end ):
     # Caluculate the average deal size and mutate each bucket
     for bl in bucketed_lists.values():
         bl.period_map( average )
-
-    # Zero out any bucketed timeperiod that does not have a key that the other bucketed periods do
-    pset = BucketedList.period_set( *(bucketed_lists.values()) )
-    map( lambda bl: bl.fill_missing_periods( pset ), bucketed_lists.values() )
 
     series = []
 
@@ -345,6 +345,7 @@ def net_value():
     series = _net_value( start, end )
     return render_template( 
             'salesdash/barchart.html', 
+#            'salesdash/barandlinechart.html', 
             series=series, 
             data_url=url_for( '.api_net_value' ),
             start=start, 
@@ -354,19 +355,28 @@ def net_value():
 def _conversion_rate( start, end ):
     bucket_func = attrgetter( request.args.get( 'bucketed', 'quarter' ) )
 
-    # Get Segmented trial counts
     trials    = query_state( ['SUT'], start, end )
     bl_trials = bucket_func( Timebucket( trials, 'updated' ) )()
 
-    # Get Segmented trial counts
-    # TODO CHECK THAT THIS DOESN"T RETRIEVE DUPES
-    converted    = query_state( ['CTP', 'TWP'], start, end )
+    converted    = query_state( ['CTP', 'TWP', 'FWP'], start, end )
     bl_converted = bucket_func( Timebucket( converted, 'updated' ) )()
+   
+    # Segment by Standard/Pro
+    dev_conv    = query_product_state( ['CTP', 'TWP', 'FWP'], ['development'], start, end )
+    bl_dev_conv = bucket_func( Timebucket( dev_conv, 'updated' ) )()
+    
+    pro_conv    = query_product_state( ['CTP', 'TWP', 'FWP'], ['production'], start, end )
+    bl_pro_conv = bucket_func( Timebucket( pro_conv, 'updated' ) )()
 
     bucketed_lists = OrderedDict((
         ('trial',  bl_trials), 
         ('conversions',  bl_converted), 
+        ('dev conversion',  bl_dev_conv), 
+        ('pro conversion',  bl_pro_conv), 
     ))
+
+    pset = BucketedList.period_set( *(bucketed_lists.values()) )
+    map( lambda bl: bl.fill_missing_periods( pset ), bucketed_lists.values() )
 
     def counts( alist ):
         return sum( 1 for entry in alist )
@@ -374,9 +384,6 @@ def _conversion_rate( start, end ):
     # Mutate the bucketedlist componenets
     for bl in bucketed_lists.values():
         bl.period_map( counts )
-    
-    pset = BucketedList.period_set( *(bucketed_lists.values()) )
-    map( lambda bl: bl.fill_missing_periods( pset ), bucketed_lists.values() )
 
     series = []
     series.append({
@@ -385,23 +392,20 @@ def _conversion_rate( start, end ):
         'labels' : [ key for key in sorted( bl ) ],
         'bar'    : True,
     })
+    
+    for name, bl in OrderedDict( bucketed_lists.items()[-3:] ).items():
+        # Calculate the conversion rate
+        for key in bl:
+            if bl_trials[key]:
+                bl[key] = float( bl.get(key, 0) ) / bl_trials[key]
+            else:
+                bl[key] = float( bl.get(key, 0) ) 
 
-    # Calculate the conversion rate
-    bl_rate = bl_converted.copy()
-    for key in bl_rate:
-        if bl_trials[key]:
-            try:
-                bl_rate[key] = float( bl_rate.get(key, 0) ) / bl_trials[key]
-            except TypeError:
-                import ipdb; ipdb.set_trace()
-        else:
-            bl_rate[key] = float( bl_rate.get(key, 0) ) 
-
-    series.append({
-        'key'    : 'conversion rate',
-        'values' : [ {'x':i, 'y':bl_rate[key]} for i, key in enumerate( sorted( bl_rate ) ) ],
-        'labels' : [ key for key in sorted( bl_rate ) ],
-    })
+        series.append({
+            'key'    : name,
+            'values' : [ {'x':i, 'y':bl[key]} for i, key in enumerate( sorted( bl ) ) ],
+            'labels' : [ key for key in sorted( bl ) ],
+        })
 
     return series
 
@@ -428,6 +432,21 @@ def conversion_rate():
             end=end 
     )
 
+
+
+@blueprint.route( '/overview' )
+def overview():
+    
+    urls = [ url_for( url ) for url in (
+        '.conversion_rate',
+        '.net_value',
+        '.average_deal_size',
+        '.mrr',
+        '.new_biz_plus_upsell',
+        '.product_mrr',
+    )]
+
+    return render_template( 'salesdash/overview.html', urls=urls )
 
 @blueprint.route( '/' )
 @blueprint.route( '/salesdash' )
