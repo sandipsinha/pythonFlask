@@ -764,7 +764,7 @@ def overview():
     urls = [ {'name':name, 'url':url_for( funcname ) } 
              for name, funcname in sorted([
                 ( 'Conversion Rate', '.conversion_rate' ),
-                ( 'Running Net Value', '.net_value'),
+#                ( 'Running Net Value', '.net_value'),
                 # Numbers slightly off.  Sames as other ADS?
                 ( 'ADS: Acquisition vs Growth', '.average_deal_size'),
                 # Number off... monthly vs annual?
