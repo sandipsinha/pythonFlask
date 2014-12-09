@@ -680,7 +680,7 @@ def net_value():
 def _conversion_rate( start, end ):
     bucket_func = attrgetter( request.args.get( 'bucketed', 'quarter' ) )
 
-    trials    = query_state( ['%T'], start, end )
+    trials    = query_state( ['SUT'], start, end )
     bl_trials = bucket_func( Timebucket( trials, 'updated' ) )()
 
     converted    = query_state( ['TWP', 'FWP'], start, end )
