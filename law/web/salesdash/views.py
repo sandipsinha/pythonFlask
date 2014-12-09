@@ -7,7 +7,7 @@
 import random
 import calendar
 from datetime    import datetime, timedelta
-from operator    import attrgetter
+from operator    import attrgetter, itemgetter
 from collections import OrderedDict
 from functools   import partial
 
@@ -39,17 +39,31 @@ def sum_states( value_prop, items ):
 sum_rate           = partial( sum_states, 'tRate' ) 
 sum_rate_change    = partial( sum_states, 'rate_delta' )
 
-query_newbiz       = partial( query_state, ['CTP', '%WP'] )
-query_gross_newbiz = partial( query_state, ['CTP', '%WP', '%WF'] )
-query_lostbiz      = partial( query_state, ['%WF'] )
+#query_newbiz       = partial( query_state, ['CTP', '%WP'] )
+query_newbiz       = partial( query_state, ['%WP'] )
+#query_gross_newbiz = partial( query_state, ['CTP', '%WP', 'PWF'] )
+query_gross_newbiz = partial( query_state, ['%WP', 'PWF'] )
+query_lostbiz      = partial( query_state, ['PWF'] )
 query_upsell       = partial( query_state, ['%WU'] )
-query_gross_upsell = partial( query_state, ['%WU', '%WD'] )
-query_downgrades   = partial( query_state, ['%WD'] )
+#query_gross_upsell = partial( query_state, ['%WU', '%WD'] )
+query_gross_upsell = partial( query_state, ['%WU', 'PWD'] )
+# Why was I using %WD?  This could mean TWD
+#query_downgrades   = partial( query_state, ['%WD'] )
+query_downgrades   = partial( query_state, ['PWD'] )
+query_upsell_and_newbiz     = partial( query_state, ['%WP', '%WU'] )
 
-query_std_newbiz = partial( query_product_state, ['CTP', '%WP'], ['development'] )
-query_std_upsell = partial( query_product_state, ['%WU'], ['development'] )
-query_pro_newbiz = partial( query_product_state, ['CTP', '%WP'], ['production'] )
-query_pro_upsell = partial( query_product_state, ['%WU'], ['production'] )
+query_std          = partial( query_product_state, ['%WP'], ['development'] )           
+query_pro          = partial( query_product_state, ['%WP'], ['production'] )           
+
+# TODO query std_to_pro needs to know previous tier
+#query_std_to_pro   = partial( query_product_state, ['PWU'],        ['production'] )           
+
+query_std_newbiz   = partial( query_product_state, ['CTP', '%WP'], ['development'] )
+#query_std_newbiz   = partial( query_product_state, ['%WP'], ['development'] )
+query_std_upsell   = partial( query_product_state, ['%WU'], ['development'] )
+query_pro_newbiz   = partial( query_product_state, ['CTP', '%WP'], ['production'] )
+#query_pro_newbiz   = partial( query_product_state, ['%WP'], ['production'] )
+query_pro_upsell   = partial( query_product_state, ['%WU'], ['production'] )
 
 def _mrr( start, end ):
     bucket = request.args.get( 'bucketed', 'quarter' )
@@ -92,7 +106,7 @@ def mrr():
 
     series = _mrr( start, end )
     return render_template( 
-        'salesdash/barchart.html', 
+        'salesdash/currencybarchart.html', 
         series=series, 
         data_url=url_for( '.api_mrr' ),
         start=start, 
@@ -103,23 +117,15 @@ def _new_biz_plus_upsell( start, end ):
 
     bucket_func = attrgetter( request.args.get( 'bucketed', 'quarter' ) )
     
-    newbiz     = query_gross_upsell( start, end )
+    newbiz     = query_upsell( start, end )
     sum_newbiz = bucket_func( Timebucket( newbiz, 'updated' ) )()
     
-    upsell     = query_gross_newbiz( start, end )
+    upsell     = query_newbiz( start, end )
     sum_upsell = bucket_func( Timebucket( upsell, 'updated' ) )()
     
-#    downgrade      = query_downgrades( start, end )
-#    sum_downgrades = bucket_func( Timebucket( downgrade, 'updated' ) )()
-#    
-#    lostbiz     = query_lostbiz( start, end )
-#    sum_lostbiz = bucket_func( Timebucket( lostbiz, 'updated' ) )()
-
     bucketed_lists = OrderedDict((
         ('newbiz',  sum_newbiz),
         ('upsell',  sum_upsell),
-#        ('lostbiz',  sum_lostbiz),
-#        ('downgrade',  sum_downgrades),
     ))
 
     # Make all bucketed list contain a single value summation of their rate change
@@ -155,12 +161,194 @@ def new_biz_plus_upsell():
 
     series = _new_biz_plus_upsell( start, end )
     return render_template( 
-            'salesdash/barchart.html', 
+            'salesdash/currencybarchart.html', 
             series=series, 
             data_url=url_for( '.api_new_biz_plus_upsell' ),
             start=start, 
             end=end 
     )
+
+
+def _downgrades_plus_churn( start, end ):
+
+    bucket_func = attrgetter( request.args.get( 'bucketed', 'quarter' ) )
+    
+    downgrade      = query_downgrades( start, end )
+    sum_downgrades = bucket_func( Timebucket( downgrade, 'updated' ) )()
+    
+    churn          = query_lostbiz( start, end )
+    sum_churn      = bucket_func( Timebucket( churn, 'updated' ) )()
+
+    bucketed_lists = OrderedDict((
+        ('churn',     sum_churn),
+        ('downgrade', sum_downgrades),
+    ))
+
+    def negate( entry ):
+        return entry * 1
+
+    # Make all bucketed list contain a single value summation of their rate change
+    for bl in bucketed_lists.values():
+        bl.period_map( sum_rate_change )
+        # Negate the numbers
+        bl.period_map( lambda x: x*-1 )
+
+    # Zero out any bucketed timeperiod that does not have a key that the other bucketed periods do
+    pset = BucketedList.period_set( *(bucketed_lists.values()) )
+    map( lambda bl: bl.fill_missing_periods( pset ), bucketed_lists.values() )
+
+    series = []
+
+    for name, bl in bucketed_lists.items():
+        series.append({
+            'key'    : name,
+            'values' : [ (key, bl[key]) for key in sorted( bl ) ],
+        })
+
+    return series
+
+@blueprint.route( '/apiv1/downgrades+churn' )
+def api_downgrades_plus_churn():
+    start = iso8601_to_dt( request.args.get( 'start', DEFAULT_START) )
+    end   = iso8601_to_dt( request.args.get( 'end', DEFAULT_END) )
+
+    series = _downgrades_plus_churn( start, end )
+    return jsonify( {'series':series} )
+
+@blueprint.route( '/downgrades+churn' )
+def downgrades_plus_churn():
+    start = iso8601_to_dt( request.args.get( 'start', DEFAULT_START) )
+    end   = iso8601_to_dt( request.args.get( 'end', DEFAULT_END) )
+
+    series = _downgrades_plus_churn( start, end )
+    return render_template( 
+            'salesdash/currencybarchart.html', 
+            series=series, 
+            data_url=url_for( '.api_downgrades_plus_churn' ),
+            start=start, 
+            end=end 
+    )
+
+def _downgrades_plus_churn_count( start, end ):
+
+    bucket_func = attrgetter( request.args.get( 'bucketed', 'quarter' ) )
+    
+    downgrade      = query_downgrades( start, end )
+    tb_downgrades = bucket_func( Timebucket( downgrade, 'updated' ) )()
+    
+    churn          = query_lostbiz( start, end )
+    tb_churn      = bucket_func( Timebucket( churn, 'updated' ) )()
+
+    bucketed_lists = OrderedDict((
+        ('churn',     tb_churn),
+        ('downgrade', tb_downgrades),
+    ))
+    
+    def counts( alist ):
+        return sum( 1 for entry in alist )
+
+    # Make all bucketed list contain a single value summation of their rate change
+    for bl in bucketed_lists.values():
+        bl.period_map( counts )
+
+    # Zero out any bucketed timeperiod that does not have a key that the other bucketed periods do
+    pset = BucketedList.period_set( *(bucketed_lists.values()) )
+    map( lambda bl: bl.fill_missing_periods( pset ), bucketed_lists.values() )
+
+    series = []
+
+    for name, bl in bucketed_lists.items():
+        series.append({
+            'key'    : name,
+            'values' : [ (key, bl[key]) for key in sorted( bl ) ],
+        })
+
+    return series
+
+@blueprint.route( '/apiv1/downgrades+churn-count' )
+def api_downgrades_plus_churn_count():
+    start = iso8601_to_dt( request.args.get( 'start', DEFAULT_START) )
+    end   = iso8601_to_dt( request.args.get( 'end', DEFAULT_END) )
+
+    series = _downgrades_plus_churn_count( start, end )
+    return jsonify( {'series':series} )
+
+@blueprint.route( '/downgrades+churn-count' )
+def downgrades_plus_churn_count():
+    datasource = _downgrades_plus_churn_count
+
+    start = iso8601_to_dt( request.args.get( 'start', DEFAULT_START) )
+    end   = iso8601_to_dt( request.args.get( 'end', DEFAULT_END) )
+
+    series = datasource( start, end )
+    return render_template( 
+            'salesdash/barchart.html', 
+            series=series, 
+            data_url=url_for( '.api{}'.format( datasource.__name__ )  ),
+            start=start, 
+            end=end 
+    )
+
+def _paid_account_count( start, end ):
+
+    bucket_func = attrgetter( request.args.get( 'bucketed', 'quarter' ) )
+    
+    std      = query_std( start, end )
+    tb_std   = bucket_func( Timebucket( std, 'updated' ) )()
+    
+    pro      = query_pro( start, end )
+    tb_pro   = bucket_func( Timebucket( pro, 'updated' ) )()
+
+    bucketed_lists = OrderedDict((
+        ('standard', tb_std),
+        ('pro',      tb_pro),
+    ))
+    
+    def counts( alist ):
+        return sum( 1 for entry in alist )
+
+    # Make all bucketed list contain a single value summation of their rate change
+    for bl in bucketed_lists.values():
+        bl.period_map( counts )
+
+    # Zero out any bucketed timeperiod that does not have a key that the other bucketed periods do
+    pset = BucketedList.period_set( *(bucketed_lists.values()) )
+    map( lambda bl: bl.fill_missing_periods( pset ), bucketed_lists.values() )
+
+    series = []
+
+    for name, bl in bucketed_lists.items():
+        series.append({
+            'key'    : name,
+            'values' : [ (key, bl[key]) for key in sorted( bl ) ],
+        })
+
+    return series
+
+@blueprint.route( '/apiv1/paid-account-count' )
+def api_paid_account_count():
+    start = iso8601_to_dt( request.args.get( 'start', DEFAULT_START) )
+    end   = iso8601_to_dt( request.args.get( 'end', DEFAULT_END) )
+
+    series = _paid_account_count( start, end )
+    return jsonify( {'series':series} )
+
+@blueprint.route( '/paid-account-count' )
+def paid_account_count():
+    datasource = _paid_account_count
+
+    start = iso8601_to_dt( request.args.get( 'start', DEFAULT_START) )
+    end   = iso8601_to_dt( request.args.get( 'end', DEFAULT_END) )
+
+    series = datasource( start, end )
+    return render_template( 
+            'salesdash/barchart.html', 
+            series=series, 
+            data_url=url_for( '.api{}'.format( datasource.__name__ )  ),
+            start=start, 
+            end=end 
+    )
+
 
 def _product_mrr( start, end ):
 
@@ -218,7 +406,7 @@ def product_mrr():
 
     series = _product_mrr( start, end )
     return render_template( 
-            'salesdash/barchart.html', 
+            'salesdash/currencybarchart.html', 
             series=series, 
             data_url=url_for( '.api_product_mrr' ),
             start=start, 
@@ -237,8 +425,8 @@ def _average_deal_size( start, end ):
     avg_upsell = bucket_func( Timebucket( upsell, 'updated' ) )()
     
     bucketed_lists = OrderedDict((
-        ('avg newbiz',  avg_newbiz), 
-        ('avg upsell',  avg_upsell), 
+        ('avg acquisition',  avg_newbiz), 
+        ('avg growth',       avg_upsell), 
     ))
     
     # Zero out any bucketed timeperiod that does not have a key that the other bucketed periods do
@@ -284,9 +472,137 @@ def average_deal_size():
 
     series = _average_deal_size( start, end )
     return render_template( 
-            'salesdash/barchart.html', 
+            'salesdash/currencybarchart.html', 
             series=series, 
             data_url=url_for( '.api_average_deal_size' ),
+            start=start, 
+            end=end 
+    )
+
+def _average_deal_size_combined( start, end ):
+
+    bucket_func = attrgetter( request.args.get( 'bucketed', 'quarter' ) )
+    
+    all_paid   = query_upsell_and_newbiz( start, end )
+    avg_all_paid = bucket_func( Timebucket( all_paid, 'updated' ) )()
+    
+    bucketed_lists = OrderedDict((
+        ('ADS',  avg_all_paid), 
+    ))
+    
+    # Zero out any bucketed timeperiod that does not have a key that the other bucketed periods do
+    pset = BucketedList.period_set( *(bucketed_lists.values()) )
+    map( lambda bl: bl.fill_missing_periods( pset ), bucketed_lists.values() )
+
+    def average( alist ):
+        num_items = len( alist )
+        if num_items != 0:
+            avg = reduce( lambda acc, val: acc + val.rate_delta, alist, 0 ) / num_items
+        else:
+            avg = 0
+        return avg
+
+    # Caluculate the average deal size and mutate each bucket
+    for bl in bucketed_lists.values():
+        bl.period_map( average )
+
+    series = []
+
+    for name, bl in bucketed_lists.items():
+        series.append({
+            'key'    : name,
+            'values' : [ (key, bl[key]) for key in sorted( bl ) ],
+        })
+
+    return series
+
+
+@blueprint.route( '/apiv1/avg-deal-size-combined' )
+def api_average_deal_size_combined():
+    start = iso8601_to_dt( request.args.get( 'start', DEFAULT_START) )
+    end   = iso8601_to_dt( request.args.get( 'end', DEFAULT_END) )
+
+    series = _average_deal_size_combined( start, end )
+    return jsonify( {'series':series} )
+
+
+@blueprint.route( '/avg-deal-size-combined' )
+def average_deal_size_combined():
+    datasource = _average_deal_size_combined
+    start = iso8601_to_dt( request.args.get( 'start', DEFAULT_START) )
+    end   = iso8601_to_dt( request.args.get( 'end', DEFAULT_END) )
+
+    series = datasource( start, end )
+    return render_template( 
+            'salesdash/currencybarchart.html', 
+            series=series, 
+            data_url=url_for( '.api{}'.format( datasource.__name__ ) ),
+            start=start, 
+            end=end 
+    )
+
+def _product_average_deal_size( start, end ):
+
+    bucket_func = attrgetter( request.args.get( 'bucketed', 'quarter' ) )
+    
+    std     = query_std( start, end )
+    avg_std = bucket_func( Timebucket( std, 'updated' ) )()
+    
+    pro     = query_pro( start, end )
+    avg_pro = bucket_func( Timebucket( pro, 'updated' ) )()
+    
+    bucketed_lists = OrderedDict((
+        ('avg standard',  avg_std), 
+        ('avg pro',       avg_pro), 
+    ))
+    
+    # Zero out any bucketed timeperiod that does not have a key that the other bucketed periods do
+    pset = BucketedList.period_set( *(bucketed_lists.values()) )
+    map( lambda bl: bl.fill_missing_periods( pset ), bucketed_lists.values() )
+
+    def average( alist ):
+        num_items = len( alist )
+        if num_items != 0:
+            avg = reduce( lambda acc, val: acc + val.rate_delta, alist, 0 ) / num_items
+        else:
+            avg = 0
+        return avg
+
+    # Caluculate the average deal size and mutate each bucket
+    for bl in bucketed_lists.values():
+        bl.period_map( average )
+
+    series = []
+
+    for name, bl in bucketed_lists.items():
+        series.append({
+            'key'    : name,
+            'values' : [ (key, bl[key]) for key in sorted( bl ) ],
+        })
+
+    return series
+
+
+@blueprint.route( '/apiv1/product-avg-deal-size' )
+def api_product_average_deal_size():
+    start = iso8601_to_dt( request.args.get( 'start', DEFAULT_START) )
+    end   = iso8601_to_dt( request.args.get( 'end', DEFAULT_END) )
+
+    series = _product_average_deal_size( start, end )
+    return jsonify( {'series':series} )
+
+
+@blueprint.route( '/product-avg-deal-size' )
+def product_average_deal_size():
+    datasource = _product_average_deal_size
+    start = iso8601_to_dt( request.args.get( 'start', DEFAULT_START) )
+    end   = iso8601_to_dt( request.args.get( 'end', DEFAULT_END) )
+
+    series = datasource( start, end )
+    return render_template( 
+            'salesdash/currencybarchart.html', 
+            series=series, 
+            data_url=url_for( '.api{}'.format( datasource.__name__ ) ),
             start=start, 
             end=end 
     )
@@ -344,7 +660,7 @@ def net_value():
     
     series = _net_value( start, end )
     return render_template( 
-            'salesdash/barchart.html', 
+            'salesdash/currencybarchart.html', 
 #            'salesdash/barandlinechart.html', 
             series=series, 
             data_url=url_for( '.api_net_value' ),
@@ -433,18 +749,28 @@ def conversion_rate():
     )
 
 
-
 @blueprint.route( '/overview' )
 def overview():
     
-    urls = [ url_for( url ) for url in (
-        '.conversion_rate',
-        '.net_value',
-        '.average_deal_size',
-        '.mrr',
-        '.new_biz_plus_upsell',
-        '.product_mrr',
-    )]
+    urls = [ {'name':name, 'url':url_for( funcname ) } 
+             for name, funcname in sorted([
+                ( 'Conversion Rate', '.conversion_rate' ),
+                ( 'Running Net Value', '.net_value'),
+                # Numbers slightly off.  Sames as other ADS?
+                ( 'ADS: Acquisition vs Growth', '.average_deal_size'),
+                # Number off... monthly vs annual?
+                ( 'ADS: Combined', '.average_deal_size_combined'),
+                # Numbers seem off.  Is annual counted as annual and not monthly?
+                ( 'ADS: Product', '.product_average_deal_size'),
+                # Why does CTP make this closer to the yearly we expect?
+                ( 'MRR: Owner', '.mrr' ),
+                ( 'MRR: Sale Type', '.new_biz_plus_upsell') ,
+                ( 'MRR: Product', '.product_mrr' ),
+                ( 'Downgrades and Churn Amount', '.downgrades_plus_churn' ),
+                ( 'Downgrades and Churn Count', '.downgrades_plus_churn_count' ),
+                ( 'Paid Account Count', '.paid_account_count' ),
+            ], key=itemgetter( 0 ) )
+    ]
 
     return render_template( 'salesdash/overview.html', urls=urls )
 
