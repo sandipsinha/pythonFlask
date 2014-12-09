@@ -1,0 +1,22 @@
+{% extends 'salesdash/base.html' %}
+{% block content %}
+<div class='slider'></div>
+<div class='chart' width='90%'>
+    <svg height='300px'></svg>
+</div>
+<script>
+require( ['charts', 'slider'], function( charts, slider ) {
+    ds = slider.dateSlider( '.slider', '{{start}}', '{{end}}' ) ;
+    charts.BarChart( 
+        '.chart svg', 
+        {{series|tojson|safe}}, 
+        { 
+            dateSlider: ds, 
+            timeBuckets: ['day','week','month','quarter','year'],
+            dataUrl: '{{data_url}}',
+            datatype: 'currency'
+        } 
+    ) ;
+});
+</script>
+{% endblock %}

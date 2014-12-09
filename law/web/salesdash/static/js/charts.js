@@ -36,7 +36,12 @@ define( ['jquery', 'd3', 'nvd3', 'underscore'], function( $, d3, nv, _ ) {
         //             .color( ['#E5975F', '#DA5FE4', '#69E45F', '#5FACE4'] );
 
             _chart.yAxis.tickFormat( function( d ) {
-                return ' $' + d3.format( ',.2f' )( d ) ;
+                if( config.datatype === 'currency' ) {
+                    return ' $' + d3.format( ',.2f' )( d ) ;
+                }
+                else {
+                    return d3.format( 'd' )( d ) ;
+                }
             });
         } else if( config.type === 'area' ) {
             _chart = nv.models.stackedAreaChart()
