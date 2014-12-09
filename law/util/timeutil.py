@@ -158,7 +158,7 @@ class Timebucket( object ):
 
             for month in range( start_month.month, end_month.month + 1 ):
                 start_date = datetime( year, month, 1 )
-                end_date   = datetime( year, month, calendar.monthrange( year, month )[-1] )
+                end_date   = datetime( year, month, calendar.monthrange( year, month )[-1], 23, 59, 59 )
                 sname      = start_date.strftime( '%Y-%m' )
 
                 segmented[ sname ] = []

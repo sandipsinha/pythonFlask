@@ -236,7 +236,7 @@ class TestTimebucket( unittest.TestCase ):
             DatedItem( 1, datetime(2013, 1, 1) ),
             DatedItem( 2, datetime(2014, 2, 28) ),
             DatedItem( 3, datetime(2014, 2, 10) ),
-            DatedItem( 4, datetime(2014, 12, 31) ),
+            DatedItem( 4, datetime(2014, 12, 31, 23, 59, 59) ),
         ]
         bucketer  = Timebucket( rows, 'created' )
         monthed = bucketer.month()
@@ -263,7 +263,7 @@ class TestTimebucket( unittest.TestCase ):
         self.assertEqual( monthed['2014-09'], [] )
         self.assertEqual( monthed['2014-10'], [] )
         self.assertEqual( monthed['2014-11'], [] )
-        self.assertEqual( monthed['2014-12'], [ DatedItem( 4, datetime( 2014, 12, 31 ) ) ] )
+        self.assertEqual( monthed['2014-12'], [ DatedItem( 4, datetime( 2014, 12, 31, 23, 59, 59 ) ) ] )
 
     def test_week( self ):
         rows = [

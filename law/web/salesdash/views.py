@@ -55,6 +55,9 @@ query_upsell_and_newbiz     = partial( query_state, ['%WP', '%WU'] )
 query_std          = partial( query_product_state, ['%WP'], ['development'] )           
 query_pro          = partial( query_product_state, ['%WP'], ['production'] )           
 
+query_std_count    = partial( query_product_state, ['%WP'], ['development'] )           
+query_pro_count    = partial( query_product_state, ['%WP'], ['production'] )           
+
 # TODO query std_to_pro needs to know previous tier
 #query_std_to_pro   = partial( query_product_state, ['PWU'],        ['production'] )           
 
@@ -293,10 +296,10 @@ def _paid_account_count( start, end ):
 
     bucket_func = attrgetter( request.args.get( 'bucketed', 'quarter' ) )
     
-    std      = query_std( start, end )
+    std      = query_std_count( start, end )
     tb_std   = bucket_func( Timebucket( std, 'updated' ) )()
     
-    pro      = query_pro( start, end )
+    pro      = query_pro_count( start, end )
     tb_pro   = bucket_func( Timebucket( pro, 'updated' ) )()
 
     bucketed_lists = OrderedDict((
@@ -434,9 +437,11 @@ def _average_deal_size( start, end ):
     map( lambda bl: bl.fill_missing_periods( pset ), bucketed_lists.values() )
 
     def average( alist ):
-        num_items = len( alist )
+        # Make sure that there is at least some kind of positive movement
+        culled_list = [item for item in alist if item.rate_delta > 0 ]
+        num_items = len( culled_list )
         if num_items != 0:
-            avg = reduce( lambda acc, val: acc + val.rate_delta, alist, 0 ) / num_items
+            avg = reduce( lambda acc, val: acc + val.rate_delta, culled_list, 0 ) / float( num_items )
         else:
             avg = 0
         return avg
@@ -495,9 +500,11 @@ def _average_deal_size_combined( start, end ):
     map( lambda bl: bl.fill_missing_periods( pset ), bucketed_lists.values() )
 
     def average( alist ):
-        num_items = len( alist )
+        # Make sure that there is at least some kind of positive movement
+        culled_list = [item for item in alist if item.rate_delta > 0 ]
+        num_items = len( culled_list )
         if num_items != 0:
-            avg = reduce( lambda acc, val: acc + val.rate_delta, alist, 0 ) / num_items
+            avg = reduce( lambda acc, val: acc + val.rate_delta, culled_list, 0 ) / float( num_items )
         else:
             avg = 0
         return avg
@@ -561,9 +568,11 @@ def _product_average_deal_size( start, end ):
     map( lambda bl: bl.fill_missing_periods( pset ), bucketed_lists.values() )
 
     def average( alist ):
-        num_items = len( alist )
+        # Make sure that there is at least some kind of positive movement
+        culled_list = [item for item in alist if item.rate_delta > 0 ]
+        num_items = len( culled_list )
         if num_items != 0:
-            avg = reduce( lambda acc, val: acc + val.rate_delta, alist, 0 ) / num_items
+            avg = reduce( lambda acc, val: acc + val.rate_delta, culled_list, 0 ) / float( num_items )
         else:
             avg = 0
         return avg
@@ -671,17 +680,17 @@ def net_value():
 def _conversion_rate( start, end ):
     bucket_func = attrgetter( request.args.get( 'bucketed', 'quarter' ) )
 
-    trials    = query_state( ['SUT'], start, end )
+    trials    = query_state( ['%T'], start, end )
     bl_trials = bucket_func( Timebucket( trials, 'updated' ) )()
 
-    converted    = query_state( ['CTP', 'TWP', 'FWP'], start, end )
+    converted    = query_state( ['TWP', 'FWP'], start, end )
     bl_converted = bucket_func( Timebucket( converted, 'updated' ) )()
    
     # Segment by Standard/Pro
-    dev_conv    = query_product_state( ['CTP', 'TWP', 'FWP'], ['development'], start, end )
+    dev_conv    = query_product_state( [ 'TWP', 'FWP'], ['development'], start, end )
     bl_dev_conv = bucket_func( Timebucket( dev_conv, 'updated' ) )()
     
-    pro_conv    = query_product_state( ['CTP', 'TWP', 'FWP'], ['production'], start, end )
+    pro_conv    = query_product_state( [ 'TWP', 'FWP'], ['production'], start, end )
     bl_pro_conv = bucket_func( Timebucket( pro_conv, 'updated' ) )()
 
     bucketed_lists = OrderedDict((
