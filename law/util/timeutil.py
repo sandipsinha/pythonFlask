@@ -132,7 +132,7 @@ class Timebucket( object ):
         for year in range( self.start.year, self.end.year + 1):
             for quarter in ('Q1', 'Q2', 'Q3', 'Q4'):
                 start_date = datetime( year, *self._QUARTER[quarter]['start'] )
-                end_date   = datetime( year, *self._QUARTER[quarter]['end'] )
+                end_date   = datetime( year, *(self._QUARTER[quarter]['end'] + (23, 59, 59 )) )
                 sname      = '{}-{}'.format( year, quarter )
 
                 segmented[sname] = []

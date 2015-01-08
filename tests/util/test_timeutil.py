@@ -167,7 +167,7 @@ class TestTimebucket( unittest.TestCase ):
             DatedItem( 1, datetime(2014, 2, 12) ),
             DatedItem( 2, datetime(2014, 6, 9) ),
             DatedItem( 3, datetime(2014, 8, 10) ),
-            DatedItem( 4, datetime(2014, 12, 31) ),
+            DatedItem( 4, datetime(2014, 12, 31, 23, 59, 59) ),
         ]
         bucketer  = Timebucket( rows, 'created' )
         quartered = bucketer.quarter()
@@ -175,7 +175,7 @@ class TestTimebucket( unittest.TestCase ):
         self.assertEqual( quartered['2014-Q1'], [ DatedItem( 1, datetime( 2014, 2, 12 ) ) ] )
         self.assertEqual( quartered['2014-Q2'], [ DatedItem( 2, datetime( 2014, 6, 9 ) ) ] )
         self.assertEqual( quartered['2014-Q3'], [ DatedItem( 3, datetime( 2014, 8, 10 ) ) ] )
-        self.assertEqual( quartered['2014-Q4'], [ DatedItem( 4, datetime( 2014, 12, 31 ) ) ] )
+        self.assertEqual( quartered['2014-Q4'], [ DatedItem( 4, datetime( 2014, 12, 31, 23, 59, 59 ) ) ] )
 
         rows = [
             DatedItem( 1, datetime(2010, 8, 12) ),
