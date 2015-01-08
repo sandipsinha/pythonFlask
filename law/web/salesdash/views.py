@@ -52,8 +52,8 @@ query_gross_upsell = partial( query_state, ['%WU', 'PWD'] )
 query_downgrades   = partial( query_state, ['PWD'] )
 query_upsell_and_newbiz     = partial( query_state, ['%WP', '%WU'] )
 
-query_std          = partial( query_product_state, ['%WP'], ['development'] )           
-query_pro          = partial( query_product_state, ['%WP'], ['production'] )           
+query_std          = partial( query_product_state, ['CTP', '%WP'], ['development'] )           
+query_pro          = partial( query_product_state, ['CTP', '%WP'], ['production'] )           
 
 query_std_count    = partial( query_product_state, ['%WP'], ['development'] )           
 query_pro_count    = partial( query_product_state, ['%WP'], ['production'] )           
@@ -777,7 +777,7 @@ def overview():
                 ( 'MRR: Product', '.product_mrr' ),
                 ( 'Downgrades and Churn Amount', '.downgrades_plus_churn' ),
                 ( 'Downgrades and Churn Count', '.downgrades_plus_churn_count' ),
-                ( 'Paid Account Count', '.paid_account_count' ),
+                ( 'New Deal Transaction Count', '.paid_account_count' ),
             ], key=itemgetter( 0 ) )
     ]
 
