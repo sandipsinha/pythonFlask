@@ -2,7 +2,7 @@
 " Copyright:    Loggly, Inc.
 " Author:       Scott Griffin
 " Email:        scott@loggly.com
-" Last Updated: 11/11/2014
+" Last Updated: 01/08/2015
 "
 """
 from contextlib import contextmanager
@@ -39,13 +39,13 @@ class Account( Base ):
 
     acct_id     = Column( Integer, primary_key=True )
     id          = Column( Integer )
-    deployment  = Column( String )
+    deployment  = Column( String(length=20) )
     legacy      = Column( Boolean )
     created     = Column( DateTime )
-    subdomain   = Column( String )
-    email       = Column( String )
-    phone       = Column( String )
-    zip         = Column( String )
+    subdomain   = Column( String(length=100) )
+    email       = Column( String(length=200) )
+    phone       = Column( String(length=25) )
+    zip         = Column( String(length=10) )
     is_test     = Column( 'is_test_acct', Boolean )
              
     def __repr__(self):
@@ -57,9 +57,9 @@ class AccountState( Base ):
     __tablename__ = 'aawsc'
     
     acct_id   = Column( Integer, primary_key=True )
-    updated   = Column( Integer, primary_key=True )
-    subdomain = Column( String )
-    state     = Column( 'stNam', String )
+    updated   = Column( DateTime, primary_key=True )
+    subdomain = Column( String(length=100) )
+    state     = Column( 'stNam', String(length=10) )
     tRate     = Column( 'trate', Float )
     fRate     = Column( 'frate', Float )
     tPlan_id  = Column( 'tPlan', Integer, ForeignKey( 'subscription_plan.id' ) )
