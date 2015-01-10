@@ -2,7 +2,6 @@
 " Copyright:    Loggly, Inc.
 " Author:       Scott Griffin
 " Email:        scott@loggly.com
-" Last Updated: 01/08/2015
 "
 """
 from contextlib import contextmanager
@@ -82,7 +81,7 @@ class Tier( Base ):
     __tablename__ = 'subscription_plan'
 
     id   = Column( Integer, primary_key=True )
-    name = Column( String )
+    name = Column( String(length=100) )
     code = Column( Integer )
 
     def __repr__(self):
