@@ -10,27 +10,34 @@ MODEL = SalesReps
 FIXTURES = [
 {
     'id'         : 1,
+    'first'      : 'Hoover',
+    'last'       : 'Loggly',
+    'email'      : 'integration@logglytest.com',
+    'sfdc_alias' : 'integ',
+},
+{
+    'id'         : 2,
     'first'      : 'Angela',
     'last'       : 'Eichner',
     'email'      : 'angela@logglytest.com',
     'sfdc_alias' : 'aeich',
 },
 {
-    'id'         : 2,
+    'id'         : 3,
     'first'      : 'Stephanie',
     'last'       : 'Skuratowicz',
     'email'      : 'stephanie@logglytest.com',
     'sfdc_alias' : 'skura',
 },
 {
-    'id'         : 3,
+    'id'         : 4,
     'first'      : 'Michael',
     'last'       : 'Johnston',
     'email'      : 'michael@logglytest.com',
     'sfdc_alias' : 'micha',
 },
 {
-    'id'         : 4,
+    'id'         : 5,
     'first'      : 'Cristina',
     'last'       : 'Quintero',
     'email'      : 'cristina@logglytest.com',
