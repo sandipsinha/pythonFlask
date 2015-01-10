@@ -2,7 +2,6 @@
 " Copyright:    Loggly, Inc.
 " Author:       Scott Griffin
 " Email:        scott@loggly.com
-" Last Updated: 01/08/2015
 "
 """
 from contextlib import contextmanager
@@ -39,7 +38,7 @@ class Touchbiz( Base ):
     __tablename__ = 'sales_touchbiz'
 
     acct_id        = Column( MEDIUMINT(unsigned=True), primary_key=True )
-    sales_rep_id   = Column( MEDIUMINT(unsigned=True) )
+    sales_rep_id   = Column( MEDIUMINT(unsigned=True), ForeignKey( 'sales_reps.id' ) )
     created        = Column( DateTime, primary_key=True )
     modified       = Column( DateTime )
     stage_id       = Column( MEDIUMINT(unsigned=True), ForeignKey( 'sales_stages.id' ) )
@@ -48,6 +47,10 @@ class Touchbiz( Base ):
     volume         = Column( BIGINT(unsigned=True) )
     sub_rate       = Column( Integer )
     billing_period = Column( String(length=50) )
+    owner          = relationship(
+                        "SalesReps", 
+                        lazy='joined',
+                        backref=backref("sales_touchbiz", uselist=False))
     stage          = relationship(
                         "SalesStages", 
                         lazy='joined',
@@ -102,6 +105,27 @@ def session_context():
         session._model_changes = {}
         yield session
         session.commit()
+    except:
+        session.rollback()
+        raise
+    finally:
+        session.close()
+
+@contextmanager
+def loader():
+    """ Loads objects from an ORM session then immediately
+    expunges them so they are not written back to the DB
+    """
+    session = Session()
+    try:
+        # flask-sqlalchemy patches the session object and enforces
+        # This model changes dict for signaling purposes.  Because
+        # We don't want flask-sqlalchemy dealing with these models
+        # Lets just fake this shit.
+        session._model_changes = {}
+        yield session
+        session.expunge_all()
+        session.rollback()
     except:
         session.rollback()
         raise
