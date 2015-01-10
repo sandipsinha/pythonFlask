@@ -178,4 +178,26 @@ def session_context():
     finally:
         session.close()
 
+@contextmanager
+def loader():
+    """ Loads objects from an ORM session then immediately
+    expunges them so they are not written back to the DB
+    """
+    session = Session()
+    try:
+        # flask-sqlalchemy patches the session object and enforces
+        # This model changes dict for signaling purposes.  Because
+        # We don't want flask-sqlalchemy dealing with these models
+        # Lets just fake this shit.
+        session._model_changes = {}
+        yield session
+        session.expunge_all()
+        session.rollback()
+    except:
+        session.rollback()
+        raise
+    finally:
+        session.close()
+
+
 
