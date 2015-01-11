@@ -22,4 +22,16 @@ FIXTURES = [
     'zip'           : '92131',
     'is_test'       : False,
 },
+{
+    'acct_id'       : 1001,
+    'id'            : 999,
+    'deployment'    : 'chopper',
+    'legacy'        : 0,
+    'created'       : datetime( 2014, 12, 15 ),
+    'subdomain'     : 'touchbiztest2',
+    'email'         : 'touchbiztest2@loggly.com',
+    'phone'         : '858-335-3341',
+    'zip'           : '92131',
+    'is_test'       : False,
+},
 ]
