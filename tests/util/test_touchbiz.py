@@ -81,6 +81,7 @@ class TestTouchbiz( unittest.TestCase ):
             aeich = l.query( tbz.SalesReps )\
                      .filter( tbz.SalesReps.sfdc_alias == 'aeich' )\
                      .one()
+            
 
             tb_entries = l.query( tbz.Touchbiz )\
                           .filter( tbz.Touchbiz.acct_id == 1000 )\
@@ -93,6 +94,37 @@ class TestTouchbiz( unittest.TestCase ):
         self.assertEqual( applied[1].owner.sfdc_alias, company.sfdc_alias )
         self.assertEqual( applied[2].owner.sfdc_alias, aeich.sfdc_alias )
         self.assertEqual( applied[3].owner.sfdc_alias, aeich.sfdc_alias )
+
+        with adb.loader() as l:
+            sub_entries = l.query( adb.AccountState )\
+                           .filter( adb.AccountState.acct_id == 1001 )\
+                           .all()
+
+        with tbz.loader() as l:
+            company = l.query( tbz.SalesReps )\
+                       .filter( tbz.SalesReps.sfdc_alias == 'integ' )\
+                       .one()
+
+            aeich = l.query( tbz.SalesReps )\
+                     .filter( tbz.SalesReps.sfdc_alias == 'aeich' )\
+                     .one()
+            
+            skura = l.query( tbz.SalesReps )\
+                     .filter( tbz.SalesReps.sfdc_alias == 'skura' )\
+                     .one()
+
+            tb_entries = l.query( tbz.Touchbiz )\
+                          .filter( tbz.Touchbiz.acct_id == 1001 )\
+                          .all()
+
+        
+        applied = touchbiz.apply_touchbiz( sub_entries, tb_entries )
+
+        self.assertEqual( len( applied ), 4 )
+        self.assertEqual( applied[0].owner.sfdc_alias, company.sfdc_alias )
+        self.assertEqual( applied[1].owner.sfdc_alias, skura.sfdc_alias )
+        self.assertEqual( applied[2].owner.sfdc_alias, skura.sfdc_alias )
+        self.assertEqual( applied[3].owner.sfdc_alias, skura.sfdc_alias )
 
     def test_touchbiz_by_account_id( self ): 
         with tbz.loader() as l:

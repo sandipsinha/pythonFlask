@@ -45,12 +45,19 @@ def apply_touchbiz( sub_entries, tb_entries ):
     key = tbkeys.pop()
 
     for sub in subs:
-        if len( tbkeys ) != 0:
-            if tbd[ tbkeys[-1] ].created <= sub.updated:
-                key = tbkeys.pop()
+        # While there are still touchbiz entries that occured before this
+        # sub iterate through them until we find the one the occured right
+        # before the subscription change.
+        while len( tbkeys ) != 0 and tbd[ tbkeys[-1] ].created <= sub.updated:
+            key = tbkeys.pop()
 
         sub.owner = tbd[key].owner
         applied.append( sub )
+
+    # If there are touchbiz entries left apply the most recent one 
+    # to the returned rows
+    if len( tbkeys ) != 0:
+        applied.append( tbd[tbkeys[0]] )
 
     return applied
         
