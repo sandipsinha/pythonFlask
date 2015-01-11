@@ -163,6 +163,45 @@ class TestTouchbiz( unittest.TestCase ):
         self.assertEqual( rows[1].owner.sfdc_alias, company.sfdc_alias )
         self.assertEqual( rows[2].owner.sfdc_alias, aeich.sfdc_alias )
         self.assertEqual( rows[3].owner.sfdc_alias, aeich.sfdc_alias )
+    
+    def test_tuplify( self ):
+        with tbz.loader() as l:
+            company = l.query( tbz.SalesReps )\
+                       .filter( tbz.SalesReps.sfdc_alias == 'integ' )\
+                       .one()
+
+            aeich = l.query( tbz.SalesReps )\
+                     .filter( tbz.SalesReps.sfdc_alias == 'aeich' )\
+                     .one()
+
+
+        columns = ('tRate', 'tGB', 'tDays', 'owner.sfdc_alias', 'owner.email' )
+        rows = touchbiz.tuplify( columns, touchbiz.touchbiz_by_account_id(1000) )
+
+        self.assertEqual( len( rows ), 4 )
+        self.assertEqual( rows[0][0], ( 'tRate', 0 ) )
+        self.assertEqual( rows[0][1], ( 'tGB', 0 ) )
+        self.assertEqual( rows[0][2], ( 'tDays', 15 ) )
+        self.assertEqual( rows[0][3], ( 'owner.sfdc_alias', company.sfdc_alias ) )
+        self.assertEqual( rows[0][4], ( 'owner.email', company.email ) )
+       
+        self.assertEqual( rows[1][0], ( 'tRate', 0 ) )
+        self.assertEqual( rows[1][1], ( 'tGB', 200000000 ) )
+        self.assertEqual( rows[1][2], ( 'tDays', 7 ) )
+        self.assertEqual( rows[1][3], ( 'owner.sfdc_alias', company.sfdc_alias ) )
+        self.assertEqual( rows[1][4], ( 'owner.email', company.email ) )
+        
+        self.assertEqual( rows[2][0], ( 'tRate', 49 ) )
+        self.assertEqual( rows[2][1], ( 'tGB', 1000000000 ) )
+        self.assertEqual( rows[2][2], ( 'tDays', 7 ) )
+        self.assertEqual( rows[2][3], ( 'owner.sfdc_alias', aeich.sfdc_alias ) )
+        self.assertEqual( rows[2][4], ( 'owner.email', aeich.email ) )
+        
+        self.assertEqual( rows[3][0], ( 'tRate', 99 ) )
+        self.assertEqual( rows[3][1], ( 'tGB', 2000000000 ) )
+        self.assertEqual( rows[3][2], ( 'tDays', 15 ) )
+        self.assertEqual( rows[3][3], ( 'owner.sfdc_alias', aeich.sfdc_alias ) )
+        self.assertEqual( rows[3][4], ( 'owner.email', aeich.email ) )
 
     def test_touchbiz_table( self ):
         pass

@@ -79,3 +79,19 @@ def touchbiz_by_account_id( acct_id ):
 
 def touchbiz_by_account( subdomain ):
     return touchbiz_by_account_id( acct_id_for_subdomain( subdomain ) )
+
+def tuplify( columns, rows, column_map=None ):
+    """ Returns the rows as a list of tuples containing ((colum name, value), ... )"""
+    column_map = column_map or {} 
+
+    # Allows dot notation in getattr.  Does not support defaults.
+    def getattrd(obj, name ):
+        return reduce(getattr, name.split("."), obj)
+
+    tuplified = []
+    for row in rows:
+        tuplified.append( [ (column_map.get( column, column), getattrd( row, column )) for column in columns ] )
+
+    return tuplified
+
+
