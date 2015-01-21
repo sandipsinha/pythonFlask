@@ -10,6 +10,7 @@ from law.util.adb import AccountState
 
 MODEL = AccountState
 FIXTURES = [
+# Cust 1001
 {
     'acct_id'   : 1000,
     'updated'   : datetime( 2014, 4, 8 ),
@@ -54,6 +55,7 @@ FIXTURES = [
     'tGB'       : 2000000000,
     'tDays'     : 15,
 },
+# Cust 1001
 {
     'acct_id'   : 1001,
     'updated'   : datetime( 2014, 12, 2, 10 ),
@@ -86,5 +88,28 @@ FIXTURES = [
     'tPlan_id'  : 4,
     'tGB'       : 1000000000,
     'tDays'     : 15,
+},
+# Cust 1002
+{
+    'acct_id'   : 1002,
+    'updated'   : datetime( 2014, 4, 8 ),
+    'subdomain' : 'touchbiztest3',
+    'state'     : 'SUT',
+    'tRate'     : 0,
+    'fRate'     : 0,
+    'tPlan_id'  : 1,
+    'tGB'       : 0,
+    'tDays'     : 15,
+},
+{
+    'acct_id'   : 1002,
+    'updated'   : datetime( 2014, 9, 22, 1 ),
+    'subdomain' : 'touchbiztest3',
+    'state'     : 'SUT',
+    'tRate'     : 49,
+    'fRate'     : 0,
+    'tPlan_id'  : 3,
+    'tGB'       : 1000000000,
+    'tDays'     : 7,
 },
 ]
