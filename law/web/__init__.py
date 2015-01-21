@@ -2,7 +2,7 @@
 " Copyright:    Loggly, Inc.
 " Author:       Scott Griffin
 " Email:        scott@loggly.com
-" Last Updated: 10/31/2014
+" Last Updated: 01/12/2015
 "
 " Flask interface for the web module
 "
@@ -11,7 +11,7 @@ from datetime            import datetime, date
 from flask               import Flask, url_for
 from flask.json          import JSONEncoder
 from law                 import config
-from law.web             import views, subscription, volumes, salesdash
+from law.web             import views, subscription, volumes, salesdash, touchbiz
 from law.util.adb        import Session, AccountState, Tier
 from law.util.lawdb      import db_url, db, security
 from flask.ext.login     import current_user, current_app, login_user
@@ -23,9 +23,13 @@ app.debug = config.getboolean( 'webapp', 'debug' )
 app.register_blueprint( views.blueprint )
 
 app.register_blueprint( subscription.views.blueprint, url_prefix = '/subscription' )
-app.register_blueprint( subscription.rest.blueprint, url_prefix = '/apiv1/subscription' )
 app.register_blueprint( volumes.views.blueprint, url_prefix = '/volumes' )
 app.register_blueprint( salesdash.views.blueprint, url_prefix = '/sales' )
+app.register_blueprint( touchbiz.views.blueprint, url_prefix = '/touchbiz' )
+
+# API routes
+app.register_blueprint( subscription.rest.blueprint, url_prefix = '/apiv1/subscription' )
+app.register_blueprint( touchbiz.rest.blueprint, url_prefix = '/apiv1/touchbiz' )
 
 # Config items
 app.config['SECRET_KEY']              = config.get( 'flask-security', 'secret_key' )
@@ -69,5 +73,6 @@ secure_blueprints([
     subscription.views.blueprint,
     subscription.rest.blueprint,
     volumes.views.blueprint,
-    salesdash.views.blueprint
+    salesdash.views.blueprint,
+    touchbiz.views.blueprint,
 ])
