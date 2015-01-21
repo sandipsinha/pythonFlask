@@ -9,7 +9,7 @@ from law.web.touchbiz     import rest
 
 blueprint = Blueprint( 'touchbiz', __name__, 
                         template_folder = 'templates',
-                        static_folder   = '../static' )
+                        static_folder   = 'static' )
 
 @blueprint.route( '/<string:subd>/table' )
 def table(subd):
