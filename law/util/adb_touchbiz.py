@@ -41,7 +41,6 @@ class Touchbiz( Base ):
     sales_rep_id   = Column( MEDIUMINT(unsigned=True), ForeignKey( 'sales_reps.id' ) )
     created        = Column( DateTime, primary_key=True )
     modified       = Column( DateTime )
-    stage_id       = Column( MEDIUMINT(unsigned=True), ForeignKey( 'sales_stages.id' ) )
     tier           = Column( String(length=100) )
     retention      = Column( Integer )
     volume         = Column( BIGINT(unsigned=True) )
@@ -49,10 +48,6 @@ class Touchbiz( Base ):
     billing_period = Column( String(length=50) )
     owner          = relationship(
                         "SalesReps", 
-                        lazy='joined',
-                        backref=backref("sales_touchbiz", uselist=False))
-    stage          = relationship(
-                        "SalesStages", 
                         lazy='joined',
                         backref=backref("sales_touchbiz", uselist=False))
              

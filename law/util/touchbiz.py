@@ -19,7 +19,6 @@ FlatTouchbiz = namedtuple( 'FlatTouchbiz', [
     'volume', 
     'period', 
     'rate', 
-    'stage', 
     'owner'] 
 )
 
@@ -32,23 +31,16 @@ def getattr_nested(obj, name, default=None ):
 
 
 def initial_touchbiz_entry():
-    INITIAL_STAGE = 'Not Engaged'
-
     epoch_start = datetime( 1970, 1, 1 )
     with tb_loader() as l:
         company = l.query( SalesReps )\
                    .filter( SalesReps.sfdc_alias == 'integ' )\
                    .one()
 
-        stage = l.query( SalesStages )\
-                 .filter( SalesStages.name == INITIAL_STAGE )\
-                 .one()
-
         initial = Touchbiz( 
             created  = epoch_start, 
             modified = epoch_start,
         )
-        initial.stage = stage
         initial.owner = company
 
     return initial
@@ -84,7 +76,6 @@ def apply_touchbiz( sub_entries, tb_entries ):
             match = True
 
         sub.owner = tbd[key].owner
-        sub.stage = tbd[key].stage
 
         applied.append( sub )
 
@@ -116,10 +107,10 @@ def touchbiz_by_account( subdomain ):
 
 def flatten( row ):
     if isinstance( row, AccountState ):
-        cols = ['updated', 'tPlan.name', 'tDays', 'tGB', 'period', 'tRate', 'stage.name', 'owner.sfdc_alias']
+        cols = ['updated', 'tPlan.name', 'tDays', 'tGB', 'period', 'tRate', 'owner.sfdc_alias']
         flattened = FlatTouchbiz( *[ item[1] for item in as_tuple( row, cols )] )
     elif isinstance( row, Touchbiz ):
-        cols = ['created', 'tier', 'retention', 'volume', 'period', 'sub_rate', 'stage.name', 'owner.sfdc_alias']
+        cols = ['created', 'tier', 'retention', 'volume', 'period', 'sub_rate', 'owner.sfdc_alias']
         flattened = FlatTouchbiz( *[ item[1] for item in as_tuple( row, cols )] )
 
     return flattened
@@ -141,7 +132,3 @@ def dictify( rows, columns=None, column_map=None ):
 def owner_id( email ):
     with tb_loader() as l:
         return l.query( SalesReps ).filter( SalesReps.email == email ).one().id
-
-def stage_id( name ):
-    with tb_loader() as l:
-        return l.query( SalesStages ).filter( SalesStages.name == name ).one().id

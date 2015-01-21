@@ -10,7 +10,7 @@ from datetime              import datetime
 from flask                 import Blueprint, jsonify, request, url_for
 from flask.ext.login       import current_user
 from law.util.adb_touchbiz import (session_context as tb_session, loader as tb_loader, 
-                                  Touchbiz, SalesStages, SalesReps )
+                                  Touchbiz, SalesReps )
 from law.util              import touchbiz
 from law.util.timeutil     import iso8601_to_dt
 
@@ -64,14 +64,12 @@ def new( subd ):
     except:
         raise Exception( 'Unauthorized to add touchbiz entry.' )
     
-    stage_id = touchbiz.stage_id( request.form['stage'] )
     created  = iso8601_to_dt( request.form.get( 'created' ) ) if 'created' in request.form else datetime.today() 
 
     with tb_session() as s:
         entry = Touchbiz( 
             acct_id        = acct_id,
             sales_rep_id   = owner_id,
-            stage_id       = stage_id, 
             created        = created,
             modified       = created,
             tier           = request.form['tier'],
@@ -88,14 +86,6 @@ def new( subd ):
 @rest_endpoint( '/subdomain/<string:subd>/update', methods=['POST'] )
 def update( subd ):
     pass
-
-
-@rest_endpoint( '/stages' )
-def stages():
-    with tb_session() as s:
-        stages = [(item.id, item.name) for item in s.query( SalesStages ).all()]
-
-    return stages
 
 
 #@blueprint.route( '/subdomain/<string:subd>' )

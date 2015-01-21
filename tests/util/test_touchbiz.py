@@ -64,7 +64,6 @@ class TestTouchbiz( unittest.TestCase ):
 
     # Setup Salesreps tables
 
-    # Setup Sales Stages Tables
 
     def test_apply_touchbiz( self ):
 
@@ -91,16 +90,12 @@ class TestTouchbiz( unittest.TestCase ):
 
         self.assertEqual( len( applied ), 4 )
         self.assertEqual( applied[0].owner.sfdc_alias, company.sfdc_alias )
-        self.assertEqual( applied[0].stage.name, 'Not Engaged' )
 
         self.assertEqual( applied[1].owner.sfdc_alias, company.sfdc_alias )
-        self.assertEqual( applied[1].stage.name, 'Not Engaged' )
 
         self.assertEqual( applied[2].owner.sfdc_alias, aeich.sfdc_alias )
-        self.assertEqual( applied[2].stage.name, 'Working' )
 
         self.assertEqual( applied[3].owner.sfdc_alias, aeich.sfdc_alias )
-        self.assertEqual( applied[3].stage.name, 'Working' )
 
         with adb.loader() as l:
             sub_entries = l.query( adb.AccountState )\
@@ -269,7 +264,6 @@ class TestTouchbiz( unittest.TestCase ):
         self.assertEqual( row.volume, 0 )
         self.assertEqual( row.rate, 0 )
         self.assertEqual( row.owner, company.sfdc_alias )
-        self.assertEqual( row.stage, 'Not Engaged')
 
         row = touchbiz.flatten( rows[1] )
         self.assertEqual( row.created, datetime( 2014, 9, 22, 1) )
@@ -278,7 +272,6 @@ class TestTouchbiz( unittest.TestCase ):
         self.assertEqual( row.volume, 1000000000 )
         self.assertEqual( row.rate, 49 )
         self.assertEqual( row.owner, company.sfdc_alias )
-        self.assertEqual( row.stage, 'Not Engaged')
 
         row = touchbiz.flatten( rows[2] )
         self.assertEqual( row.created, datetime( 2015, 2, 10, 15) )
@@ -287,7 +280,6 @@ class TestTouchbiz( unittest.TestCase ):
         self.assertEqual( row.volume, 200000000000 )
         self.assertEqual( row.rate, 109 )
         self.assertEqual( row.owner, aeich.sfdc_alias )
-        self.assertEqual( row.stage, 'Working')
 
 
 
