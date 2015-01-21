@@ -58,4 +58,16 @@ FIXTURES = [
     'sub_rate'      : 109,
     'billing_period': 'annual',
 },
+{
+    'acct_id'       : 1002,
+    'sales_rep_id'  : 2,
+    'created'       : datetime( 2015, 2, 10, 15 ),
+    'modified'      : datetime( 2015, 2, 10, 15 ),
+    'stage_id'      : 2,
+    'tier'          : 'Production',
+    'retention'     : 15,
+    'volume'        : 200000000000,
+    'sub_rate'      : 109,
+    'billing_period': 'annual',
+},
 ]
