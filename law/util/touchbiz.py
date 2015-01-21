@@ -6,19 +6,49 @@
 " Module that acts as a controller to the Touchbiz data model
 "
 """
-from datetime import datetime
+from datetime    import datetime
+from collections import namedtuple
 
-from law.util.adb_touchbiz  import loader as tb_loader, Touchbiz, SalesReps
+from law.util.adb_touchbiz  import loader as tb_loader, Touchbiz, SalesReps, SalesStages
 from law.util.adb           import loader as adb_loader, AccountState, Account
 
+FlatTouchbiz = namedtuple( 'FlatTouchbiz', [
+    'created', 
+    'tier', 
+    'retention', 
+    'volume', 
+    'period', 
+    'rate', 
+    'stage', 
+    'owner'] 
+)
+
+def getattr_nested(obj, name, default=None ):
+    """ Allows dot notation in getattr. """
+    try:
+        return reduce(getattr, name.split("."), obj)
+    except AttributeError:
+        return default
+
+
 def initial_touchbiz_entry():
+    INITIAL_STAGE = 'Not Engaged'
+
     epoch_start = datetime( 1970, 1, 1 )
     with tb_loader() as l:
         company = l.query( SalesReps )\
                    .filter( SalesReps.sfdc_alias == 'integ' )\
                    .one()
 
-        initial = Touchbiz( created = epoch_start, modified = epoch_start )
+        stage = l.query( SalesStages )\
+                 .filter( SalesStages.name == INITIAL_STAGE )\
+                 .one()
+
+        initial = Touchbiz( 
+            created  = epoch_start, 
+            modified = epoch_start,
+        )
+        initial.stage = stage
         initial.owner = company
 
     return initial
@@ -43,6 +73,7 @@ def apply_touchbiz( sub_entries, tb_entries ):
 
     applied = []
     key = tbkeys.pop()
+    match = False
 
     for sub in subs:
         # While there are still touchbiz entries that occured before this
@@ -50,8 +81,11 @@ def apply_touchbiz( sub_entries, tb_entries ):
         # before the subscription change.
         while len( tbkeys ) != 0 and tbd[ tbkeys[-1] ].created <= sub.updated:
             key = tbkeys.pop()
+            match = True
 
         sub.owner = tbd[key].owner
+        sub.stage = tbd[key].stage
+
         applied.append( sub )
 
     # If there are touchbiz entries left apply the most recent one 
@@ -80,18 +114,34 @@ def touchbiz_by_account_id( acct_id ):
 def touchbiz_by_account( subdomain ):
     return touchbiz_by_account_id( acct_id_for_subdomain( subdomain ) )
 
-def tuplify( columns, rows, column_map=None ):
+def flatten( row ):
+    if isinstance( row, AccountState ):
+        cols = ['updated', 'tPlan.name', 'tDays', 'tGB', 'period', 'tRate', 'stage.name', 'owner.sfdc_alias']
+        flattened = FlatTouchbiz( *[ item[1] for item in as_tuple( row, cols )] )
+    elif isinstance( row, Touchbiz ):
+        cols = ['created', 'tier', 'retention', 'volume', 'period', 'sub_rate', 'stage.name', 'owner.sfdc_alias']
+        flattened = FlatTouchbiz( *[ item[1] for item in as_tuple( row, cols )] )
+
+    return flattened
+
+def as_tuple( row, columns, column_map=None ):
+    column_map = column_map or {} 
+    return [ (column_map.get( column, column ), getattr_nested( row, column )) for column in columns ]
+
+def tuplify( rows, columns=None, column_map=None ):
     """ Returns the rows as a list of tuples containing ((colum name, value), ... )"""
     column_map = column_map or {} 
-
-    # Allows dot notation in getattr.  Does not support defaults.
-    def getattrd(obj, name ):
-        return reduce(getattr, name.split("."), obj)
-
-    tuplified = []
-    for row in rows:
-        tuplified.append( [ (column_map.get( column, column), getattrd( row, column )) for column in columns ] )
+    tuplified = [ as_tuple( row, columns, column_map ) for row in rows ]
 
     return tuplified
 
+def dictify( rows, columns=None, column_map=None ):
+    return [ dict( pairs ) for pairs in tuplify( rows, columns, column_map ) ]
 
+def owner_id( email ):
+    with tb_loader() as l:
+        return l.query( SalesReps ).filter( SalesReps.email == email ).one().id
+
+def stage_id( name ):
+    with tb_loader() as l:
+        return l.query( SalesStages ).filter( SalesStages.name == name ).one().id

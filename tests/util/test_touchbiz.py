@@ -91,9 +91,16 @@ class TestTouchbiz( unittest.TestCase ):
 
         self.assertEqual( len( applied ), 4 )
         self.assertEqual( applied[0].owner.sfdc_alias, company.sfdc_alias )
+        self.assertEqual( applied[0].stage.name, 'Not Engaged' )
+
         self.assertEqual( applied[1].owner.sfdc_alias, company.sfdc_alias )
+        self.assertEqual( applied[1].stage.name, 'Not Engaged' )
+
         self.assertEqual( applied[2].owner.sfdc_alias, aeich.sfdc_alias )
+        self.assertEqual( applied[2].stage.name, 'Working' )
+
         self.assertEqual( applied[3].owner.sfdc_alias, aeich.sfdc_alias )
+        self.assertEqual( applied[3].stage.name, 'Working' )
 
         with adb.loader() as l:
             sub_entries = l.query( adb.AccountState )\
@@ -176,7 +183,7 @@ class TestTouchbiz( unittest.TestCase ):
 
 
         columns = ('tRate', 'tGB', 'tDays', 'owner.sfdc_alias', 'owner.email' )
-        rows = touchbiz.tuplify( columns, touchbiz.touchbiz_by_account_id(1000) )
+        rows = touchbiz.tuplify( touchbiz.touchbiz_by_account_id(1000), columns )
 
         self.assertEqual( len( rows ), 4 )
         self.assertEqual( rows[0][0], ( 'tRate', 0 ) )
@@ -202,6 +209,87 @@ class TestTouchbiz( unittest.TestCase ):
         self.assertEqual( rows[3][2], ( 'tDays', 15 ) )
         self.assertEqual( rows[3][3], ( 'owner.sfdc_alias', aeich.sfdc_alias ) )
         self.assertEqual( rows[3][4], ( 'owner.email', aeich.email ) )
+    
+    def test_dictify( self ):
+        with tbz.loader() as l:
+            company = l.query( tbz.SalesReps )\
+                       .filter( tbz.SalesReps.sfdc_alias == 'integ' )\
+                       .one()
+
+            aeich = l.query( tbz.SalesReps )\
+                     .filter( tbz.SalesReps.sfdc_alias == 'aeich' )\
+                     .one()
+
+
+        columns = ('tRate', 'tGB', 'tDays', 'owner.sfdc_alias', 'owner.email' )
+        rows = touchbiz.dictify( touchbiz.touchbiz_by_account_id(1000), columns )
+
+        self.assertEqual( len( rows ), 4 )
+        self.assertEqual( rows[0][ 'tRate' ], 0 )
+        self.assertEqual( rows[0][ 'tGB' ], 0 )
+        self.assertEqual( rows[0][ 'tDays' ], 15 )
+        self.assertEqual( rows[0][ 'owner.sfdc_alias' ], company.sfdc_alias )
+        self.assertEqual( rows[0][ 'owner.email' ], company.email )
+       
+        self.assertEqual( rows[1][ 'tRate' ], 0 )
+        self.assertEqual( rows[1][ 'tGB' ], 200000000 )
+        self.assertEqual( rows[1][ 'tDays' ], 7 )
+        self.assertEqual( rows[1][ 'owner.sfdc_alias' ], company.sfdc_alias )
+        self.assertEqual( rows[1][ 'owner.email' ], company.email )
+        
+        self.assertEqual( rows[2][ 'tRate' ], 49 )
+        self.assertEqual( rows[2][ 'tGB' ], 1000000000 )
+        self.assertEqual( rows[2][ 'tDays' ], 7 )
+        self.assertEqual( rows[2][ 'owner.sfdc_alias' ], aeich.sfdc_alias )
+        self.assertEqual( rows[2][ 'owner.email' ], aeich.email )
+        
+        self.assertEqual( rows[3][ 'tRate' ], 99 )
+        self.assertEqual( rows[3][ 'tGB' ], 2000000000 )
+        self.assertEqual( rows[3][ 'tDays' ], 15 )
+        self.assertEqual( rows[3][ 'owner.sfdc_alias' ], aeich.sfdc_alias )
+        self.assertEqual( rows[3][ 'owner.email' ], aeich.email )
+    
+    def test_flatten( self ):
+        with tbz.loader() as l:
+            company = l.query( tbz.SalesReps )\
+                       .filter( tbz.SalesReps.sfdc_alias == 'integ' )\
+                       .one()
+
+            aeich = l.query( tbz.SalesReps )\
+                     .filter( tbz.SalesReps.sfdc_alias == 'aeich' )\
+                     .one()
+
+
+        rows = touchbiz.touchbiz_by_account_id(1002)
+
+        row = touchbiz.flatten( rows[0] )
+        self.assertEqual( row.created, datetime( 2014, 4, 8) )
+        self.assertEqual( row.tier, 'trial' )
+        self.assertEqual( row.retention, 15 )
+        self.assertEqual( row.volume, 0 )
+        self.assertEqual( row.rate, 0 )
+        self.assertEqual( row.owner, company.sfdc_alias )
+        self.assertEqual( row.stage, 'Not Engaged')
+
+        row = touchbiz.flatten( rows[1] )
+        self.assertEqual( row.created, datetime( 2014, 9, 22, 1) )
+        self.assertEqual( row.tier, 'development' )
+        self.assertEqual( row.retention, 7 )
+        self.assertEqual( row.volume, 1000000000 )
+        self.assertEqual( row.rate, 49 )
+        self.assertEqual( row.owner, company.sfdc_alias )
+        self.assertEqual( row.stage, 'Not Engaged')
+
+        row = touchbiz.flatten( rows[2] )
+        self.assertEqual( row.created, datetime( 2015, 2, 10, 15) )
+        self.assertEqual( row.tier, 'Production' )
+        self.assertEqual( row.retention, 15 )
+        self.assertEqual( row.volume, 200000000000 )
+        self.assertEqual( row.rate, 109 )
+        self.assertEqual( row.owner, aeich.sfdc_alias )
+        self.assertEqual( row.stage, 'Working')
+
+
 
     def test_touchbiz_table( self ):
         pass
