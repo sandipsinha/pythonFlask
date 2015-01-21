@@ -1,0 +1,48 @@
+{% extends 'touchbiz/base.html' %}
+{% block content %}
+<table id='sub_table' class='display'></table>
+<script>
+$(document).ready(function() {
+    $('#sub_table').dataTable( {
+        "searching": false,
+        "paging": false,
+        "scrollY": "150px", 
+        "order": [0, 'desc'],
+        "data": {{data|tojson|safe}},
+        "bInfo": false,
+        "columns": [{ 
+            "title": "Date", 
+            "data" : "created", 
+        },{ 
+            "title": "Rate", 
+            "data" : "rate",
+            "render": function( data, type, row, meta ) { 
+                return "$" + Number( data ).toFixed( 2 ) + "/mo" ;
+            }
+        },{
+            "title": "Tier", 
+            "data" : "tier" 
+        },{ 
+            "title": "Volume (GB)", 
+            "data" : "volume",
+            "render": function( data, type, row, meta ) { 
+                return Number( data ).toFixed( 2 ) ;
+            }
+        },{
+            "title": "Retention", 
+            "data" : "retention",
+            "render": function( data, type, row, meta ) { 
+                return data + " days" ;
+            }
+        },{
+            "title": "Owner", 
+            "data" : "owner",
+        },{
+            "title": "Stage", 
+            "data" : "stage",
+        }
+        ]
+    });
+});
+</script>
+{% endblock %}

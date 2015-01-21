@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <script src="//ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.1/js/bootstrap.min.js"></script>
+
+    <link rel='stylesheet' type='text/css' href='static/styles/law.css'/>
+    <!-- Latest compiled and minified CSS -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.1/css/bootstrap.min.css">
+
+</head>
+<body>
+<div id='slide1' class='row-fluid'>
+  <div class='span4 offset4 text-center'>
+    <button id="add-touchbiz" class="btn btn-info text-center">Touch This Account</button>
+  </div>
+</div>
+
+<div id='slide2' class='row-fluid'>
+    <form class="form-horizontal touchbiz-form">
+    <fieldset>
+    <!-- Text input-->
+    <div class="touchbiz-form form-group">
+    <label class="col-md-4 control-label" for="tier">Tier</label>  
+    <div class="col-md-4">
+    <input id="tier" name="tier" type="text" placeholder="tier" class="form-control input-md">
+        
+    </div>
+    </div>
+
+    <!-- Appended Input-->
+    <div class="form-group">
+    <label class="col-md-4 control-label" for="volume">Volume</label>
+    <div class="col-md-4">
+        <div class="input-group">
+        <input id="volume" name="volume" class="form-control" placeholder="volume" type="text">
+        <span class="input-group-addon">GB</span>
+        </div>
+        
+    </div>
+    </div>
+    <!-- Appended Input-->
+    <div class="form-group">
+    <label class="col-md-4 control-label" for="retention">Retention</label>
+    <div class="col-md-4">
+        <div class="input-group">
+        <input id="retention" name="retention" class="form-control" placeholder="retention" type="text">
+        <span class="input-group-addon">Days</span>
+        </div>
+        
+    </div>
+    </div>
+    <!-- Select Basic -->
+    <div class="form-group">
+    <label class="col-md-4 control-label" for="billing_period">Billing Period</label>
+    <div class="col-md-4">
+        <select id="billing_period" name="billing_period" class="form-control">
+        <option value="monthly">Monthly</option>
+        <option value="annual">Annual</option>
+        </select>
+    </div>
+    </div>
+
+    <!-- Appended Input-->
+    <div class="form-group">
+    <label class="col-md-4 control-label" for="sub_rate">Sub Rate</label>
+    <div class="col-md-4">
+        <div class="input-group">
+        <input id="sub_rate" name="sub_rate" class="form-control" placeholder="$$$" type="text">
+        <span class="input-group-addon">.00</span>
+        </div>
+        
+    </div>
+    </div>
+    <!-- Select Basic -->
+    <div class="form-group">
+    <label class="col-md-4 control-label" for="stage">Stage</label>
+    <div class="col-md-4">
+        <select id="stage" name="stage" class="form-control">
+        <option value="Working">Working</option>
+        <option value="Not Engaged">Not Engaged</option>
+        </select>
+    </div>
+    </div>
+
+    <!-- Button (Double) -->
+    <div class="form-group">
+    <label class="col-md-4 control-label" for="save"></label>
+    <div class="col-md-8">
+        <button id="save" name="save" class="btn btn-info">Save</button>
+        <button id="cancel" name="cancel" class="btn btn-inverse">Cancel</button>
+    </div>
+    </div>
+
+    </fieldset>
+        
+    </form>
+</div>
+</body>
+<script type='text/javascript'>
+$(document).ready( function() {
+(function ($, document) {
+
+    $('#slide2').hide(0);
+
+    var form = $('.touchbiz-form') ;
+    var failure = $('<div class="span4 offset4 text-center"><span>Failed!</span></div>' )
+    var success = $('<div class="span4 offset4 text-center"><span>Success!</span></div>' )
+
+    $('button#save').click( function(e) {
+        $(this).prop('disabled', true);
+        e.preventDefault() ;
+        $.post( "{{new_url}}", form.serialize(), function() {
+            $('form.touchbiz-form').before( success );
+            // do more inteligent stuff such as reloading the page
+        })
+        .fail( function() {
+            $('form.touchbiz-form').before( failure );
+        });
+
+    });
+    
+    $('button#cancel').click( function(e) {
+        e.preventDefault() ;
+        // revert form to initial look
+        $('#slide2').hide( 0 ) ;
+        $('#slide1').show( 50 ) ;
+    });
+
+    $('button#add-touchbiz' ).click( function(e) {
+        $('#slide1').hide( 0 ) ;
+        $('#slide2').show( 50 ) ;
+    }) ;
+
+})(jQuery, document); 
+});
+</script>
+</html>
