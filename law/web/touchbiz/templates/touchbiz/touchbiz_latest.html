@@ -12,7 +12,7 @@
 <body>
 <div id='slide1' class='row-fluid'>
   <div class='span4 offset4 text-center'>
-    <button id="add-touchbiz" class="btn btn-info text-center">Touch This Account</button>
+    <button id="touchbiz-manipulator" class="btn btn-info text-center">Touch This Account</button>
   </div>
 </div>
 
@@ -101,8 +101,8 @@ $(document).ready( function() {
         $(this).prop('disabled', true);
         e.preventDefault() ;
         $.post( "{{new_url}}", form.serialize(), function() {
-            $('form.touchbiz-form').before( success );
-            // do more inteligent stuff such as reloading the page
+            $('button#touchbiz-manipulator').html( 'Edit Touchbiz' );
+            toggleSlides();
         })
         .fail( function() {
             $('form.touchbiz-form').before( failure );
@@ -113,14 +113,26 @@ $(document).ready( function() {
     $('button#cancel').click( function(e) {
         e.preventDefault() ;
         // revert form to initial look
-        $('#slide2').hide( 0 ) ;
-        $('#slide1').show( 50 ) ;
+        toggleSlides() ;
     });
 
-    $('button#add-touchbiz' ).click( function(e) {
-        $('#slide1').hide( 0 ) ;
-        $('#slide2').show( 50 ) ;
+    $('button#touchbiz-manipulator' ).click( function(e) {
+        toggleSlides() ;
     }) ;
+
+    function toggleSlides() {
+        var slide1 = $('#slide1')
+
+        console.log( slide1.is( ':visible' ) ) ;
+
+        if( slide1.is(':visible') ) {
+            $('#slide1').hide( 0 ) ;
+            $('#slide2').show( 0 ) ;
+        } else {
+            $('#slide2').hide( 0 ) ;
+            $('#slide1').show( 0 ) ;
+        }
+    }
 
 })(jQuery, document); 
 });
