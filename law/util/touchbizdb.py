@@ -18,17 +18,17 @@ from sqlalchemy.orm             import sessionmaker, relationship, backref
 Base = declarative_base()
 
 db_url = '{dialect}://{user}:{passwd}@{host}:{port}/{dbname}'.format(
-    dialect = config.get( 'adb_touchbiz', 'dialect' ),
-    user    = config.get( 'adb_touchbiz', 'username' ),
-    passwd  = config.get( 'adb_touchbiz', 'password' ),
-    host    = config.get( 'adb_touchbiz', 'host' ),
-    port    = config.get( 'adb_touchbiz', 'port' ),
-    dbname  = config.get( 'adb_touchbiz', 'dbname' ),
+    dialect = config.get( 'touchbizdb', 'dialect' ),
+    user    = config.get( 'touchbizdb', 'username' ),
+    passwd  = config.get( 'touchbizdb', 'password' ),
+    host    = config.get( 'touchbizdb', 'host' ),
+    port    = config.get( 'touchbizdb', 'port' ),
+    dbname  = config.get( 'touchbizdb', 'dbname' ),
 )
 
 engine = create_engine( 
             db_url, 
-            echo=config.getboolean( 'adb_touchbiz', 'debug' ), 
+            echo=config.getboolean( 'touchbizdb', 'debug' ), 
             pool_recycle=3600 
          )
 

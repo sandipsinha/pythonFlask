@@ -10,7 +10,7 @@ from collections import namedtuple
 from datetime    import datetime
 
 from tests.fixtures import populate
-from law.util import adb_touchbiz as tbz
+from law.util import touchbizdb as tbz
 from law.util import adb
 from law.util import touchbiz
 

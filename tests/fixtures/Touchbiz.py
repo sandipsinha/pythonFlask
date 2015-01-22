@@ -6,7 +6,7 @@
 """
 from datetime import datetime
 
-from law.util.adb_touchbiz import Touchbiz
+from law.util.touchbizdb import Touchbiz
 
 MODEL = Touchbiz
 FIXTURES = [

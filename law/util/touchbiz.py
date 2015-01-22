@@ -9,7 +9,7 @@
 from datetime    import datetime
 from collections import namedtuple
 
-from law.util.adb_touchbiz  import loader as tb_loader, Touchbiz, SalesReps, SalesStages
+from law.util.touchbizdb  import loader as tb_loader, Touchbiz, SalesReps, SalesStages
 from law.util.adb           import loader as adb_loader, AccountState, Account
 
 FlatTouchbiz = namedtuple( 'FlatTouchbiz', [

@@ -4,7 +4,7 @@
 " Email:        scott@loggly.com
 "
 """
-from law.util.adb_touchbiz import SalesReps
+from law.util.touchbizdb import SalesReps
 
 MODEL = SalesReps
 FIXTURES = [
