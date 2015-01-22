@@ -2,7 +2,7 @@
 " Copyright:    Loggly, Inc.
 " Author:       Scott Griffin
 " Email:        scott@loggly.com
-" Last Updated: 01/12/2015
+" Last Updated: 01/22/2015
 "
 " Flask interface for the web module
 "
@@ -75,4 +75,5 @@ secure_blueprints([
     volumes.views.blueprint,
     salesdash.views.blueprint,
     touchbiz.views.blueprint,
+    touchbiz.rest.blueprint,
 ])
