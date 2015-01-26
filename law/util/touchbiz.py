@@ -107,10 +107,10 @@ def touchbiz_by_account( subdomain ):
 
 def flatten( row ):
     if isinstance( row, AccountState ):
-        cols = ['updated', 'tPlan.name', 'tDays', 'tGB', 'period', 'tRate', 'owner.sfdc_alias']
+        cols = ['updated', 'tPlan.name', 'tDays', 'tGB', 'billing_period', 'tRate', 'owner.sfdc_alias']
         flattened = FlatTouchbiz( *[ item[1] for item in as_tuple( row, cols )] )
     elif isinstance( row, Touchbiz ):
-        cols = ['created', 'tier', 'retention', 'volume', 'period', 'sub_rate', 'owner.sfdc_alias']
+        cols = ['created', 'tier', 'retention', 'volume', 'billing_period', 'sub_rate', 'owner.sfdc_alias']
         flattened = FlatTouchbiz( *[ item[1] for item in as_tuple( row, cols )] )
 
     return flattened
