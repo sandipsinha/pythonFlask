@@ -21,6 +21,8 @@ def table(subd):
 
 @blueprint.route( '/<string:subd>/latest' )
 def latest( subd ):
+    latest = rest.latest( subd )
     return render_template( 'touchbiz/touchbiz_latest.html', **{
         'new_url': url_for( 'rest.touchbiz.new', subd=subd ),
+        'data': latest,
     })

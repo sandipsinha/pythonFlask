@@ -21,8 +21,8 @@ def rest_endpoint( route, methods=None ):
         """ A decorator that binds the decorated function to
         an enpoint.  This will jsonify the results automatically
         and pack them in {'data':<results>} json property.
-        If this function is not called directly then it will not
-        jsonify the results.
+        If this function is not called via a REST endpiont (ala via
+        a module import) then it will not jsonify the results.
         """
         @blueprint.route( route, methods=methods )
         @wraps( func )
@@ -54,6 +54,13 @@ def history( subd ):
     rows = [ touchbiz.flatten( row )._asdict() for row in touchbiz.touchbiz_by_account( subd )]
     return rows
 
+@rest_endpoint( '/subdomain/<string:subd>/latest', methods=['POST','PUT'] )
+def latest( subd ):
+    latest = touchbiz.flatten( touchbiz.touchbiz_by_account( subd )[-1] )._asdict()
+
+    return latest
+
+
 @rest_endpoint( '/subdomain/<string:subd>/new', methods=['POST','PUT'] )
 def new( subd ):
 
@@ -80,13 +87,12 @@ def new( subd ):
         )
         s.add( entry )
 
-    return {'status':'success'}
-    
+    latest = touchbiz.flatten( touchbiz.touchbiz_by_account( subd )[-1] )._asdict()
 
-@rest_endpoint( '/subdomain/<string:subd>/update', methods=['POST'] )
-def update( subd ):
-    pass
-
+    return {
+        'status':'success',
+        'new'   : latest,
+    }
 
 #@blueprint.route( '/subdomain/<string:subd>' )
 #def touchbiz_by_account( subd ):
