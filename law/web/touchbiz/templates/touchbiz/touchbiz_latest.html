@@ -11,8 +11,49 @@
 </head>
 <body>
 <div id='slide1' class='row-fluid'>
-  <div class='span4 offset4 text-center'>
-    <button id="touchbiz-manipulator" class="btn btn-info text-center">Touch This Account</button>
+  <div class='row'>
+    <div class="col-md-5"></div>
+    <label class="col-md-1 text-left">Owner:</label>
+    <div data-key="owner" class="col-md-1 text-left"></div>
+    <div class="col-md-5"></div>
+  </div>
+  <div class='row'>
+    <div class="col-md-5"></div>
+    <label class="col-md-1 text-left disabled">Tier:</label>
+    <div data-key="tier" class="col-md-1 text-left"></div>
+    <div class="col-md-5"></div>
+  </div>
+  <div class='row'>
+    <div class="col-md-5"></div>
+    <label class="col-md-1 text-left">Volume:</label>
+    <div data-key="volume" class="col-md-1 text-left"></div>
+    <div class="col-md-5"></div>
+  </div>
+  <div class='row'>
+    <div class="col-md-5"></div>
+    <label class="col-md-1 text-left">Retention:</label>
+    <div data-key="retention" class="col-md-1 text-left"></div>
+    <div class="col-md-5"></div>
+  </div>
+  <div class='row'>
+    <div class="col-md-5"></div>
+    <label class="col-md-1 text-left">Bill Period:</label>
+    <div data-key="period" class="col-md-1 text-left"></div>
+    <div class="col-md-5"></div>
+  </div>
+  <div class='row'>
+    <div class="col-md-5"></div>
+    <label class="col-md-1 text-left">Sub Rate:</label>
+    <div data-key="rate" class="col-md-1 text-left"></div>
+    <div class="col-md-5"></div>
+  </div>
+  <div class='row'></div>
+  <div class='row'>
+    <div class="col-md-5"></div>
+    <div class='col-md-2 text-left'>
+        <button id="touchbiz-manipulator" class="btn btn-info btn-block text-center">Touch This Account</button>
+    </div>
+    <div class="col-md-5"></div>
   </div>
 </div>
 
@@ -23,7 +64,7 @@
     <div class="touchbiz-form form-group">
     <label class="col-md-4 control-label" for="tier">Tier</label>  
     <div class="col-md-4">
-    <input id="tier" name="tier" type="text" placeholder="tier" class="form-control input-sm">
+    <input id="tier" name="tier" data-key='tier' type="text" placeholder="tier" class="form-control input-sm">
         
     </div>
     </div>
@@ -33,7 +74,7 @@
     <label class="col-md-4 control-label" for="volume">Volume</label>
     <div class="col-md-4">
         <div class="input-group">
-        <input id="volume" name="volume" class="form-control input-sm" placeholder="volume" type="text">
+        <input id="volume" name="volume" data-key='volume' class="form-control input-sm" placeholder="volume" type="text">
         <span class="input-group-addon">GB</span>
         </div>
         
@@ -44,7 +85,7 @@
     <label class="col-md-4 control-label" for="retention">Retention</label>
     <div class="col-md-4">
         <div class="input-group">
-        <input id="retention" name="retention" class="form-control input-sm" placeholder="retention" type="text">
+        <input id="retention" name="retention" data-key='retention' class="form-control input-sm" placeholder="retention" type="text">
         <span class="input-group-addon">Days</span>
         </div>
         
@@ -54,7 +95,7 @@
     <div class="form-group">
     <label class="col-md-4 control-label" for="billing_period">Billing Period</label>
     <div class="col-md-4">
-        <select id="billing_period" name="billing_period" class="form-control input-sm">
+        <select id="billing_period" name="billing_period" data-key='period' class="form-control input-sm">
         <option value="monthly">Monthly</option>
         <option value="annual">Annual</option>
         </select>
@@ -66,7 +107,7 @@
     <label class="col-md-4 control-label" for="sub_rate">Sub Rate</label>
     <div class="col-md-4">
         <div class="input-group">
-        <input id="sub_rate" name="sub_rate" class="form-control input-sm" placeholder="$$$" type="text">
+        <input id="sub_rate" name="sub_rate" data-key='rate' class="form-control input-sm" placeholder="$$$" type="text">
         <span class="input-group-addon">.00</span>
         </div>
         
@@ -91,18 +132,21 @@
 $(document).ready( function() {
 (function ($, document) {
 
-    $('#slide2').hide(0);
 
     var form = $('.touchbiz-form') ;
     var failure = $('<div class="span4 offset4 text-center"><span>Failed!</span></div>' )
     var success = $('<div class="span4 offset4 text-center"><span>Success!</span></div>' )
 
     $('button#save').click( function(e) {
-        $(this).prop('disabled', true);
         e.preventDefault() ;
-        $.post( "{{new_url}}", form.serialize(), function() {
+        var button = $(this);
+
+        button.prop('disabled', true);
+        $.post( "{{new_url}}", form.serialize(), function( result ) {
             $('button#touchbiz-manipulator').html( 'Edit Touchbiz' );
+            setData( '#slide1', result.data.new ) ;
             toggleSlides();
+            button.prop('disabled', false);
         })
         .fail( function() {
             $('form.touchbiz-form').before( failure );
@@ -123,7 +167,6 @@ $(document).ready( function() {
     function toggleSlides() {
         var slide1 = $('#slide1')
 
-        console.log( slide1.is( ':visible' ) ) ;
 
         if( slide1.is(':visible') ) {
             $('#slide1').hide( 0 ) ;
@@ -133,6 +176,16 @@ $(document).ready( function() {
             $('#slide1').show( 0 ) ;
         }
     }
+
+    function setData( parentid, data ) {
+        for( key in data ) {
+            $( parentid + ' [data-key="' + key + '"]' ).html( data[key] ) ;
+        }
+    }
+
+    // Do the initial data setting
+    $('#slide2').hide(0);
+    setData( '#slide1', {{data|tojson|safe }} ) ;
 
 })(jQuery, document); 
 });
