@@ -9,7 +9,7 @@ from datetime              import datetime
 
 from flask                 import Blueprint, jsonify, request, url_for
 from flask.ext.login       import current_user
-from law.util.touchbizdb import (session_context as tb_session, loader as tb_loader, 
+from law.util.touchbizdb   import (session_context as tb_session, loader as tb_loader, 
                                   Touchbiz, SalesReps )
 from law.util              import touchbiz
 from law.util.timeutil     import iso8601_to_dt
