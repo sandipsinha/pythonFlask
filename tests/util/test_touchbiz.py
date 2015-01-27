@@ -58,13 +58,6 @@ def teardown_module():
 
 class TestTouchbiz( unittest.TestCase ):
 
-    # Setup the subscription tables
-
-    # Setup touchbiz tables
-
-    # Setup Salesreps tables
-
-
     def test_apply_touchbiz( self ):
 
         with adb.loader() as l:
