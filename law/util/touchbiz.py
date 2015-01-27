@@ -9,7 +9,8 @@
 from datetime    import datetime
 from collections import namedtuple
 
-from law.util.touchbizdb  import loader as tb_loader, Touchbiz, SalesReps, SalesStages
+from law                    import config
+from law.util.touchbizdb    import loader as tb_loader, Touchbiz, SalesReps, SalesStages
 from law.util.adb           import loader as adb_loader, AccountState, Account
 
 FlatTouchbiz = namedtuple( 'FlatTouchbiz', [
@@ -34,8 +35,9 @@ def initial_touchbiz_entry():
     epoch_start = datetime( 1970, 1, 1 )
     with tb_loader() as l:
         company = l.query( SalesReps )\
-                   .filter( SalesReps.sfdc_alias == 'integ' )\
+                   .filter( SalesReps.email == config.get( 'touchbiz', 'company_user' ) )\
                    .one()
+
 
         initial = Touchbiz( 
             created  = epoch_start, 
