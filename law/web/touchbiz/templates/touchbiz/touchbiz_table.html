@@ -26,7 +26,11 @@ $(document).ready(function() {
             "title": "Volume (GB)", 
             "data" : "volume",
             "render": function( data, type, row, meta ) { 
-                return Number( data ).toFixed( 2 ) ;
+                if( typeof( data ) === 'number' ){
+                    return Number( data ).toFixed( 2 ) ;
+                } else {
+                    return data
+            }
             }
         },{
             "title": "Retention", 
