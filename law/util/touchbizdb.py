@@ -43,7 +43,7 @@ class Touchbiz( Base ):
     modified       = Column( DateTime )
     tier           = Column( String(length=100) )
     retention      = Column( Integer )
-    volume         = Column( BIGINT(unsigned=True) )
+    volume         = Column( String(length=50) )
     sub_rate       = Column( Integer )
     billing_period = Column( String(length=50) )
     owner          = relationship(

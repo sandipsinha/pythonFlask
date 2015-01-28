@@ -270,7 +270,7 @@ class TestTouchbiz( unittest.TestCase ):
         self.assertEqual( row.created, datetime( 2015, 2, 10, 15) )
         self.assertEqual( row.tier, 'Production' )
         self.assertEqual( row.retention, 15 )
-        self.assertEqual( row.volume, 200000000000 )
+        self.assertEqual( row.volume, '200000000000' )
         self.assertEqual( row.rate, 109 )
         self.assertEqual( row.owner, aeich.sfdc_alias )
 
