@@ -79,11 +79,11 @@ def new( subd ):
             sales_rep_id   = owner_id,
             created        = created,
             modified       = created,
-            tier           = request.form['tier'],
+            tier           = request.form['tier'].lower(),
             retention      = request.form['retention'],
             volume         = request.form['volume'],
             sub_rate       = request.form['sub_rate'],
-            billing_period = request.form['billing_period'],
+            billing_period = request.form['billing_period'].lower(),
         )
         s.add( entry )
 
