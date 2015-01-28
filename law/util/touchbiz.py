@@ -84,6 +84,7 @@ def apply_touchbiz( sub_entries, tb_entries ):
     # If there are touchbiz entries left apply the most recent one 
     # to the returned rows
     if len( tbkeys ) != 0:
+        tbd[tbkeys[0]].created = 'pending'
         applied.append( tbd[tbkeys[0]] )
 
     return applied
