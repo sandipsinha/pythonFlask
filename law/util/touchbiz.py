@@ -21,8 +21,12 @@ FlatTouchbiz = namedtuple( 'FlatTouchbiz', [
     'volume', 
     'period', 
     'rate', 
-    'owner'] 
+    'owner',
+    'status'] 
 )
+
+PENDING = 'pending'
+WON = 'won'
 
 TIMEZONE = pytz.timezone( 'US/Pacific' ) 
 
@@ -94,13 +98,15 @@ def apply_touchbiz( sub_entries, tb_entries ):
             match = True
 
         sub.owner = tbd[key].owner
+        sub.status = WON
 
         applied.append( sub )
 
     # If there are touchbiz entries left apply the most recent one 
     # to the returned rows
     if len( tbkeys ) != 0:
-        tbd[tbkeys[0]].created = 'pending'
+        tbd[tbkeys[0]].created = PENDING
+        tbd[tbkeys[0]].status  = PENDING
         applied.append( tbd[tbkeys[0]] )
 
     return applied
@@ -126,10 +132,10 @@ def touchbiz_by_account( subdomain ):
 
 def flatten( row ):
     if isinstance( row, AccountState ):
-        cols = ['updated', 'tPlan.name', 'tDays', 'tGB', 'billing_period', 'tRate', 'owner.sfdc_alias']
+        cols = ['updated', 'tPlan.name', 'tDays', 'tGB', 'billing_period', 'tRate', 'owner.sfdc_alias', 'status']
         flattened = FlatTouchbiz( *[ item[1] for item in as_tuple( row, cols )] )
     elif isinstance( row, Touchbiz ):
-        cols = ['created', 'tier', 'retention', 'volume', 'billing_period', 'sub_rate', 'owner.sfdc_alias']
+        cols = ['created', 'tier', 'retention', 'volume', 'billing_period', 'sub_rate', 'owner.sfdc_alias', 'status']
         flattened = FlatTouchbiz( *[ item[1] for item in as_tuple( row, cols )] )
 
     return flattened

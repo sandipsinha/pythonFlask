@@ -83,12 +83,13 @@ class TestTouchbiz( unittest.TestCase ):
 
         self.assertEqual( len( applied ), 4 )
         self.assertEqual( applied[0].owner.sfdc_alias, company.sfdc_alias )
-
+        self.assertEqual( applied[0].status, 'won' )
         self.assertEqual( applied[1].owner.sfdc_alias, company.sfdc_alias )
-
+        self.assertEqual( applied[0].status, 'won' )
         self.assertEqual( applied[2].owner.sfdc_alias, aeich.sfdc_alias )
-
+        self.assertEqual( applied[0].status, 'won' )
         self.assertEqual( applied[3].owner.sfdc_alias, aeich.sfdc_alias )
+        self.assertEqual( applied[0].status, 'won' )
 
         with adb.loader() as l:
             sub_entries = l.query( adb.AccountState )\
@@ -117,9 +118,13 @@ class TestTouchbiz( unittest.TestCase ):
 
         self.assertEqual( len( applied ), 4 )
         self.assertEqual( applied[0].owner.sfdc_alias, company.sfdc_alias )
+        self.assertEqual( applied[0].status, 'won' )
         self.assertEqual( applied[1].owner.sfdc_alias, skura.sfdc_alias )
+        self.assertEqual( applied[1].status, 'won' )
         self.assertEqual( applied[2].owner.sfdc_alias, skura.sfdc_alias )
+        self.assertEqual( applied[2].status, 'won' )
         self.assertEqual( applied[3].owner.sfdc_alias, skura.sfdc_alias )
+        self.assertEqual( applied[3].status, 'pending' )
 
     def test_touchbiz_by_account_id( self ): 
         with tbz.loader() as l:
