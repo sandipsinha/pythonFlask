@@ -5,6 +5,7 @@ nose==1.3.3
 MySQL-python==1.2.5
 Flask-Security==1.7.3
 Flask-SQLAlchemy==1.0
+pytz==2014.10
 
 -e git+git://github.com/sirsgriffin/conman.git@v0.3#egg=conman
 -e git+git://github.com/loggly/scry.git@v1.4#egg=scry

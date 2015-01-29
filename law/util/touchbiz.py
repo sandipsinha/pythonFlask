@@ -9,6 +9,7 @@
 from datetime    import datetime
 from collections import namedtuple
 
+import pytz
 from law                    import config
 from law.util.touchbizdb    import loader as tb_loader, Touchbiz, SalesReps, SalesStages
 from law.util.adb           import loader as adb_loader, AccountState, Account
@@ -22,6 +23,20 @@ FlatTouchbiz = namedtuple( 'FlatTouchbiz', [
     'rate', 
     'owner'] 
 )
+
+TIMEZONE = pytz.timezone( 'US/Pacific' ) 
+
+def localized_tb( tb_entries, timezone=TIMEZONE ):
+    """ Localizes created and modified colums of all Touchbiz object in 
+    tb_entries to the supplied timezone.  This does not make the datetime
+    objects timezone aware, but rather just applies the timezone offsets.
+    """
+    def localized( tb ):
+        tb.created  = timezone.normalize( pytz.utc.localize( tb.created ) ).replace( tzinfo=None )
+        tb.modified = timezone.normalize( pytz.utc.localize( tb.modified ) ).replace( tzinfo=None )
+        return tb
+
+    return (localized( tb ) for tb in tb_entries )
 
 def getattr_nested(obj, name, default=None ):
     """ Allows dot notation in getattr. """
@@ -60,10 +75,11 @@ def apply_touchbiz( sub_entries, tb_entries ):
     This should add an owner column to each subscription row.
     """
     tb_entries.append( initial_touchbiz_entry() )
-    tbd = {tb.created: tb for tb in tb_entries}
-    tbkeys = sorted( tbd.keys(), reverse=True )
 
-    subs = sorted( sub_entries, key=lambda x: x.updated )
+    #tbd    = _make_tb_dict( tb_entries )
+    tbd    = {tb.created: tb for tb in localized_tb( tb_entries, pytz.utc ) }
+    tbkeys = sorted( tbd.keys(), reverse=True )
+    subs   = sorted( sub_entries, key=lambda x: x.updated )
 
     applied = []
     key = tbkeys.pop()
