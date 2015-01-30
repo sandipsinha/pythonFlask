@@ -80,8 +80,7 @@ def apply_touchbiz( sub_entries, tb_entries ):
     """
     tb_entries.append( initial_touchbiz_entry() )
 
-    #tbd    = _make_tb_dict( tb_entries )
-    tbd    = {tb.created: tb for tb in localized_tb( tb_entries, pytz.utc ) }
+    tbd    = {tb.created: tb for tb in localized_tb( tb_entries ) }
     tbkeys = sorted( tbd.keys(), reverse=True )
     subs   = sorted( sub_entries, key=lambda x: x.updated )
 
