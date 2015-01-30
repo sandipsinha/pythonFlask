@@ -20,7 +20,7 @@ def fixtures():
     adb.Base.metadata.create_all( 
         bind=tbz.engine,
         tables = [
-            adb.AccountState.__table__,
+            adb.AccountStateUncompressed.__table__,
             adb.Tier.__table__,
             adb.Account.__table__,
         ]
@@ -30,7 +30,7 @@ def fixtures():
         populate( s, model_names=['SalesReps', 'Touchbiz'] )
 
     with adb.session_context() as s:
-        populate( s, model_names=['AccountState', 'Tier', 'Account'] )
+        populate( s, model_names=['AccountStateUncompressed', 'Tier', 'Account'] )
 
 
 def setup_module():
@@ -49,7 +49,7 @@ def teardown_module():
     adb.Base.metadata.drop_all( 
         bind=tbz.engine,
         tables=[
-            adb.AccountState.__table__,
+            adb.AccountStateUncompressed.__table__,
             adb.Tier.__table__,
             adb.Account.__table__,
         ]
@@ -61,8 +61,8 @@ class TestTouchbiz( unittest.TestCase ):
     def test_apply_touchbiz( self ):
 
         with adb.loader() as l:
-            sub_entries = l.query( adb.AccountState )\
-                           .filter( adb.AccountState.acct_id == 1000 )\
+            sub_entries = l.query( adb.AccountStateUncompressed )\
+                           .filter( adb.AccountStateUncompressed.acct_id == 1000 )\
                            .all()
 
         with tbz.loader() as l:
@@ -92,8 +92,8 @@ class TestTouchbiz( unittest.TestCase ):
         self.assertEqual( applied[0].status, 'won' )
 
         with adb.loader() as l:
-            sub_entries = l.query( adb.AccountState )\
-                           .filter( adb.AccountState.acct_id == 1001 )\
+            sub_entries = l.query( adb.AccountStateUncompressed )\
+                           .filter( adb.AccountStateUncompressed.acct_id == 1001 )\
                            .all()
 
         with tbz.loader() as l:

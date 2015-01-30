@@ -53,6 +53,9 @@ class Account( Base ):
             self.subdomain)
 
 class AccountState( Base ):
+    """ Compressed subscription table.  Any subscriptions that take place from
+    sun-sat are compressed into a single entry
+    """
     __tablename__ = 'aawsc'
     
     acct_id   = Column( Integer, primary_key=True )
@@ -74,6 +77,32 @@ class AccountState( Base ):
 
     def __repr__(self):
         return "<AccountState({},{})>".format(
+            self.acct_id, 
+            self.updated)
+
+class AccountStateUncompressed( Base ):
+    """ Account state where subcriptions are not compressed """
+    __tablename__ = 'aaws'
+    
+    acct_id   = Column( Integer, primary_key=True )
+    updated   = Column( DateTime, primary_key=True )
+    subdomain = Column( String(length=100) )
+    state     = Column( 'stNam', String(length=10) )
+    tRate     = Column( 'trate', Float )
+    fRate     = Column( 'frate', Float )
+    tPlan_id  = Column( 'tPlan', Integer, ForeignKey( 'subscription_plan.id' ) )
+    tGB       = Column( Numeric( asdecimal=False ) )
+    tDays     = Column( Integer )
+    tPlan     = relationship("Tier", 
+                             lazy='joined',
+                             backref=backref("AAWS", uselist=False))
+
+    @property
+    def rate_delta( self ):
+        return self.tRate - self.fRate 
+
+    def __repr__(self):
+        return "<AccountStateUncompressed({},{})>".format(
             self.acct_id, 
             self.updated)
 

@@ -6,9 +6,9 @@
 """
 from datetime import datetime
 
-from law.util.adb import AccountState
+from law.util.adb import AccountStateUncompressed
 
-MODEL = AccountState
+MODEL = AccountStateUncompressed
 FIXTURES = [
 # Cust 1001
 {

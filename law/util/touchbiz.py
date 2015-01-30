@@ -12,7 +12,7 @@ from collections import namedtuple
 import pytz
 from law                    import config
 from law.util.touchbizdb    import loader as tb_loader, Touchbiz, SalesReps, SalesStages
-from law.util.adb           import loader as adb_loader, AccountState, Account
+from law.util.adb           import loader as adb_loader, AccountStateUncompressed, Account
 
 FlatTouchbiz = namedtuple( 'FlatTouchbiz', [
     'created', 
@@ -116,8 +116,8 @@ def touchbiz_by_account_id( acct_id ):
     """ Munges subscription changes with our touchbiz entries"""
 
     with adb_loader() as l:
-        sub_entries = l.query( AccountState )\
-                       .filter( AccountState.acct_id == acct_id )\
+        sub_entries = l.query( AccountStateUncompressed )\
+                       .filter( AccountStateUncompressed.acct_id == acct_id )\
                        .all()
 
     with tb_loader() as l:
@@ -131,7 +131,7 @@ def touchbiz_by_account( subdomain ):
     return touchbiz_by_account_id( acct_id_for_subdomain( subdomain ) )
 
 def flatten( row ):
-    if isinstance( row, AccountState ):
+    if isinstance( row, AccountStateUncompressed ):
         cols = ['updated', 'tPlan.name', 'tDays', 'tGB', 'billing_period', 'tRate', 'owner.sfdc_alias', 'status']
         flattened = FlatTouchbiz( *[ item[1] for item in as_tuple( row, cols )] )
     elif isinstance( row, Touchbiz ):
