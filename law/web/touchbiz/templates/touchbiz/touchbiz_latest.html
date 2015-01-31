@@ -128,6 +128,7 @@
     <div class="col-md-8">
         <button id="save" name="save" class="btn btn-info btn-xs">Save</button>
         <button id="cancel" name="cancel" class="btn btn-inverse btn-xs">Cancel</button>
+        <img class='spinner' src="{{ url_for('touchbiz.static', filename='images/spinner.svg') }}"/>
     </div>
     </div>
 
@@ -144,20 +145,26 @@ $(document).ready( function() {
     var form = $('.touchbiz-form') ;
     var failure = $('<div class="span4 offset4 text-center"><span>Failed!</span></div>' )
     var success = $('<div class="span4 offset4 text-center"><span>Success!</span></div>' )
+    var spinner = $('button#save').siblings( '.spinner' ) ;
+    spinner.hide()
 
     $('button#save').click( function(e) {
         e.preventDefault() ;
         var button = $(this);
 
         button.prop('disabled', true);
+        spinner.show() ;
         $.post( "{{new_url}}", form.serialize(), function( result ) {
             $('button#touchbiz-manipulator').html( 'Edit Touchbiz' );
             setData( '#slide1', result.data.new ) ;
             toggleSlides();
-            button.prop('disabled', false);
         })
         .fail( function() {
             $('form.touchbiz-form').before( failure );
+        })
+        .always( function() {
+            spinner.hide() ;
+            button.prop('disabled', false);
         });
 
     });
