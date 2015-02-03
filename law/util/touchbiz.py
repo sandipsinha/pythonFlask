@@ -221,7 +221,7 @@ class TableCreator( object ):
         # per acct_id to operate on.
         owned = []
         for acct_id in source_acct_rows:
-            owned.extend( apply_touchbiz( source_acct_rows[acct_id], touchbiz_acct_rows[acct_id], with_pending=False ) )
+            owned.extend( apply_touchbiz( source_acct_rows[acct_id], touchbiz_acct_rows.get(acct_id, []), with_pending=False ) )
         
         def set_owner_name( row ):
             row.owner = '{} {}'.format( row.owner.first, row.owner.last )

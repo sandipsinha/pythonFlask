@@ -327,7 +327,7 @@ class TestTouchbiz( unittest.TestCase ):
             for col in columns:
                 self.assertEqual( getattr( source[i], col ), getattr( owners[i], col ) )
 
-        self.assertEqual( len( owners ), 9 )
+        self.assertEqual( len( owners ), 10 )
 
         self.assertEqual( owners[0].owner, 'Hoover Loggly' )
         self.assertEqual( owners[1].owner, 'Hoover Loggly' )

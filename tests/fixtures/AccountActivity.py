@@ -94,4 +94,14 @@ FIXTURES = [
     'to_vol_bytes'    : 1000000000,
     'to_ret_days'     : 7,
 },
+# Cust 1003
+{
+    'acct_id'         : 1003,
+    'updated'         : datetime( 2015, 2, 27 ),
+    'to_sub_rate'     : 0,
+    'from_sub_rate'   : 0,
+    'to_plan_id'      : 1,
+    'to_vol_bytes'    : 0,
+    'to_ret_days'     : 15,
+},
 ]
