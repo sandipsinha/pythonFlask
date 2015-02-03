@@ -29,7 +29,7 @@ db_url = '{dialect}://{user}:{passwd}@{host}:{port}/{dbname}'.format(
 engine = create_engine( 
             db_url, 
             echo=config.getboolean( 'touchbizdb', 'debug' ), 
-            pool_recycle=3600 
+            pool_recycle=config.getint( 'touchbizdb', 'pool_recycle' ), 
          )
 
 Session = sessionmaker( bind=engine )

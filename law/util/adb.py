@@ -30,7 +30,7 @@ db_url = '{dialect}://{user}:{passwd}@{host}:{port}/{dbname}'.format(
 engine = create_engine( 
             db_url, 
             echo=config.getboolean( 'adb', 'debug' ), 
-            pool_recycle=3600 
+            pool_recycle=config.getint( 'adb', 'pool_recycle' ),
          )
 
 Session = sessionmaker( bind=engine )
