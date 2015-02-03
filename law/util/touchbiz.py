@@ -52,13 +52,16 @@ def localized_tb( tb_entries, timezone=TIMEZONE ):
 
     return (localized( tb ) for tb in tb_entries )
 
+def owner_id( email ):
+    with tb_loader() as l:
+        return l.query( SalesReps ).filter( SalesReps.email == email ).one().id
+
 def getattr_nested(obj, name, default=None ):
     """ Allows dot notation in getattr. """
     try:
         return reduce(getattr, name.split("."), obj)
     except AttributeError:
         return default
-
 
 def initial_touchbiz_entry():
     epoch_start = datetime( 1970, 1, 1 )
@@ -99,7 +102,6 @@ def apply_touchbiz( sub_entries, tb_entries, localize=False, with_pending=True )
 
     applied = []
     key = tbkeys.pop()
-    match = False
 
     for sub in subs:
         # While there are still touchbiz entries that occured before this
@@ -107,7 +109,6 @@ def apply_touchbiz( sub_entries, tb_entries, localize=False, with_pending=True )
         # before the subscription change.
         while len( tbkeys ) != 0 and tbd[ tbkeys[-1] ].created <= sub.updated:
             key = tbkeys.pop()
-            match = True
 
         sub.owner = tbd[key].owner
         sub.status = WON
@@ -122,7 +123,6 @@ def apply_touchbiz( sub_entries, tb_entries, localize=False, with_pending=True )
         applied.append( tbd[tbkeys[0]] )
 
     return applied
-        
 
 def touchbiz_by_account_id( acct_id, localize=True ):
     """ Munges subscription changes with our touchbiz entries"""
@@ -153,10 +153,15 @@ def flatten( row ):
     return flattened
 
 def as_tuple( row, columns, column_map=None ):
+    """ Converts the row into a list of (column_name, value) pairs. 
+    Filters unneeded pairs by only including pairs that have a column 
+    name existing in the 'columns' list of this function's params.  
+    Useful for later converting to a dict.
+    """
     column_map = column_map or {} 
     return [ (column_map.get( column, column ), getattr_nested( row, column )) for column in columns ]
 
-def tuplify( rows, columns=None, column_map=None ):
+def tuplify( rows, columns, column_map=None ):
     """ Returns the rows as a list of tuples containing ((colum name, value), ... )"""
     column_map = column_map or {} 
     tuplified = [ as_tuple( row, columns, column_map ) for row in rows ]
@@ -164,11 +169,9 @@ def tuplify( rows, columns=None, column_map=None ):
     return tuplified
 
 def dictify( rows, columns=None, column_map=None ):
+    """ Returns a list of dictionaries that represent the supplied rows """
     return [ dict( pairs ) for pairs in tuplify( rows, columns, column_map ) ]
 
-def owner_id( email ):
-    with tb_loader() as l:
-        return l.query( SalesReps ).filter( SalesReps.email == email ).one().id
 
 
 class TableCreator( object ):
