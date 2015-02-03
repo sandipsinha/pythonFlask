@@ -22,6 +22,13 @@ from law.util.adb           import (loader as adb_loader,
                                     AAOwner,
                                     Account,)
 
+LOG = make_logger( 'sales-touchbiz' )
+
+TIMEZONE = pytz.timezone( 'US/Pacific' ) 
+PENDING  = 'pending'
+WON      = 'won'
+
+# Used to create a single ad-hoc'd object containing the most pertinent fields.
 FlatTouchbiz = namedtuple( 'FlatTouchbiz', [
     'created', 
     'tier', 
@@ -32,13 +39,6 @@ FlatTouchbiz = namedtuple( 'FlatTouchbiz', [
     'owner',
     'status'] 
 )
-
-PENDING = 'pending'
-WON = 'won'
-
-TIMEZONE = pytz.timezone( 'US/Pacific' ) 
-
-log = make_logger( 'sales-touchbiz' )
 
 def localized_tb( tb_entries, timezone=TIMEZONE ):
     """ Localizes created and modified colums of all Touchbiz object in 
@@ -159,7 +159,7 @@ def as_tuple( row, columns, column_map=None ):
     Useful for later converting to a dict.
     """
     column_map = column_map or {} 
-    return [ (column_map.get( column, column ), getattr_nested( row, column )) for column in columns ]
+    return tuple( (column_map.get( column, column ), getattr_nested( row, column )) for column in columns )
 
 def tuplify( rows, columns, column_map=None ):
     """ Returns the rows as a list of tuples containing ((colum name, value), ... )"""
@@ -171,7 +171,6 @@ def tuplify( rows, columns, column_map=None ):
 def dictify( rows, columns=None, column_map=None ):
     """ Returns a list of dictionaries that represent the supplied rows """
     return [ dict( pairs ) for pairs in tuplify( rows, columns, column_map ) ]
-
 
 
 class TableCreator( object ):
@@ -265,7 +264,7 @@ class TableCreator( object ):
             trans.commit()
         except Exception as e:
             trans.rollback()
-            log.exception({ 
+            LOG.exception({ 
                 'action':'rollback', 
                 'status':'failure',
                 'reason':'insert failed',
