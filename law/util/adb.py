@@ -10,7 +10,8 @@ from law                        import config
 from sqlalchemy                 import (create_engine, Column, 
                                         Integer, DateTime, 
                                         Boolean, String,
-                                        Float, Numeric, ForeignKey)
+                                        Float, Numeric, ForeignKey,
+                                        Index)
 from sqlalchemy.dialects.mysql  import BIGINT, SMALLINT, MEDIUMINT
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm             import sessionmaker, relationship, backref
@@ -55,9 +56,9 @@ class Account( Base ):
             self.subdomain)
 
 class AccountActivitySchema( object ):
-    acct_id        = Column( Integer, primary_key=True )
+    acct_id        = Column( Integer, primary_key=True, index=True )
+    updated        = Column( DateTime, primary_key=True, index=True )
     created        = Column( DateTime)
-    updated        = Column( DateTime, primary_key=True, default='0000-00-00 00:00:00'  )
     from_vol_bytes = Column( BIGINT(unsigned=True), default=0 )
     from_ret_days  = Column( SMALLINT(unsigned=True), default=0 )
     from_sub_rate  = Column( MEDIUMINT(unsigned=True), default=0 )

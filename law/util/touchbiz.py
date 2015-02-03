@@ -232,7 +232,7 @@ class TableCreator( object ):
     def _insert( self, items ):
         conn = self.engine.connect().execution_options( autocommit=False )
 
-        # Turn array of objects into a dict
+        # Turn array of objects into a dict for insert
         inserts = dictify( items, columns=[
             'acct_id',
             'created',
