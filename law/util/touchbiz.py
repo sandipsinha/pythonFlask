@@ -173,8 +173,9 @@ def owner_id( email ):
 
 class TableCreator( object ):
     """ Creates a separate table where toucbiz ownership
-    is applied by matching touchbiz to source entries via 
-    their updated dates.  Writes an owner column field.
+    is applied by matching touchbiz to source entries 
+    (subscriptoin changes) via their updated dates.  
+    Writes an owner column field as '<firstname> <lastname>'.
     """
 
     def __init__(self,  **kargs):
@@ -220,13 +221,19 @@ class TableCreator( object ):
         for acct_id in source_acct_rows:
             owned.extend( apply_touchbiz( source_acct_rows[acct_id], touchbiz_acct_rows[acct_id], with_pending=False ) )
         
-        def map_name( row ):
+        def set_owner_name( row ):
             row.owner = '{} {}'.format( row.owner.first, row.owner.last )
             return row
 
         # Remove pending touchbiz items as they are not subject to ownership
-        owned = ( map_name( row ) for row in owned if row.status is not PENDING )
-        dictified = dictify( owned, columns=[
+        owned = ( set_owner_name( row ) for row in owned if row.status is not PENDING )
+        self._insert( owned )
+
+    def _insert( self, items ):
+        conn = self.engine.connect().execution_options( autocommit=False )
+
+        # Turn array of objects into a dict
+        inserts = dictify( items, columns=[
             'acct_id',
             'created',
             'updated',
@@ -247,16 +254,11 @@ class TableCreator( object ):
             'trial_exp',
             'owner',
         ])
-        self._insert( dictified )
 
-    def _insert( self, items ):
-        conn = self.engine.connect().execution_options( autocommit=False )
-
-#        inserts = [self._dict_from_object( row ) for row in rows]
         try:
             trans = conn.begin()        
             conn.execute( self.dest.__table__.delete() )
-            conn.execute( self.dest.__table__.insert(), items )
+            conn.execute( self.dest.__table__.insert(), inserts )
             trans.commit()
         except Exception as e:
             trans.rollback()
@@ -269,10 +271,10 @@ class TableCreator( object ):
 
 class AAOwnerCreator( TableCreator ):        
     def __init__( self ):
-        super( AAOwnerCreator, self ).__init__(**{
-            'src_table'   : AccountActivity,
-            'src_loader'  : adb_loader,
-            'dest_table'  : AAOwner,
-            'dest_engine' : adb_engine,
-        })
+        super( AAOwnerCreator, self ).__init__(
+            src_table   = AccountActivity,
+            src_loader  = adb_loader,
+            dest_table  = AAOwner,
+            dest_engine = adb_engine,
+        )
 
