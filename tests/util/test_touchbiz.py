@@ -23,6 +23,8 @@ def fixtures():
             adb.AccountStateUncompressed.__table__,
             adb.Tier.__table__,
             adb.Account.__table__,
+            adb.AccountActivity.__table__,
+            adb.AAOwner.__table__,
         ]
     )
     
@@ -30,7 +32,12 @@ def fixtures():
         populate( s, model_names=['SalesReps', 'Touchbiz'] )
 
     with adb.session_context() as s:
-        populate( s, model_names=['AccountStateUncompressed', 'Tier', 'Account'] )
+        populate( s, model_names=[
+                        'AccountStateUncompressed', 
+                        'Tier', 
+                        'Account', 
+                        'AccountActivity']
+        )
 
 
 def setup_module():
@@ -52,6 +59,8 @@ def teardown_module():
             adb.AccountStateUncompressed.__table__,
             adb.Tier.__table__,
             adb.Account.__table__,
+            adb.AccountActivity.__table__,
+            adb.AAOwner.__table__,
         ]
     )
 
@@ -279,10 +288,58 @@ class TestTouchbiz( unittest.TestCase ):
         self.assertEqual( row.rate, 109 )
         self.assertEqual( row.owner, aeich.sfdc_alias )
 
+    def test_aaowners( self ):
+        creator = touchbiz.AAOwnerCreator()
+        creator.apply_ownership()
 
+        with adb.loader() as l:
+            source = l.query( adb.AccountActivity )\
+                      .order_by( adb.AccountActivity.acct_id, adb.AccountActivity.updated )\
+                      .all()
+            owners = l.query( adb.AAOwner )\
+                      .order_by( adb.AAOwner.acct_id, adb.AAOwner.updated )\
+                      .all()
 
-    def test_touchbiz_table( self ):
-        pass
+        columns = [ 
+            'acct_id',
+            'created',
+            'updated',
+            'from_vol_bytes',
+            'from_ret_days',
+            'from_sub_rate',
+            'from_plan_id',
+            'from_sched_id',
+            'from_bill_per',
+            'from_bill_chan',
+            'to_vol_bytes',
+            'to_ret_days',
+            'to_sub_rate',
+            'to_plan_id',
+            'to_sched_id',
+            'to_bill_per',
+            'to_bill_chan',
+            'trial_exp',
+        ]
+
+        # Make sure that every column except the 'owner' col is the exact same
+        # in the dest table (AAOwner) as the source table (account activity)
+        for i in xrange( len( source ) ):
+            for col in columns:
+                self.assertEqual( getattr( source[i], col ), getattr( owners[i], col ) )
+
+        self.assertEqual( len( owners ), 9 )
+
+        self.assertEqual( owners[0].owner, 'Hoover Loggly' )
+        self.assertEqual( owners[1].owner, 'Hoover Loggly' )
+        self.assertEqual( owners[2].owner, 'Angela Eichner' )
+        self.assertEqual( owners[3].owner, 'Angela Eichner' )
+
+        self.assertEqual( owners[4].owner, 'Hoover Loggly' )
+        self.assertEqual( owners[5].owner, 'Stephanie Skuratowicz' )
+        self.assertEqual( owners[6].owner, 'Stephanie Skuratowicz' )
+        
+        self.assertEqual( owners[7].owner, 'Hoover Loggly' )
+        self.assertEqual( owners[8].owner, 'Hoover Loggly' )
 
     def test_add_touchbiz( self ):
         pass

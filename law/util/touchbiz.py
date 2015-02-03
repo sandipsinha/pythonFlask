@@ -7,12 +7,20 @@
 "
 """
 from datetime    import datetime
-from collections import namedtuple
+from collections import namedtuple, defaultdict
 
 import pytz
 from law                    import config
-from law.util.touchbizdb    import loader as tb_loader, Touchbiz, SalesReps, SalesStages
-from law.util.adb           import loader as adb_loader, AccountStateUncompressed, Account
+from law.util.logger        import make_logger
+from law.util.touchbizdb    import (loader as tb_loader, 
+                                    Touchbiz, 
+                                    SalesReps,)
+from law.util.adb           import (loader as adb_loader, 
+                                    engine as adb_engine,
+                                    AccountStateUncompressed, 
+                                    AccountActivity,
+                                    AAOwner,
+                                    Account,)
 
 FlatTouchbiz = namedtuple( 'FlatTouchbiz', [
     'created', 
@@ -29,6 +37,8 @@ PENDING = 'pending'
 WON = 'won'
 
 TIMEZONE = pytz.timezone( 'US/Pacific' ) 
+
+log = make_logger( 'sales-touchbiz' )
 
 def localized_tb( tb_entries, timezone=TIMEZONE ):
     """ Localizes created and modified colums of all Touchbiz object in 
@@ -74,13 +84,16 @@ def acct_id_for_subdomain( subdomain ):
 
     return acct.acct_id
 
-def apply_touchbiz( sub_entries, tb_entries ):
+def apply_touchbiz( sub_entries, tb_entries, localize=False, with_pending=True ):
     """ Applies touchbiz rows to the supplied standard rows.
     This should add an owner column to each subscription row.
     """
     tb_entries.append( initial_touchbiz_entry() )
 
-    tbd    = {tb.created: tb for tb in localized_tb( tb_entries ) }
+    if localize:
+        tb_entries = localized_tb( tb_entries )
+
+    tbd    = {tb.created: tb for tb in tb_entries }
     tbkeys = sorted( tbd.keys(), reverse=True )
     subs   = sorted( sub_entries, key=lambda x: x.updated )
 
@@ -103,7 +116,7 @@ def apply_touchbiz( sub_entries, tb_entries ):
 
     # If there are touchbiz entries left apply the most recent one 
     # to the returned rows
-    if len( tbkeys ) != 0:
+    if len( tbkeys ) != 0 and with_pending:
         tbd[tbkeys[0]].created = PENDING
         tbd[tbkeys[0]].status  = PENDING
         applied.append( tbd[tbkeys[0]] )
@@ -111,7 +124,7 @@ def apply_touchbiz( sub_entries, tb_entries ):
     return applied
         
 
-def touchbiz_by_account_id( acct_id ):
+def touchbiz_by_account_id( acct_id, localize=True ):
     """ Munges subscription changes with our touchbiz entries"""
 
     with adb_loader() as l:
@@ -124,7 +137,7 @@ def touchbiz_by_account_id( acct_id ):
                       .filter( Touchbiz.acct_id == acct_id )\
                       .all()
 
-    return apply_touchbiz( sub_entries, tb_entries )
+    return apply_touchbiz( sub_entries, tb_entries, localize=localize )
 
 def touchbiz_by_account( subdomain ):
     return touchbiz_by_account_id( acct_id_for_subdomain( subdomain ) )
@@ -156,3 +169,110 @@ def dictify( rows, columns=None, column_map=None ):
 def owner_id( email ):
     with tb_loader() as l:
         return l.query( SalesReps ).filter( SalesReps.email == email ).one().id
+
+
+class TableCreator( object ):
+    """ Creates a separate table where toucbiz ownership
+    is applied by matching touchbiz to source entries via 
+    their updated dates.  Writes an owner column field.
+    """
+
+    def __init__(self,  **kargs):
+        self.source     = kargs['src_table']
+        self.dest       = kargs['dest_table']
+        self.engine     = kargs['dest_engine']
+        self.src_loader = kargs['src_loader']
+
+    def source_rows( self ):
+        with self.src_loader() as l:
+            items = l.query( self.source )\
+                     .order_by( self.source.acct_id, self.source.updated )\
+                     .all()
+
+        #Make a dictionary keyed by acct_id
+        acct_rows = defaultdict( list )
+        for row in items:
+            acct_rows[row.acct_id].append( row )
+
+        return dict( acct_rows )
+    
+    def touchbiz_rows( self ):
+        with tb_loader() as l:
+            items =  l.query( Touchbiz )\
+                     .order_by( Touchbiz.acct_id, Touchbiz.created )\
+                     .all()
+
+        #Make a dictionary keyed by acct_id
+        acct_rows = defaultdict( list )
+        for row in items:
+            acct_rows[row.acct_id].append( row )
+
+        return dict( acct_rows )
+    
+    def apply_ownership( self ):
+        source_acct_rows = self.source_rows()
+        touchbiz_acct_rows = self.touchbiz_rows()
+
+        # Because apply_touchbiz works at the account level we need to create
+        # an mapping of acct_ids to Subscription table rows and Touchbiz rows
+        # per acct_id to operate on.
+        owned = []
+        for acct_id in source_acct_rows:
+            owned.extend( apply_touchbiz( source_acct_rows[acct_id], touchbiz_acct_rows[acct_id], with_pending=False ) )
+        
+        def map_name( row ):
+            row.owner = '{} {}'.format( row.owner.first, row.owner.last )
+            return row
+
+        # Remove pending touchbiz items as they are not subject to ownership
+        owned = ( map_name( row ) for row in owned if row.status is not PENDING )
+        dictified = dictify( owned, columns=[
+            'acct_id',
+            'created',
+            'updated',
+            'from_vol_bytes',
+            'from_ret_days',
+            'from_sub_rate',
+            'from_plan_id',
+            'from_sched_id',
+            'from_bill_per',
+            'from_bill_chan',
+            'to_vol_bytes',
+            'to_ret_days',
+            'to_sub_rate',
+            'to_plan_id',
+            'to_sched_id',
+            'to_bill_per',
+            'to_bill_chan',
+            'trial_exp',
+            'owner',
+        ])
+        self._insert( dictified )
+
+    def _insert( self, items ):
+        conn = self.engine.connect().execution_options( autocommit=False )
+
+#        inserts = [self._dict_from_object( row ) for row in rows]
+        try:
+            trans = conn.begin()        
+            conn.execute( self.dest.__table__.delete() )
+            conn.execute( self.dest.__table__.insert(), items )
+            trans.commit()
+        except Exception as e:
+            trans.rollback()
+            log.exception({ 
+                'action':'rollback', 
+                'status':'failure',
+                'reason':'insert failed',
+            })
+            raise e
+
+class AAOwnerCreator( TableCreator ):        
+    def __init__( self ):
+        super( AAOwnerCreator, self ).__init__(**{
+            'src_table'   : AccountActivity,
+            'src_loader'  : adb_loader,
+            'dest_table'  : AAOwner,
+            'dest_engine' : adb_engine,
+        })
+
