@@ -11,6 +11,7 @@ from sqlalchemy                 import (create_engine, Column,
                                         Integer, DateTime, 
                                         Boolean, String,
                                         Float, Numeric, ForeignKey)
+from sqlalchemy.dialects.mysql  import BIGINT, SMALLINT, MEDIUMINT
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm             import sessionmaker, relationship, backref
 
@@ -34,7 +35,8 @@ engine = create_engine(
 Session = sessionmaker( bind=engine )
 
 class Account( Base ):
-    __tablename__ = 'accounts'
+    __tablename__  = 'accounts'
+    __table_args__ = {'mysql_engine':'InnoDB'}
 
     acct_id     = Column( Integer, primary_key=True )
     id          = Column( Integer )
@@ -52,11 +54,71 @@ class Account( Base ):
             self.acct_id, 
             self.subdomain)
 
+class AccountActivitySchema( object ):
+    acct_id        = Column( Integer, primary_key=True )
+    created        = Column( DateTime)
+    updated        = Column( DateTime, primary_key=True, default='0000-00-00 00:00:00'  )
+    from_vol_bytes = Column( BIGINT(unsigned=True), default=0 )
+    from_ret_days  = Column( SMALLINT(unsigned=True), default=0 )
+    from_sub_rate  = Column( MEDIUMINT(unsigned=True), default=0 )
+    from_plan_id   = Column( SMALLINT(unsigned=True), default=0 )
+    from_sched_id  = Column( SMALLINT(unsigned=True), default=0 )
+    from_bill_per  = Column( String(length=2), default='' )
+    from_bill_chan = Column( SMALLINT(unsigned=True), default=0 ) 
+    to_vol_bytes   = Column( BIGINT(unsigned=True), default=0 )
+    to_ret_days    = Column( SMALLINT(unsigned=True), default=0 )
+    to_sub_rate    = Column( MEDIUMINT(unsigned=True), default=0 )
+    to_plan_id     = Column( SMALLINT(unsigned=True), default=0 )
+    to_sched_id    = Column( SMALLINT(unsigned=True), default=0 )
+    to_bill_per    = Column( String(length=2), default='' )
+    to_bill_chan   = Column( SMALLINT(unsigned=True), default=0) 
+    trial_exp      = Column( DateTime, default=None )
+
+class AccountActivity( Base, AccountActivitySchema ):
+    __tablename__  = 'account_activity'
+    __table_args__ = {'mysql_engine':'InnoDB'}
+    
+    def __repr__(self):
+        return "<AccountActivity([{id},{upd}] ${frate},{fvol}b,{fret}d,{fper} -> ${trate},{tvol}b,{tret}d,{tper})>".format(
+            id    = self.acct_id, 
+            upd   = self.updated,
+            frate = self.from_sub_rate,
+            fvol  = self.from_vol_bytes,
+            fret  = self.from_ret_days,
+            fper  = self.from_bill_per,
+            trate = self.to_sub_rate,
+            tvol  = self.to_vol_bytes,
+            tret  = self.to_ret_days,
+            tper  = self.to_bill_per,
+        )
+
+class AAOwner( Base, AccountActivitySchema ):
+    __tablename__  = 'account_activity_owners'
+    __table_args__ = {'mysql_engine':'InnoDB'}
+
+    owner = Column( String(length=100) )
+    
+    def __repr__(self):
+        return "<AAOwner([{id},{upd},{owner}] ${frate},{fvol}b,{fret}d,{fper} -> ${trate},{tvol}b,{tret}d,{tper})>".format(
+            id    = self.acct_id, 
+            upd   = self.updated,
+            owner = self.owner,
+            frate = self.from_sub_rate,
+            fvol  = self.from_vol_bytes,
+            fret  = self.from_ret_days,
+            fper  = self.from_bill_per,
+            trate = self.to_sub_rate,
+            tvol  = self.to_vol_bytes,
+            tret  = self.to_ret_days,
+            tper  = self.to_bill_per,
+        )
+
 class AccountState( Base ):
     """ Compressed subscription table.  Any subscriptions that take place from
     sun-sat are compressed into a single entry
     """
-    __tablename__ = 'aawsc'
+    __tablename__  = 'aawsc'
+    __table_args__ = {'mysql_engine':'InnoDB'}
     
     acct_id   = Column( Integer, primary_key=True )
     updated   = Column( DateTime, primary_key=True )
@@ -82,7 +144,8 @@ class AccountState( Base ):
 
 class AccountStateUncompressed( Base ):
     """ Account state where subcriptions are not compressed """
-    __tablename__ = 'aaws'
+    __tablename__  = 'aaws'
+    __table_args__ = {'mysql_engine':'InnoDB'}
     
     acct_id   = Column( Integer, primary_key=True )
     updated   = Column( DateTime, primary_key=True )
@@ -107,7 +170,8 @@ class AccountStateUncompressed( Base ):
             self.updated)
 
 class Tier( Base ):
-    __tablename__ = 'subscription_plan'
+    __tablename__  = 'subscription_plan'
+    __table_args__ = {'mysql_engine':'InnoDB'}
 
     id   = Column( Integer, primary_key=True )
     name = Column( String(length=100) )
@@ -120,7 +184,8 @@ class Tier( Base ):
             self.code)
 
 class VolumeAccepted( Base ):
-    __tablename__ = 'chopper_account_volumes'
+    __tablename__  = 'chopper_account_volumes'
+    __table_args__ = {'mysql_engine':'InnoDB'}
 
     acct_id = Column( Integer, primary_key=True )
     date    = Column( 'vol_date', DateTime, primary_key=True )
@@ -133,7 +198,8 @@ class VolumeAccepted( Base ):
             self.bytes)
 
 class VolumeDropped( Base ):
-    __tablename__ = 'chopper_account_volumes_dropped'
+    __tablename__  = 'chopper_account_volumes_dropped'
+    __table_args__ = {'mysql_engine':'InnoDB'}
 
     acct_id = Column( Integer, primary_key=True )
     date    = Column( 'vol_date', DateTime, primary_key=True )
@@ -146,7 +212,8 @@ class VolumeDropped( Base ):
             self.bytes)
 
 class EventsAccepted( Base ):
-    __tablename__ = 'chopper_events_allowed'
+    __tablename__  = 'chopper_events_allowed'
+    __table_args__ = {'mysql_engine':'InnoDB'}
 
     acct_id = Column( Integer, primary_key=True )
     date    = Column( DateTime, primary_key=True )
@@ -160,7 +227,8 @@ class EventsAccepted( Base ):
 
 
 class EventsDropped( Base ):
-    __tablename__ = 'chopper_events_denied'
+    __tablename__  = 'chopper_events_denied'
+    __table_args__ = {'mysql_engine':'InnoDB'}
 
     acct_id = Column( Integer, primary_key=True )
     date    = Column( DateTime, primary_key=True )
@@ -173,7 +241,8 @@ class EventsDropped( Base ):
             self.events)
 
 class Owners( Base ):
-    __tablename__ = 'account_owners'
+    __tablename__  = 'account_owners'
+    __table_args__ = {'mysql_engine':'InnoDB'}
 
     acct_id    = Column( Integer )
     subdomain  = Column( String, primary_key=True )
