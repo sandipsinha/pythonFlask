@@ -25,7 +25,8 @@ def make_logger( name, level=LOG_LEVEL, path=LOG_PATH ):
     rfh = logging.handlers.RotatingFileHandler( os.path.join( LOG_PATH, name ), 
                                                 maxBytes    = LOG_MAX_BYTES,
                                                 backupCount = LOG_BACKUPS)
-    rfh.setFormatter( LOG_FORMAT )
+    formatter = logging.Formatter( LOG_FORMAT )
+    rfh.setFormatter( formatter )
     logger.addHandler( rfh )
 
     return logger
