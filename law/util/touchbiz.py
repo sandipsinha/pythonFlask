@@ -241,7 +241,7 @@ class TableCreator( object ):
         owned = ( set_owner_name( row ) for row in owned if row.status is not PENDING )
         self._insert( owned )
 
-    def _insert( self, items ):
+    def _insert( self, items, batch_size=5000 ):
         conn = self.engine.connect().execution_options( autocommit=False )
 
         # Turn array of objects into a dict for insert
@@ -270,7 +270,10 @@ class TableCreator( object ):
         try:
             trans = conn.begin()        
             conn.execute( self.dest.__table__.delete() )
-            conn.execute( self.dest.__table__.insert(), inserts )
+            # Batch so MySql doesn't close the connection due to too large of a 
+            # max_allowed_packet size
+            for start in range( 0, len(inserts), batch_size):
+                conn.execute( self.dest.__table__.insert(), inserts[start:start+batch_size] )
             trans.commit()
         except Exception as e:
             trans.rollback()
