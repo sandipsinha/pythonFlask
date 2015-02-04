@@ -87,11 +87,14 @@ def acct_id_for_subdomain( subdomain ):
 
     return acct.acct_id
 
-def apply_touchbiz( sub_entries, tb_entries, localize=False, with_pending=True ):
+def apply_touchbiz( sub_entries, tb_entries, initial_entry=None, localize=False, with_pending=True ):
     """ Applies touchbiz rows to the supplied standard rows.
     This should add an owner column to each subscription row.
     """
-    tb_entries.append( initial_touchbiz_entry() )
+    if initial_entry is None:
+        initial_entry = initial_touchbiz_entry()
+
+    tb_entries.append( initial_entry )
 
     if localize:
         tb_entries = localized_tb( tb_entries )
@@ -137,7 +140,7 @@ def touchbiz_by_account_id( acct_id, localize=True ):
                       .filter( Touchbiz.acct_id == acct_id )\
                       .all()
 
-    return apply_touchbiz( sub_entries, tb_entries, localize=localize )
+    return apply_touchbiz( sub_entries, tb_entries, initial_entry=initial_touchbiz_entry(),  localize=localize )
 
 def touchbiz_by_account( subdomain ):
     return touchbiz_by_account_id( acct_id_for_subdomain( subdomain ) )
@@ -216,12 +219,19 @@ class TableCreator( object ):
         source_acct_rows = self.source_rows()
         touchbiz_acct_rows = self.touchbiz_rows()
 
+        # The default owner
+        default_owner = initial_touchbiz_entry()
+
         # Because apply_touchbiz works at the account level we need to create
         # an mapping of acct_ids to Subscription table rows and Touchbiz rows
         # per acct_id to operate on.
         owned = []
         for acct_id in source_acct_rows:
-            owned.extend( apply_touchbiz( source_acct_rows[acct_id], touchbiz_acct_rows.get(acct_id, []), with_pending=False ) )
+            owned.extend( apply_touchbiz( 
+                                source_acct_rows[acct_id], 
+                                touchbiz_acct_rows.get(acct_id, []), 
+                                initial_entry=default_owner, 
+                                with_pending=False ))
         
         def set_owner_name( row ):
             row.owner = '{} {}'.format( row.owner.first, row.owner.last )
