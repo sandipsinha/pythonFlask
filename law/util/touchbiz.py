@@ -215,7 +215,7 @@ class TableCreator( object ):
 
         return dict( acct_rows )
     
-    def apply_ownership( self ):
+    def apply_ownership( self, localize=False ):
         source_acct_rows = self.source_rows()
         touchbiz_acct_rows = self.touchbiz_rows()
 
@@ -231,7 +231,8 @@ class TableCreator( object ):
                                 source_acct_rows[acct_id], 
                                 touchbiz_acct_rows.get(acct_id, []), 
                                 initial_entry=default_owner, 
-                                with_pending=False ))
+                                with_pending=False,
+                                localize=localize ))
         
         def set_owner_name( row ):
             row.owner = '{} {}'.format( row.owner.first, row.owner.last )
