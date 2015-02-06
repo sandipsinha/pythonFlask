@@ -8,7 +8,7 @@ from contextlib import contextmanager
 
 from law                        import config
 from sqlalchemy                 import (create_engine, Column, 
-                                        Integer, DateTime, 
+                                        Integer, DateTime, Date,
                                         Boolean, String,
                                         Float, Numeric, ForeignKey,
                                         Index)
@@ -17,6 +17,9 @@ from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm             import sessionmaker, relationship, backref
 
 Base = declarative_base()
+# Duplicate models of the same table need another base declaration
+# so that they have a separate MetaData instance
+OwnersBase = declarative_base()
 
 db_url = '{dialect}://{user}:{passwd}@{host}:{port}/{dbname}'.format(
     dialect = config.get( 'adb', 'dialect' ),
@@ -93,7 +96,7 @@ class AccountActivity( Base, AccountActivitySchema ):
             tper  = self.to_bill_per,
         )
 
-class AAOwner( Base, AccountActivitySchema ):
+class AAOwner( OwnersBase, AccountActivitySchema ):
     __tablename__  = 'account_activity_owners'
     __table_args__ = {'mysql_engine':'InnoDB'}
 
@@ -112,6 +115,132 @@ class AAOwner( Base, AccountActivitySchema ):
             tvol  = self.to_vol_bytes,
             tret  = self.to_ret_days,
             tper  = self.to_bill_per,
+        )
+
+class AAWithStatesBase( AccountActivitySchema ):
+    subdomain        = Column( String(length=100) )
+    state_name       = Column( String(length=6) )
+    plan_state_name  = Column( String(length=20) )
+
+class AAWithStates( Base, AAWithStatesBase ):
+    __tablename__  = 'account_activity_with_states'
+    __table_args__ = {'mysql_engine':'InnoDB'}
+
+class AAWithStatesCollapsed( Base, AAWithStatesBase ):
+    __tablename__  = 'account_activity_with_states_collapsed'
+    __table_args__ = {'mysql_engine':'InnoDB'}
+    
+    paid_status      = Column( String(length=6) )
+    collapse_count   = Column( Integer )
+
+class AAWSBase( object ):
+    
+    acct_id   = Column( Integer, primary_key=True )
+    subdomain = Column( String(length=100) )
+
+    updated   = Column( DateTime, primary_key=True )
+    created   = Column( DateTime )
+    trial_exp = Column( Date )
+    stNam     = Column( String(length=6) )
+    pStNam    = Column( String(length=20) )
+
+    fGB       = Column( Numeric( asdecimal=False ) )
+    fDays     = Column( SMALLINT( unsigned=True ) )
+    frate     = Column( Float )
+    fPlan     = Column( SMALLINT( unsigned=True ) )
+    fPer      = Column( String(length=2) )
+    fBC       = Column( SMALLINT( unsigned=True ) )
+
+    tGB       = Column( Numeric( asdecimal=False ) )
+    tDays     = Column( SMALLINT( unsigned=True ) )
+    trate     = Column( Float )
+    tPlan     = Column( SMALLINT( unsigned=True ) )
+    tPer      = Column( String(length=2) )
+    tBC       = Column( SMALLINT( unsigned=True ) )
+
+class AAWS( OwnersBase, AAWSBase ):
+    __tablename__  = 'aaws'
+    __table_args__ = {'mysql_engine':'InnoDB'}
+    
+    def __repr__(self):
+        return "<AAWS([{id},{upd}] ${frate},{fvol}b,{fret}d,{fper} -> ${trate},{tvol}b,{tret}d,{tper})>".format(
+            id    = self.acct_id, 
+            upd   = self.updated,
+            frate = self.frate,
+            fvol  = self.fGB,
+            fret  = self.fDays,
+            fper  = self.fPer,
+            trate = self.trate,
+            tvol  = self.tGB,
+            tret  = self.tDays,
+            tper  = self.tPer,
+        )
+
+class AAWSOwner( OwnersBase, AAWSBase ):
+    __tablename__  = 'aaws_owners'
+    __table_args__ = {'mysql_engine':'InnoDB'}
+    
+    owner  = Column( String(length=100) )
+    
+    def __repr__(self):
+        return "<AAWSOwners([{id},{upd},{owner}] ${frate},{fvol}b,{fret}d,{fper} -> ${trate},{tvol}b,{tret}d,{tper})>".format(
+            id    = self.acct_id, 
+            upd   = self.updated,
+            owner = self.owner,
+            frate = self.frate,
+            fvol  = self.fGB,
+            fret  = self.fDays,
+            fper  = self.fPer,
+            trate = self.trate,
+            tvol  = self.tGB,
+            tret  = self.tDays,
+            tper  = self.tPer,
+        )
+    
+
+class AAWSC( OwnersBase, AAWSBase ):
+    __tablename__  = 'aawsc'
+    __table_args__ = {'mysql_engine':'InnoDB'}
+    
+    cc      = Column( SMALLINT(unsigned=True) )
+    pdStat  = Column( String(length=6) )
+    
+    def __repr__(self):
+        return "<AAWSC([{id},{upd}] ${frate},{fvol}b,{fret}d,{fper} -> ${trate},{tvol}b,{tret}d,{tper})>".format(
+            id    = self.acct_id, 
+            upd   = self.updated,
+            frate = self.frate,
+            fvol  = self.fGB,
+            fret  = self.fDays,
+            fper  = self.fPer,
+            trate = self.trate,
+            tvol  = self.tGB,
+            tret  = self.tDays,
+            tper  = self.tPer,
+        )
+
+
+class AAWSCOwner( OwnersBase, AAWSBase ):
+    __tablename__  = 'aawsc_owners'
+    __table_args__ = {'mysql_engine':'InnoDB'}
+    
+    cc     = Column( SMALLINT(unsigned=True) )
+    pdStat = Column( String(length=6) )
+    owner  = Column( String(length=100) )
+    
+    def __repr__(self):
+        return "<AAWSCOwner([{id},{upd},{owner}] ${frate},{fvol}b,{fret}d,{fper} -> ${trate},{tvol}b,{tret}d,{tper})>".format(
+            id    = self.acct_id, 
+            upd   = self.updated,
+            owner = self.owner,
+            frate = self.frate,
+            fvol  = self.fGB,
+            fret  = self.fDays,
+            fper  = self.fPer,
+            trate = self.trate,
+            tvol  = self.tGB,
+            tret  = self.tDays,
+            tper  = self.tPer,
         )
 
 class AccountState( Base ):
