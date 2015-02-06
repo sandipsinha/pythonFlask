@@ -245,28 +245,10 @@ class TableCreator( object ):
     def _insert( self, items, batch_size=5000 ):
         conn = self.engine.connect().execution_options( autocommit=False )
 
+        # Get all destination table fields
+        cols = [col.name for col in self.dest.__table__.columns]
         # Turn array of objects into a dict for insert
-        inserts = dictify( items, columns=[
-            'acct_id',
-            'created',
-            'updated',
-            'from_vol_bytes',
-            'from_ret_days',
-            'from_sub_rate',
-            'from_plan_id',
-            'from_sched_id',
-            'from_bill_per',
-            'from_bill_chan',
-            'to_vol_bytes',
-            'to_ret_days',
-            'to_sub_rate',
-            'to_plan_id',
-            'to_sched_id',
-            'to_bill_per',
-            'to_bill_chan',
-            'trial_exp',
-            'owner',
-        ])
+        inserts = dictify( items, columns=cols )
 
         try:
             trans = conn.begin()        
