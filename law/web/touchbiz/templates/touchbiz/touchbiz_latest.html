@@ -4,72 +4,75 @@
     <script src="//ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.1/js/bootstrap.min.js"></script>
 
-    <link rel='stylesheet' type='text/css' href="{{ url_for('touchbiz.static', filename='stylesheets/touchbiz.css') }}"/>
     <!-- Latest compiled and minified CSS -->
+    <link rel='stylesheet' type='text/css' href="{{ url_for('touchbiz.static', filename='stylesheets/touchbiz.css') }}"/>
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.1/css/bootstrap.min.css">
 
 </head>
 <body>
+<div class='container' >
 <div id='slide1' class='row-fluid'>
   <div class='row'>
-    <div class="col-md-4"></div>
-    <label class="col-md-1 text-right">Owner:</label>
-    <div data-key="owner" class="col-md-1 text-left"></div>
-    <div class="col-md-6"></div>
+    <div class="col-xs-3"></div>
+    <label class="col-xs-2 text-right">Owner:</label>
+    <div data-key="owner" class="col-xs-2 text-left"></div>
+    <div class="col-xs-5"></div>
   </div>
   <div class='row'>
-    <div class="col-md-4"></div>
-    <label class="col-md-1 text-right">Status:</label>
-    <div data-key="status" class="col-md-1 text-left"></div>
-    <div class="col-md-6"></div>
+    <div class="col-xs-3"></div>
+    <label class="col-xs-2 text-right">Status:</label>
+    <div data-key="status" class="col-xs-2 text-left"></div>
+    <div class="col-xs-5"></div>
   </div>
   <div class='row'>
-    <div class="col-md-4"></div>
-    <label class="col-md-1 text-right disabled">Tier:</label>
-    <div data-key="tier" class="col-md-1 text-left"></div>
-    <div class="col-md-6"></div>
+    <div class="col-xs-3"></div>
+    <label class="col-xs-2 text-right disabled">Tier:</label>
+    <div data-key="tier" class="col-xs-2 text-left"></div>
+    <div class="col-xs-5"></div>
   </div>
   <div class='row'>
-    <div class="col-md-4"></div>
-    <label class="col-md-1 text-right">Volume:</label>
-    <div data-key="volume" class="col-md-1 text-left"></div>
-    <div class="col-md-6"></div>
+    <div class="col-xs-3"></div>
+    <label class="col-xs-2 text-right">Volume:</label>
+    <div data-key="volume" class="col-xs-2 text-left"></div>
+    <div class="col-xs-5"></div>
   </div>
   <div class='row'>
-    <div class="col-md-4"></div>
-    <label class="col-md-1 text-right">Retention:</label>
-    <div data-key="retention" class="col-md-1 text-left"></div>
-    <div class="col-md-6"></div>
+    <div class="col-xs-3"></div>
+    <label class="col-xs-2 text-right">Retention:</label>
+    <div data-key="retention" class="col-xs-2 text-left"></div>
+    <div class="col-xs-5"></div>
   </div>
   <div class='row'>
-    <div class="col-md-4"></div>
-    <label class="col-md-1 text-right">Bill Period:</label>
-    <div data-key="period" class="col-md-1 text-left"></div>
-    <div class="col-md-6"></div>
+    <div class="col-xs-3"></div>
+    <label class="col-xs-2 text-right">Bill Period:</label>
+    <div data-key="period" class="col-xs-2 text-left"></div>
+    <div class="col-xs-5"></div>
   </div>
   <div class='row'>
-    <div class="col-md-4"></div>
-    <label class="col-md-1 text-right">Sub Rate:</label>
-    <div data-key="rate" class="col-md-1 text-left"></div>
-    <div class="col-md-6"></div>
+    <div class="col-xs-3"></div>
+    <label class="col-xs-2 text-right">Sub Rate:</label>
+    <div data-key="rate" class="col-xs-2 text-left"></div>
+    <div class="col-xs-5"></div>
   </div>
   <div class='row'></div>
   <div class='row'>
-    <div class="col-md-4"></div>
-    <div class='col-md-2 text-left'>
+    <div class="col-xs-3"></div>
+    <div class='col-xs-4 text-left'>
         <button id="touchbiz-manipulator" class="btn btn-info btn-block text-center">Touch This Account</button>
     </div>
-    <div class="col-md-6"></div>
+    <div class="col-xs-5"></div>
   </div>
 </div>
+</div>
 
+<div class='container' >
 <div id='slide2' class='row-fluid'>
     <form class="form-horizontal touchbiz-form">
     <fieldset>
     <!-- Text input-->
     <div class="touchbiz-form form-group">
-    <label class="col-md-4 control-label" for="tier">Tier</label>  
-    <div class="col-md-4">
+    <label class="col-xs-4 control-label text-right" for="tier">Tier</label>  
+    <div class="col-xs-4">
     <input id="tier" name="tier" data-key='tier' type="text" placeholder="tier" class="form-control input-sm">
         
     </div>
@@ -77,8 +80,8 @@
 
     <!-- Appended Input-->
     <div class="form-group">
-    <label class="col-md-4 control-label" for="volume">Volume</label>
-    <div class="col-md-4">
+    <label class="col-xs-4 control-label text-right" for="volume">Volume</label>
+    <div class="col-xs-4">
         <div class="input-group">
         <input id="volume" name="volume" data-key='volume' class="form-control input-sm" placeholder="volume" type="text">
         <span class="input-group-addon">GB</span>
@@ -88,8 +91,8 @@
     </div>
     <!-- Appended Input-->
     <div class="form-group">
-    <label class="col-md-4 control-label" for="retention">Retention</label>
-    <div class="col-md-4">
+    <label class="col-xs-4 control-label text-right" for="retention">Retention</label>
+    <div class="col-xs-4">
         <div class="input-group">
         <input id="retention" name="retention" data-key='retention' class="form-control input-sm" placeholder="retention" type="text">
         <span class="input-group-addon">Days</span>
@@ -99,8 +102,8 @@
     </div>
     <!-- Select Basic -->
     <div class="form-group">
-    <label class="col-md-4 control-label" for="billing_period">Billing Period</label>
-    <div class="col-md-4">
+    <label class="col-xs-4 control-label text-right" for="billing_period">Billing Period</label>
+    <div class="col-xs-4">
         <select id="billing_period" name="billing_period" data-key='period' class="form-control input-sm">
         <option value="monthly">Monthly</option>
         <option value="annual-upfront">Annual Upfront</option>
@@ -112,8 +115,8 @@
 
     <!-- Appended Input-->
     <div class="form-group">
-    <label class="col-md-4 control-label" for="sub_rate">Sub Rate</label>
-    <div class="col-md-4">
+    <label class="col-xs-4 control-label text-right" for="sub_rate">Sub Rate</label>
+    <div class="col-xs-4">
         <div class="input-group">
         <input id="sub_rate" name="sub_rate" data-key='rate' class="form-control input-sm" placeholder="$$$" type="text">
         <span class="input-group-addon">.00</span>
@@ -124,8 +127,8 @@
 
     <!-- Button (Double) -->
     <div class="form-group">
-    <label class="col-md-4 control-label" for="save"></label>
-    <div class="col-md-8">
+    <label class="col-xs-4 control-label text-right" for="save"></label>
+    <div class="col-xs-8">
         <button id="save" name="save" class="btn btn-info btn-xs">Save</button>
         <button id="cancel" name="cancel" class="btn btn-inverse btn-xs">Cancel</button>
         <img class='spinner' src="{{ url_for('touchbiz.static', filename='images/spinner.svg') }}"/>
@@ -135,6 +138,7 @@
     </fieldset>
         
     </form>
+</div>
 </div>
 </body>
 <script type='text/javascript'>

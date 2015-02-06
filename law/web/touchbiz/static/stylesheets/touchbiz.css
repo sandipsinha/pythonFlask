@@ -10,3 +10,7 @@
 #slide1 {
     margin-top:10px;
 }
+
+.container {
+  width: 800px !important;
+}
