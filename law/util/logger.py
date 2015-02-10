@@ -9,16 +9,18 @@
 import os
 import logging, logging.handlers
 
-LOG_FORMAT = '%(astime)s - %(name)s [%(levelname)s]: %(message)s' 
-LOG_PATH = '/var/log/loggly/LAW/' 
-LOG_PREFIX = 'LAW'
-LOG_LEVEL = logging.INFO
-LOG_MAX_BYTES = 100000000
-LOG_BACKUPS = 3
+from law import config
+
+LOG_PREFIX    = 'LAW'
+LOG_FORMAT    = config.get( 'logging', 'format', raw=True )
+LOG_PATH      = config.get( 'logging', 'logdir' )
+LOG_LEVEL     = getattr( logging, config.get( 'logging', 'level' ) )
+LOG_MAX_BYTES = config.getint( 'logging', 'maxbytes' )
+LOG_BACKUPS   = config.getint( 'logging', 'numbackups' )
 
 def make_logger( name, level=LOG_LEVEL, path=LOG_PATH ):
     if not os.path.exists( LOG_PATH ):
-        os.makedirs( LOG_PATH, 0755 )
+        os.makedirs( LOG_PATH, 0775 )
     logger = logging.getLogger( '{}.{}'.format( LOG_PREFIX, name ) )
     logger.setLevel( level )
 
