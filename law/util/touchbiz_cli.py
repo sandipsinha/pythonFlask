@@ -64,5 +64,5 @@ def cli( args ):
 
     return 0
 
-if __name__ == '__name__':
+if __name__ == '__main__':
     sys.exit( cli( sys.argv[1:] ) )
