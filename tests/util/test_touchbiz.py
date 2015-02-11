@@ -13,6 +13,7 @@ from tests.fixtures import populate
 from law.util import touchbizdb as tbz
 from law.util import adb
 from law.util import touchbiz
+from law.util import touchbiz_cli
 
 def fixtures():
     teardown_module()
@@ -21,6 +22,7 @@ def fixtures():
         bind=tbz.engine,
         tables = [
             adb.AccountStateUncompressed.__table__,
+            adb.AAWSC.__table__,
             adb.Tier.__table__,
             adb.Account.__table__,
             adb.AccountActivity.__table__,
@@ -34,6 +36,7 @@ def fixtures():
     with adb.session_context() as s:
         populate( s, model_names=[
                         'AccountStateUncompressed', 
+                        'AAWSC',
                         'Tier', 
                         'Account', 
                         'AccountActivity']
@@ -57,6 +60,7 @@ def teardown_module():
         bind=tbz.engine,
         tables=[
             adb.AccountStateUncompressed.__table__,
+            adb.AAWSC.__table__,
             adb.Tier.__table__,
             adb.Account.__table__,
             adb.AccountActivity.__table__,
@@ -349,3 +353,43 @@ class TestTouchbiz( unittest.TestCase ):
     
     def test_sync_stages( self ):
         pass
+
+
+class TestTouchbizCLI( unittest.TestCase ):
+
+    @classmethod
+    def setup_class( cls ):
+        adb.Base.metadata.create_all( 
+            bind=tbz.engine,
+            tables = [
+                adb.AAWSCOwner.__table__,
+            ]
+        )
+
+    @classmethod
+    def teardown_class( cls ):
+        adb.Base.metadata.drop_all( 
+            bind=tbz.engine,
+            tables=[
+                adb.AAWSCOwner.__table__,
+            ]
+        )
+
+    def test_apply( self ):
+        touchbiz_cli.cli( ['apply'] )
+
+        with adb.loader() as l:
+            rows = l.query( adb.AAWSCOwner ).all()
+
+        self.assertTrue( len( rows ) > 0 )
+        for row in rows:
+            self.assertIsNotNone( row.owner )
+
+        touchbiz_cli.cli( ['apply', '--localize'] )
+
+        with adb.loader() as l:
+            rows = l.query( adb.AAWSCOwner ).all()
+
+        self.assertTrue( len( rows ) > 0 )
+        for row in rows:
+            self.assertIsNotNone( row.owner )
