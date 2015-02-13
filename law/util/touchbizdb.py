@@ -67,6 +67,10 @@ class SalesReps( Base ):
     email      = Column( String(length=200) )
     sfdc_alias = Column( String(length=10) )
     active     = Column( Integer )
+
+    @property
+    def full_name(self):
+        return '{} {}'.format( self.first, self.last )
              
     def __repr__(self):
         return "<SalesReps({},{} {},{})>".format(
