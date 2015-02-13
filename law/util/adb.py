@@ -375,18 +375,22 @@ class Owners( Base ):
     __table_args__ = {'mysql_engine':'InnoDB'}
 
     acct_id    = Column( Integer )
-    subdomain  = Column( String, primary_key=True )
-    owner      = Column( String )
+    subdomain  = Column( String(length=100), primary_key=True )
+    owner      = Column( String(length=100) )
     start_date = Column( DateTime, primary_key=True )
     end_date   = Column( DateTime )
+    executive  = Column( Boolean )
 
     def __repr__(self):
-        return "<Owners({},{},{},{},{})>".format(
-            self.acct_id, 
-            self.subdomain, 
-            self.owner,
-            self.start_date,
-            self.end_date)
+        return "<Owner: {}>".format(
+            "|".join(map( str, [
+                self.acct_id, 
+                self.subdomain,
+                self.owner,
+                self.start_date,
+                self.end_date,
+            ]))
+        )
 
 @contextmanager
 def session_context():
