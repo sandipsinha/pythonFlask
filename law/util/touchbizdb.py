@@ -35,7 +35,8 @@ engine = create_engine(
 Session = sessionmaker( bind=engine )
 
 class Touchbiz( Base ):
-    __tablename__ = 'sales_touchbiz'
+    __tablename__  = 'sales_touchbiz_migration'
+    __table_args__ = {'mysql_engine':'InnoDB'}
 
     acct_id        = Column( MEDIUMINT(unsigned=True), primary_key=True )
     sales_rep_id   = Column( MEDIUMINT(unsigned=True), ForeignKey( 'sales_reps.id' ) )
@@ -59,7 +60,8 @@ class Touchbiz( Base ):
         )
 
 class SalesReps( Base ):
-    __tablename__ = 'sales_reps'
+    __tablename__  = 'sales_reps'
+    __table_args__ = {'mysql_engine':'InnoDB'}
 
     id         = Column( MEDIUMINT(unsigned=True), primary_key=True )
     first      = Column( String(length=100) )
@@ -81,7 +83,8 @@ class SalesReps( Base ):
         )
 
 class SalesStages( Base ):
-    __tablename__ = 'sales_stages'
+    __tablename__  = 'sales_stages'
+    __table_args__ = {'mysql_engine':'InnoDB'}
 
     id   = Column( MEDIUMINT(unsigned=True ), primary_key=True )
     name = Column( String(length=100) )
