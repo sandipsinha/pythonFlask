@@ -32,13 +32,14 @@ class AccountOwnersMigrator( object ):
     it just injects a touchbiz entry for the start_date of the 
     account_owners entry
     """
-    def __init__(self, source, dest, localize=False ):
+    def __init__(self, source, dest, default_rep=None ):
         """ Source and dest are DataSource objects.
         Before is a datetime object to use as the upper time bound when
         querying source objects
         """
         self.source       = source
         self.dest         = dest
+        self.default_rep  = default_rep
         self._rep_lookup  = None
 
     @property
@@ -53,7 +54,15 @@ class AccountOwnersMigrator( object ):
         return self._rep_lookup
 
     def get_salesrep_id( self, full_name ):
-        return self.salesrep[full_name].id
+        try:
+            rep = self.salesrep[ full_name ]
+        except KeyError as e:
+            if self.default_rep is not None:
+                rep = self.salesrep[ self.default_rep ]
+            else:
+                raise e
+
+        return rep.id
 
     def migrate( self, before=None ):
         before = before if before is not None else datetime.now()

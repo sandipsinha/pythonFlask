@@ -12,7 +12,7 @@ MODEL = Owners
 FIXTURES = [
 {
     'acct_id'    : 1000,
-    'subdomain'  : 'tbmigration',
+    'subdomain'  : 'touchbiztest',
     'owner'      : 'Angela Eichner',
     'start_date' : datetime( 2014, 4, 8 ),
     'end_date'   : datetime( 2014, 4, 9 ),
@@ -20,9 +20,17 @@ FIXTURES = [
 },
 {
     'acct_id'    : 1000,
-    'subdomain'  : 'tbmigration',
+    'subdomain'  : 'touchbiztest',
     'owner'      : 'Cristina Quintero',
     'start_date' : datetime( 2014, 4, 10 ),
+    'end_date'   : datetime( 9999, 12, 31 ),
+    'executive'  : 0,
+},
+{
+    'acct_id'    : 1001,
+    'subdomain'  : 'touchbiztest2',
+    'owner'      : 'Unknown Rep',
+    'start_date' : datetime( 2014, 5, 5 ),
     'end_date'   : datetime( 9999, 12, 31 ),
     'executive'  : 0,
 },

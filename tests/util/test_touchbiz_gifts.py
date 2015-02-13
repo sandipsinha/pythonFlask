@@ -122,6 +122,10 @@ class TestTouchbizGifts( unittest.TestCase ):
         self.assertEqual( entry.sales_rep_id,   5 )
         self.assertEqual( entry.created,        datetime( 2014, 4, 10 ) )
         self.assertEqual( entry.modified,       datetime( 2014, 4, 10 ) )
+        
+        entry = touchbiz[2]
+        self.assertEqual( entry.acct_id,        1001 )
+        self.assertEqual( entry.sales_rep_id,   1 )
         self.assertEqual( entry.tier,           '' )
         self.assertEqual( entry.retention,      0 )
         self.assertEqual( entry.volume,         '0' )
