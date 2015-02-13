@@ -6,14 +6,16 @@
 " Routines that gift touch business based on our old account_owner tables.
 "
 """
-from datetime import datetime
+from datetime import datetime, date
 from types    import FunctionType
 
+import pytz
 from law.util.logger     import make_logger
 from law.util.adb        import loader as adb_loader, Owners, AAWSC #tmp_uspg1?
 from law.util.touchbizdb import session_context as tbz_session, loader as tbz_loader, Touchbiz, SalesReps
 
-LOG = make_logger( 'touchbiz-gifts' )
+LOG      = make_logger( 'touchbiz-gifts' )
+TIMEZONE = pytz.timezone( 'US/Pacific' ) 
 
 class DataSource( object ):
     def __init__(self, table, loader ):
@@ -82,11 +84,18 @@ class AccountOwnersMigrator( object ):
 
 
     def migrate_columns( self, row ):
+        
+        # Account owners is always US/Pacific (from SFDC) and touchbiz is always UTC
+        def localize( dt ):
+            if isinstance( dt, date ):
+                dt = datetime( *(dt.timetuple()[:3]) )
+            return pytz.utc.normalize( TIMEZONE.localize( dt ) ).replace( tzinfo=None )
+
         migrate_rules = {
             'acct_id'       : lambda x: x.acct_id,
             'sales_rep_id'  : lambda x: self.get_salesrep_id( x.owner ),
-            'created'       : lambda x: x.start_date,
-            'modified'      : lambda x: x.start_date,
+            'created'       : lambda x: localize( x.start_date ),
+            'modified'      : lambda x: localize( x.start_date ),
             'tier'          : '',
             'retention'     : 0,
             'volume'        : 0,

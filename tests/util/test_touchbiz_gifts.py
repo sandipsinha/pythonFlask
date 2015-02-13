@@ -74,8 +74,8 @@ class TestTouchbizGifts( unittest.TestCase ):
         migrated = migrator.migrate_columns( owners[0] ) 
         self.assertEqual( migrated['acct_id'],        1000 )
         self.assertEqual( migrated['sales_rep_id'],   2 )
-        self.assertEqual( migrated['created'],        datetime( 2014, 4, 8 ) )
-        self.assertEqual( migrated['modified'],       datetime( 2014, 4, 8 ) )
+        self.assertEqual( migrated['created'],        datetime( 2014, 4, 8, 7) )
+        self.assertEqual( migrated['modified'],       datetime( 2014, 4, 8, 7 ) )
         self.assertEqual( migrated['tier'],           '' )
         self.assertEqual( migrated['retention'],      0 )
         self.assertEqual( migrated['volume'],         0 )
@@ -85,32 +85,36 @@ class TestTouchbizGifts( unittest.TestCase ):
         migrated = migrator.migrate_columns( owners[1] ) 
         self.assertEqual( migrated['acct_id'],        1000 )
         self.assertEqual( migrated['sales_rep_id'],   5 )
-        self.assertEqual( migrated['created'],        datetime( 2014, 4, 10 ) )
-        self.assertEqual( migrated['modified'],       datetime( 2014, 4, 10 ) )
+        self.assertEqual( migrated['created'],        datetime( 2014, 4, 10, 7 ) )
+        self.assertEqual( migrated['modified'],       datetime( 2014, 4, 10, 7 ) )
         self.assertEqual( migrated['tier'],           '' )
         self.assertEqual( migrated['retention'],      0 )
         self.assertEqual( migrated['volume'],         0 )
         self.assertEqual( migrated['sub_rate'],       0 )
         self.assertEqual( migrated['billing_period'], '' )
 
+        # No default rep
+        with self.assertRaises( KeyError ):
+            migrated = migrator.migrate_columns( owners[2] ) 
+
 
     def test_migrate( self ):
         src   = DataSource( adb.Owners, adb.loader )
         dest  = DataDestination( tbz.Touchbiz, tbz.engine )
 
-        migrator = AccountOwnersMigrator( src, dest )
+        migrator = AccountOwnersMigrator( src, dest, default_rep='Hoover Loggly' )
         migrator.migrate()
 
         with tbz.loader() as l:
             touchbiz = l.query( tbz.Touchbiz ).all()
 
-        self.assertEqual( len( touchbiz ), 2 )
+        self.assertEqual( len( touchbiz ), 3 )
 
         entry = touchbiz[0]
         self.assertEqual( entry.acct_id,        1000 )
         self.assertEqual( entry.sales_rep_id,   2 )
-        self.assertEqual( entry.created,        datetime( 2014, 4, 8 ) )
-        self.assertEqual( entry.modified,       datetime( 2014, 4, 8 ) )
+        self.assertEqual( entry.created,        datetime( 2014, 4, 8, 7 ) )
+        self.assertEqual( entry.modified,       datetime( 2014, 4, 8, 7 ) )
         self.assertEqual( entry.tier,           '' )
         self.assertEqual( entry.retention,      0 )
         self.assertEqual( entry.volume,         '0' )
@@ -120,12 +124,19 @@ class TestTouchbizGifts( unittest.TestCase ):
         entry = touchbiz[1]
         self.assertEqual( entry.acct_id,        1000 )
         self.assertEqual( entry.sales_rep_id,   5 )
-        self.assertEqual( entry.created,        datetime( 2014, 4, 10 ) )
-        self.assertEqual( entry.modified,       datetime( 2014, 4, 10 ) )
+        self.assertEqual( entry.created,        datetime( 2014, 4, 10, 7 ) )
+        self.assertEqual( entry.modified,       datetime( 2014, 4, 10, 7 ) )
+        self.assertEqual( entry.tier,           '' )
+        self.assertEqual( entry.retention,      0 )
+        self.assertEqual( entry.volume,         '0' )
+        self.assertEqual( entry.sub_rate,       0 )
+        self.assertEqual( entry.billing_period, '' )
         
         entry = touchbiz[2]
         self.assertEqual( entry.acct_id,        1001 )
         self.assertEqual( entry.sales_rep_id,   1 )
+        self.assertEqual( entry.created,        datetime( 2014, 5, 5, 7 ) )
+        self.assertEqual( entry.modified,       datetime( 2014, 5, 5, 7 ) )
         self.assertEqual( entry.tier,           '' )
         self.assertEqual( entry.retention,      0 )
         self.assertEqual( entry.volume,         '0' )
