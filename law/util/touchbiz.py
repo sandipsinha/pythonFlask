@@ -92,7 +92,7 @@ def acct_id_for_subdomain( subdomain ):
 def ownership_expired( prev_sub, current_sub, tb_entry ):
     if prev_sub is not None:
         if (current_sub.updated - prev_sub.updated).days >= EXPIRE_DAYS \
-            and (current_sub.updated - tb_entry.created).days >= EXPIRE_DAYS:
+            and current_sub.state in ('PWF', 'PWD'):
             return True
 
     return False

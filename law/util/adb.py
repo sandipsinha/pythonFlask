@@ -158,6 +158,10 @@ class AAWSBase( object ):
     tPer      = Column( String(length=2) )
     tBC       = Column( SMALLINT( unsigned=True ) )
 
+    @property
+    def state( self ):
+        return self.stNam
+
 class AAWS( OwnersBase, AAWSBase ):
     __tablename__  = 'aaws'
     __table_args__ = {'mysql_engine':'InnoDB'}
