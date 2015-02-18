@@ -24,9 +24,11 @@ from law.util.adb           import (loader as adb_loader,
 
 LOG = make_logger( 'sales-touchbiz' )
 
-TIMEZONE = pytz.timezone( 'US/Pacific' ) 
-PENDING  = 'pending'
-WON      = 'won'
+TIMEZONE    = pytz.timezone( 'US/Pacific' ) 
+EXPIRE_DAYS = config.getint( 'touchbiz', 'expire_days' )
+PENDING     = 'pending'
+WON         = 'won'
+EXPIRED     = 'ownership expired'
 
 # Used to create a single ad-hoc'd object containing the most pertinent fields.
 FlatTouchbiz = namedtuple( 'FlatTouchbiz', [
@@ -87,14 +89,23 @@ def acct_id_for_subdomain( subdomain ):
 
     return acct.acct_id
 
+def ownership_expired( prev_sub, current_sub, tb_entry ):
+    if prev_sub is not None:
+        if (current_sub.updated - prev_sub.updated).days >= EXPIRE_DAYS \
+            and (current_sub.updated - tb_entry.created).days >= EXPIRE_DAYS:
+            return True
+
+    return False
+
 def apply_touchbiz( sub_entries, tb_entries, initial_entry=None, localize=False, with_pending=True ):
     """ Applies touchbiz rows to the supplied standard rows.
     This should add an owner column to each subscription row.
     """
-    if initial_entry is None:
-        initial_entry = initial_touchbiz_entry()
+    default = initial_entry
+    if default is None:
+        default = initial_touchbiz_entry()
 
-    tb_entries.append( initial_entry )
+    tb_entries.append( default )
 
     if localize:
         tb_entries = localized_tb( tb_entries )
@@ -106,17 +117,25 @@ def apply_touchbiz( sub_entries, tb_entries, initial_entry=None, localize=False,
     applied = []
     key = tbkeys.pop()
 
+    prev_sub = None
     for sub in subs:
         # While there are still touchbiz entries that occured before this
-        # sub iterate through them until we find the one the occured right
+        # sub iterate through them until we find the one that occured right
         # before the subscription change.
         while len( tbkeys ) != 0 and tbd[ tbkeys[-1] ].created <= sub.updated:
             key = tbkeys.pop()
 
-        sub.owner = tbd[key].owner
-        sub.status = WON
+        # Owners can expire and be returned to the company after a 
+        # certain timeperiod of inactivity.
+        if ownership_expired( prev_sub, sub, tbd[key] ):
+            sub.owner = default.owner
+            sub.status = EXPIRED
+        else:
+            sub.owner = tbd[key].owner
+            sub.status = WON
 
         applied.append( sub )
+        prev_sub = sub
 
     # If there are touchbiz entries left apply the most recent one 
     # to the returned rows

@@ -15,7 +15,7 @@ from law.util.adb        import loader as adb_loader, Owners, AAWSC #tmp_uspg1?
 from law.util.touchbizdb import session_context as tbz_session, loader as tbz_loader, Touchbiz, SalesReps
 
 LOG      = make_logger( 'touchbiz-gifts' )
-TIMEZONE = pytz.timezone( 'US/Pacific' ) 
+TIMEZONE = pytz.timezone( 'US/Pacific' )
 
 class DataSource( object ):
     def __init__(self, table, loader ):
@@ -27,7 +27,6 @@ class DataDestination( object ):
         self.table  = table
         self.engine = engine
 
-# Simple Migration
 class AccountOwnersMigrator( object ):
     """ Creates a management objects that performs a simple migration
     of account_owners to the touchbiz model.  This is stupid in that
@@ -84,7 +83,7 @@ class AccountOwnersMigrator( object ):
 
 
     def migrate_columns( self, row ):
-        
+
         # Account owners is always US/Pacific (from SFDC) and touchbiz is always UTC
         def localize( dt ):
             if isinstance( dt, date ):

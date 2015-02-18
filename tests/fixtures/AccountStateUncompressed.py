@@ -112,4 +112,49 @@ FIXTURES = [
     'tGB'       : 1000000000,
     'tDays'     : 7,
 },
+# Cust 1003
+{
+    'acct_id'   : 1003,
+    'updated'   : datetime( 2014, 4, 8 ),
+    'subdomain' : 'expiredtouchbiz',
+    'state'     : 'SUT',
+    'tRate'     : 0,
+    'fRate'     : 0,
+    'tPlan_id'  : 1, # Trial
+    'tGB'       : 0,
+    'tDays'     : 15,
+},
+{
+    'acct_id'   : 1003,
+    'updated'   : datetime( 2014, 5, 8, 1 ),
+    'subdomain' : 'expiredtouchbiz',
+    'state'     : 'TWP',
+    'tRate'     : 49,
+    'fRate'     : 0,
+    'tPlan_id'  : 4, # production
+    'tGB'       : 1000000000,
+    'tDays'     : 7,
+},
+{
+    'acct_id'   : 1003,
+    'updated'   : datetime( 2015, 2, 2, 2),
+    'subdomain' : 'expiredtouchbiz',
+    'state'     : 'PWF',
+    'tRate'     : 0,
+    'fRate'     : 49,
+    'tPlan_id'  : 2, # Lite
+    'tGB'       : 200000000,
+    'tDays'     : 7,
+},
+{
+    'acct_id'   : 1003,
+    'updated'   : datetime( 2015, 2, 11),
+    'subdomain' : 'expiredtouchbiz',
+    'state'     : 'FWP',
+    'tRate'     : 49,
+    'fRate'     : 0,
+    'tPlan_id'  : 3, # Lite
+    'tGB'       : 1000000000,
+    'tDays'     : 7,
+},
 ]

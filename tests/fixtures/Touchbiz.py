@@ -12,7 +12,7 @@ MODEL = Touchbiz
 FIXTURES = [
 {
     'acct_id'       : 1000,
-    'sales_rep_id'  : 2,
+    'sales_rep_id'  : 2, # Angela
     'created'       : datetime( 2014, 5, 9 ),
     'modified'      : datetime( 2014, 5, 9 ),
     'tier'          : 'Development',
@@ -23,7 +23,7 @@ FIXTURES = [
 },
 {
     'acct_id'       : 1001,
-    'sales_rep_id'  : 2,
+    'sales_rep_id'  : 2, # Angela
     'created'       : datetime( 2014, 12, 15 ),
     'modified'      : datetime( 2014, 12, 15 ),
     'tier'          : 'Development',
@@ -34,7 +34,7 @@ FIXTURES = [
 },
 {
     'acct_id'       : 1001,
-    'sales_rep_id'  : 3,
+    'sales_rep_id'  : 3, # Steph
     'created'       : datetime( 2014, 12, 25, 3 ),
     'modified'      : datetime( 2014, 12, 25, 3 ),
     'tier'          : 'Production',
@@ -45,7 +45,7 @@ FIXTURES = [
 },
 {
     'acct_id'       : 1001,
-    'sales_rep_id'  : 3,
+    'sales_rep_id'  : 3, # Steph
     'created'       : datetime( 2015, 2, 10, 15 ),
     'modified'      : datetime( 2015, 2, 10, 15 ),
     'tier'          : 'Production',
@@ -56,7 +56,7 @@ FIXTURES = [
 },
 {
     'acct_id'       : 1002,
-    'sales_rep_id'  : 2,
+    'sales_rep_id'  : 2, # Angela
     'created'       : datetime( 2015, 2, 10, 15 ),
     'modified'      : datetime( 2015, 2, 10, 15 ),
     'tier'          : 'Production',
@@ -64,5 +64,27 @@ FIXTURES = [
     'volume'        : 200000000000,
     'sub_rate'      : 109,
     'billing_period': 'annual',
+},
+{
+    'acct_id'       : 1003,
+    'sales_rep_id'  : 2, # Angela
+    'created'       : datetime( 2014, 4, 10 ),
+    'modified'      : datetime( 2014, 4, 10 ),
+    'tier'          : 'Production',
+    'retention'     : 7,
+    'volume'        : 100000000000,
+    'sub_rate'      : 49,
+    'billing_period': 'monthly',
+},
+{
+    'acct_id'       : 1003,
+    'sales_rep_id'  : 2, # Angela
+    'created'       : datetime( 2015, 2, 10 ),
+    'modified'      : datetime( 2015, 2, 10 ),
+    'tier'          : 'Development',
+    'retention'     : 7,
+    'volume'        : 100000000000,
+    'sub_rate'      : 49,
+    'billing_period': 'monthly',
 },
 ]
