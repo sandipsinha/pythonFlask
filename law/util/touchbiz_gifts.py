@@ -75,7 +75,7 @@ class AccountOwnersMigrator( object ):
 
         # Construct a batch dict for entry
         # Should set touchbiz created/modified to the start date
-        items = (self.migrate_columns( owner ) for owner in owners )
+        items = [self.migrate_columns( owner ) for owner in owners ]
         items = self.migrate_by_sub_state( items )
 
         self._insert( items )
@@ -173,10 +173,20 @@ class AccountOwnersMigrator( object ):
                         # Move the current owner to a time that exists just after this 
                         # subscription entry so that the previous owner will be seen
                         # as the owner of this subscription.
-                        tbd[key]['created']  = sub.utc_updated + timedelta( minutes=1 )
-                        tbd[key]['modified'] = tbd[key]['created']
 
-            prev_owner_id = tbd[key]['sales_rep_id']
+                        # Because there may be multiple subscriptions that this applies to
+                        # we need to continue processing in our normal way once the sub is
+                        # bumped.
+                        update_entry = tbd.pop(key)
+                        update_entry['created'] = sub.utc_updated + timedelta( minutes=1 )
+                        update_entry['modified'] = update_entry['created']
+                        update_key = update_entry['created']
+                        tbd[update_key] = update_entry
+                        tbkeys.append( update_key )
+                        # Found the downgrade owner. Stop going through old states.
+                        break
+            else:
+                prev_owner_id = tbd[key]['sales_rep_id']
 
         return tbd.values()
 

@@ -45,7 +45,7 @@ def _localize( dt ):
         return dt
 
     timezone = pytz.timezone( 'US/Pacific' )
-    if isinstance( dt, date ):
+    if type( dt ) is date:
         dt = datetime( *(dt.timetuple()[:3]) )
     return pytz.utc.normalize( timezone.localize( dt ) ).replace( tzinfo=None )
 
