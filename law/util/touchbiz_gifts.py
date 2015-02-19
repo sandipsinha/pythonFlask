@@ -6,16 +6,15 @@
 " Routines that gift touch business based on our old account_owner tables.
 "
 """
-from datetime import datetime, date
-from types    import FunctionType
+from datetime  import datetime, timedelta
+from types     import FunctionType
+from itertools import chain
 
-import pytz
 from law.util.logger     import make_logger
-from law.util.adb        import loader as adb_loader, Owners, AAWSC #tmp_uspg1?
-from law.util.touchbizdb import session_context as tbz_session, loader as tbz_loader, Touchbiz, SalesReps
+from law.util.adb        import loader as adb_loader, AAWSC
+from law.util.touchbizdb import loader as tbz_loader, SalesReps
 
-LOG      = make_logger( 'touchbiz-gifts' )
-TIMEZONE = pytz.timezone( 'US/Pacific' )
+LOG = make_logger( 'touchbiz-gifts' )
 
 class DataSource( object ):
     def __init__(self, table, loader ):
@@ -76,11 +75,12 @@ class AccountOwnersMigrator( object ):
 
         # Construct a batch dict for entry
         # Should set touchbiz created/modified to the start date
-        items = [self.migrate_columns( owner ) for owner in owners ]
+        items = (self.migrate_columns( owner ) for owner in owners )
+        items = self.migrate_by_sub_state( items )
+
         self._insert( items )
     
         return len( items )
-
 
     def migrate_columns( self, row ):
 
@@ -107,6 +107,78 @@ class AccountOwnersMigrator( object ):
             return res
 
         return apply_migrate( row )
+
+    def migrate_by_sub_state( self, touchbiz ):
+        """ Migrates based on special business rules that apply based
+        on the previous state of the account.
+        """
+        with adb_loader() as l:
+            subs = l.query( AAWSC ).all()
+
+        # Bucket by acct_id
+        subd = {}
+        for s in subs:
+            try:
+                subd[ s.acct_id ].append( s )
+            except KeyError:
+                subd[ s.acct_id ] = [s]
+
+        tbd  = {}
+        for t in touchbiz:
+            try:
+                tbd[ t['acct_id'] ].append( t )
+            except KeyError:
+                tbd[ t['acct_id'] ] = [t]
+
+        migrated_tbd = {}
+        for acct_id in tbd:
+            if acct_id in subd:
+                migrated_tbd[ acct_id ] = self._migrate_by_sub_state( subd[acct_id], tbd[acct_id] )
+            else:
+                migrated_tbd[ acct_id ] = tbd[acct_id]
+
+        # flatten
+        return list( chain.from_iterable( migrated_tbd.values() ) )
+
+    def _migrate_by_sub_state( self, sub_entries, tb_entries ):
+        """ Performs the migration with special rules given the previous subscripton state.
+        For instance, if someone has a FWP|TWP|PWU then ownership was transfered and the first
+        move as PWD|PWF then the initial owner is given the downgrade.
+
+        Works on a per-account basis.
+        """
+        tbd    = {tb['created']: tb for tb in tb_entries }
+        tbkeys = sorted( tbd.keys(), reverse=True )
+        subs   = sorted( sub_entries, key=lambda x: x.utc_updated )
+
+        key     = tbkeys.pop()
+        states  = []
+        prev_owner_id = None
+        for sub in subs:
+            states.append( sub.state )
+            # While there are still touchbiz entries that occured before this
+            # sub iterate through them until we find the one that occured right
+            # before the subscription change.
+            while len( tbkeys ) != 0 and tbd[ tbkeys[-1] ]['created'] <= sub.utc_updated:
+                key = tbkeys.pop()
+
+            # TODO - might have to write routine that finds the most applicable 
+            # owner for a subscription independent of this flow
+
+            # In the case of a downgrade, apply touchbiz to the previous subs
+            # owner that won the subscription.
+            if sub.state in ('PWF', 'PWD') and prev_owner_id != tbd[key]['sales_rep_id']:
+                for state in states[::-1]:
+                    if state in ('SUP', 'TWP', 'FWP', 'PWU' ):
+                        # Move the current owner to a time that exists just after this 
+                        # subscription entry so that the previous owner will be seen
+                        # as the owner of this subscription.
+                        tbd[key]['created']  = sub.utc_updated + timedelta( minutes=1 )
+                        tbd[key]['modified'] = tbd[key]['created']
+
+            prev_owner_id = tbd[key]['sales_rep_id']
+
+        return tbd.values()
 
     def _insert( self, inserts, batch_size=5000 ):
         conn = self.dest.engine.connect().execution_options( autocommit=False )
