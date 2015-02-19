@@ -84,17 +84,11 @@ class AccountOwnersMigrator( object ):
 
     def migrate_columns( self, row ):
 
-        # Account owners is always US/Pacific (from SFDC) and touchbiz is always UTC
-        def localize( dt ):
-            if isinstance( dt, date ):
-                dt = datetime( *(dt.timetuple()[:3]) )
-            return pytz.utc.normalize( TIMEZONE.localize( dt ) ).replace( tzinfo=None )
-
         migrate_rules = {
             'acct_id'       : lambda x: x.acct_id,
             'sales_rep_id'  : lambda x: self.get_salesrep_id( x.owner ),
-            'created'       : lambda x: localize( x.start_date ),
-            'modified'      : lambda x: localize( x.start_date ),
+            'created'       : lambda x: x.utc_start_date,
+            'modified'      : lambda x: x.utc_start_date,
             'tier'          : '',
             'retention'     : 0,
             'volume'        : 0,
