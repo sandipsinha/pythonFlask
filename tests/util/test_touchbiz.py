@@ -161,15 +161,17 @@ class TestTouchbiz( unittest.TestCase ):
 
         applied = touchbiz.apply_touchbiz( sub_entries, tb_entries )
        
-        self.assertEqual( len( applied ), 4 )
+        self.assertEqual( len( applied ), 5 )
         self.assertEqual( applied[0].owner.sfdc_alias, company.sfdc_alias )
         self.assertEqual( applied[0].status, 'won' )
         self.assertEqual( applied[1].owner.sfdc_alias, aeich.sfdc_alias )
         self.assertEqual( applied[1].status, 'won' )
         self.assertEqual( applied[2].owner.sfdc_alias, company.sfdc_alias )
         self.assertEqual( applied[2].status, 'ownership expired' )
-        self.assertEqual( applied[3].owner.sfdc_alias, aeich.sfdc_alias )
-        self.assertEqual( applied[3].status, 'won' )
+        self.assertEqual( applied[3].owner.sfdc_alias, company.sfdc_alias )
+        self.assertEqual( applied[3].status, 'ownership expired' )
+        self.assertEqual( applied[4].owner.sfdc_alias, aeich.sfdc_alias )
+        self.assertEqual( applied[4].status, 'won' )
 
 
     def test_touchbiz_by_account_id( self ): 

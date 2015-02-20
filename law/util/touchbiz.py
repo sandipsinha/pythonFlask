@@ -90,10 +90,11 @@ def acct_id_for_subdomain( subdomain ):
     return acct.acct_id
 
 def ownership_expired( prev_sub, current_sub, tb_entry ):
+    upstates = ('SUP', 'TWP', 'TWF', 'FWP', 'PWU')
     if prev_sub is not None:
-        if prev_sub.status == EXPIRED and current_sub.state in ('PWF', 'PWD'):
+        if prev_sub.status == EXPIRED and current_sub.state not in upstates:
             return True
-        if (current_sub.updated - prev_sub.updated).days >= EXPIRE_DAYS and current_sub.state in ('PWF', 'PWD'):
+        if (current_sub.updated - prev_sub.updated).days >= EXPIRE_DAYS and current_sub.state not in upstates:
             return True
 
     return False

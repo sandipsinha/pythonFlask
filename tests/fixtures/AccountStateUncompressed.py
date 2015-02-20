@@ -148,7 +148,18 @@ FIXTURES = [
 },
 {
     'acct_id'   : 1003,
-    'updated'   : datetime( 2015, 2, 11),
+    'updated'   : datetime( 2015, 7, 2),
+    'subdomain' : 'expiredtouchbiz',
+    'state'     : 'FTF',
+    'tRate'     : 0,
+    'fRate'     : 0,
+    'tPlan_id'  : 2, # Lite
+    'tGB'       : 200000000,
+    'tDays'     : 7,
+},
+{
+    'acct_id'   : 1003,
+    'updated'   : datetime( 2015, 12, 11),
     'subdomain' : 'expiredtouchbiz',
     'state'     : 'FWP',
     'tRate'     : 49,
