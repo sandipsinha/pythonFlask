@@ -147,46 +147,43 @@ class AccountOwnersMigrator( object ):
 
         Works on a per-account basis.
         """
-        tbd    = {tb['created']: tb for tb in tb_entries }
-        tbkeys = sorted( tbd.keys(), reverse=True )
-        subs   = sorted( sub_entries, key=lambda x: x.utc_updated )
+        def applicable_touchbiz( tbd, sub ):
+            """ Retrieves the most recent touchbiz entry prior to the subscription """
+            tb = None
+            tbkeys = sorted( tbd.keys(), reverse=True )
+            while len( tbkeys ) != 0 and tbd[ tbkeys[-1] ]['created'] <= sub.utc_updated:
+                tb = tbd[ tbkeys.pop() ]
 
-        key     = tbkeys.pop()
-        states  = []
+            return tb
+
+        tbd    = {tb['created']: tb for tb in tb_entries }
+        subs   = sorted( sub_entries, key=lambda x: x.utc_updated )
+        states = []
         prev_owner_id = None
         for sub in subs:
             states.append( sub.state )
             # While there are still touchbiz entries that occured before this
             # sub iterate through them until we find the one that occured right
             # before the subscription change.
-            while len( tbkeys ) != 0 and tbd[ tbkeys[-1] ]['created'] <= sub.utc_updated:
-                key = tbkeys.pop()
+            tb = applicable_touchbiz( tbd, sub )
 
-            # TODO - might have to write routine that finds the most applicable 
-            # owner for a subscription independent of this flow
-
-            # In the case of a downgrade, apply touchbiz to the previous subs
-            # owner that won the subscription.
-            if sub.state in ('PWF', 'PWD') and prev_owner_id != tbd[key]['sales_rep_id']:
-                for state in states[::-1]:
-                    if state in ('SUP', 'TWP', 'FWP', 'PWU' ):
-                        # Move the current owner to a time that exists just after this 
-                        # subscription entry so that the previous owner will be seen
-                        # as the owner of this subscription.
-
-                        # Because there may be multiple subscriptions that this applies to
-                        # we need to continue processing in our normal way once the sub is
-                        # bumped.
-                        update_entry = tbd.pop(key)
-                        update_entry['created'] = sub.utc_updated + timedelta( minutes=1 )
-                        update_entry['modified'] = update_entry['created']
-                        update_key = update_entry['created']
-                        tbd[update_key] = update_entry
-                        tbkeys.append( update_key )
-                        # Found the downgrade owner. Stop going through old states.
-                        break
-            else:
-                prev_owner_id = tbd[key]['sales_rep_id']
+            if tb is not None:
+                # In the case of a downgrade, apply touchbiz to the previous subs
+                # owner that won the subscription.
+                if sub.state in ('PWF', 'PWD') and prev_owner_id != tb['sales_rep_id']:
+                    for state in states[::-1]:
+                        if state in ('SUP', 'TWP', 'FWP', 'PWU' ):
+                            # Move the current owner to a time that exists just after this 
+                            # subscription entry so that the previous owner will be seen
+                            # as the owner of this subscription.
+                            tbd.pop(tb['created'])
+                            tb['created'] = sub.utc_updated + timedelta( minutes=1 )
+                            tb['modified'] = tb['created']
+                            tbd[tb['created']] = tb
+                            # Found the downgrade owner. Stop going through old states.
+                            break
+                else:
+                    prev_owner_id = tb['sales_rep_id']
 
         return tbd.values()
 
