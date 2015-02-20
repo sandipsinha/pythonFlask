@@ -156,12 +156,22 @@ class AccountOwnersMigrator( object ):
 
             return tb
 
+        def touchbiz_in_range( tbd, start, end ):
+            """ Retrieves all touchbiz entries that may be applicable for the specified range """
+            in_range = []
+            for tb in tbd.values():
+                if tb['created'] > start and tb['created'] <= end:
+                    in_range.append( tb )
+
+            return sorted( in_range, key=lambda x: x['created'] )
+
+
         tbd    = {tb['created']: tb for tb in tb_entries }
         subs   = sorted( sub_entries, key=lambda x: x.utc_updated )
         states = []
         prev_owner_id = None
         for sub in subs:
-            states.append( sub.state )
+            states.append( (sub.state, sub.utc_updated) )
             # While there are still touchbiz entries that occured before this
             # sub iterate through them until we find the one that occured right
             # before the subscription change.
@@ -171,15 +181,20 @@ class AccountOwnersMigrator( object ):
                 # In the case of a downgrade, apply touchbiz to the previous subs
                 # owner that won the subscription.
                 if sub.state in ('PWF', 'PWD') and prev_owner_id != tb['sales_rep_id']:
-                    for state in states[::-1]:
-                        if state in ('SUP', 'TWP', 'FWP', 'PWU' ):
-                            # Move the current owner to a time that exists just after this 
-                            # subscription entry so that the previous owner will be seen
-                            # as the owner of this subscription.
-                            tbd.pop(tb['created'])
-                            tb['created'] = sub.utc_updated + timedelta( minutes=1 )
-                            tb['modified'] = tb['created']
-                            tbd[tb['created']] = tb
+                    for prev_state, prev_state_dt in states[::-1]:
+                        if prev_state in ('SUP', 'TWP', 'FWP', 'PWU' ):
+
+                            # Bump all owners that exist witin the time range of the Paid win.
+                            # This will effectively overwrite owner transitions within the timerange
+                            # with the most applicable (latest entry prior to sub change) owner.
+                            for bump_tb in touchbiz_in_range( tbd, prev_state_dt, sub.utc_updated ):
+                                # Move the current owner to a time that exists just after this 
+                                # subscription entry so that the previous owner will be seen
+                                # as the owner of this subscription.
+                                tbd.pop(bump_tb['created'])
+                                bump_tb['created'] = sub.utc_updated + timedelta( minutes=1 )
+                                bump_tb['modified'] = bump_tb['created']
+                                tbd[bump_tb['created']] = bump_tb
                             # Found the downgrade owner. Stop going through old states.
                             break
                 else:
