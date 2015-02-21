@@ -171,10 +171,8 @@ class AccountOwnersMigrator( object ):
         states = []
         prev_owner_id = None
         for sub in subs:
+
             states.append( (sub.state, sub.utc_updated) )
-            # While there are still touchbiz entries that occured before this
-            # sub iterate through them until we find the one that occured right
-            # before the subscription change.
             tb = applicable_touchbiz( tbd, sub )
 
             if tb is not None:
@@ -195,6 +193,7 @@ class AccountOwnersMigrator( object ):
                                 bump_tb['created'] = sub.utc_updated + timedelta( minutes=1 )
                                 bump_tb['modified'] = bump_tb['created']
                                 tbd[bump_tb['created']] = bump_tb
+
                             # Found the downgrade owner. Stop going through old states.
                             break
                 else:
