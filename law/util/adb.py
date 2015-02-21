@@ -5,7 +5,9 @@
 "
 """
 from contextlib import contextmanager
+from datetime import date, datetime
 
+import pytz
 from law                        import config
 from sqlalchemy                 import (create_engine, Column, 
                                         Integer, DateTime, Date,
@@ -37,6 +39,15 @@ engine = create_engine(
          )
 
 Session = sessionmaker( bind=engine )
+
+def _localize( dt ):
+    if dt is None:
+        return dt
+
+    timezone = pytz.timezone( 'US/Pacific' )
+    if type( dt ) is date:
+        dt = datetime( *(dt.timetuple()[:3]) )
+    return pytz.utc.normalize( timezone.localize( dt ) ).replace( tzinfo=None )
 
 class Account( Base ):
     __tablename__  = 'accounts'
@@ -161,6 +172,14 @@ class AAWSBase( object ):
     @property
     def state( self ):
         return self.stNam
+
+    @property
+    def utc_created(self):
+        return _localize( self.created )
+    
+    @property
+    def utc_updated(self):
+        return _localize( self.updated )
 
 class AAWS( OwnersBase, AAWSBase ):
     __tablename__  = 'aaws'
@@ -384,6 +403,14 @@ class Owners( Base ):
     start_date = Column( DateTime, primary_key=True )
     end_date   = Column( DateTime )
     executive  = Column( Boolean )
+
+    @property
+    def utc_start_date( self ):
+        return _localize( self.start_date )
+
+    @property
+    def utc_end_date( self ):
+        return _localize( self.end_date )
 
     def __repr__(self):
         return "<Owner: {}>".format(

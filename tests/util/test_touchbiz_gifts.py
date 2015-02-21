@@ -22,11 +22,12 @@ def fixtures():
         bind=tbz.engine,
         tables = [
             adb.Owners.__table__,
+            adb.AAWSC.__table__,
         ]
     )
     
     with adb.session_context() as s:
-        populate( s, model_names=['Owners'] )
+        populate( s, model_names=['Owners', 'AAWSC'] )
 
     tbz.Base.metadata.create_all( 
         bind=tbz.engine,
@@ -48,6 +49,7 @@ def teardown_module():
         bind=tbz.engine,
         tables=[
             adb.Owners.__table__,
+            adb.AAWSC.__table__,
         ]
     )
 
@@ -67,26 +69,34 @@ class TestTouchbizGifts( unittest.TestCase ):
         dest  = DataDestination( tbz.Touchbiz, tbz.engine )
 
         with src.loader() as l:
-            owners = l.query( src.table ).order_by( src.table.owner ).all()
+            angela  = l.query( src.table )\
+                       .filter( src.table.owner == 'Angela Eichner' )\
+                       .order_by( src.table.acct_id ).all()
+            cquin   = l.query( src.table )\
+                       .filter( src.table.owner == 'Cristina Quintero' )\
+                       .order_by( src.table.acct_id ).all()
+            unknown = l.query( src.table )\
+                       .filter( src.table.owner == 'Unknown Rep' )\
+                       .order_by( src.table.acct_id ).all()
 
         migrator = AccountOwnersMigrator( src, dest )
 
-        migrated = migrator.migrate_columns( owners[0] ) 
+        migrated = migrator.migrate_columns( angela[0] ) 
         self.assertEqual( migrated['acct_id'],        1000 )
         self.assertEqual( migrated['sales_rep_id'],   2 )
         self.assertEqual( migrated['created'],        datetime( 2014, 4, 8, 7) )
-        self.assertEqual( migrated['modified'],       datetime( 2014, 4, 8, 7 ) )
+        self.assertEqual( migrated['modified'],       datetime( 2014, 4, 8, 7) )
         self.assertEqual( migrated['tier'],           '' )
         self.assertEqual( migrated['retention'],      0 )
         self.assertEqual( migrated['volume'],         0 )
         self.assertEqual( migrated['sub_rate'],       0 )
         self.assertEqual( migrated['billing_period'], '' )
 
-        migrated = migrator.migrate_columns( owners[1] ) 
+        migrated = migrator.migrate_columns( cquin[0] ) 
         self.assertEqual( migrated['acct_id'],        1000 )
         self.assertEqual( migrated['sales_rep_id'],   5 )
-        self.assertEqual( migrated['created'],        datetime( 2014, 4, 10, 7 ) )
-        self.assertEqual( migrated['modified'],       datetime( 2014, 4, 10, 7 ) )
+        self.assertEqual( migrated['created'],        datetime( 2014, 4, 10, 7) )
+        self.assertEqual( migrated['modified'],       datetime( 2014, 4, 10, 7) )
         self.assertEqual( migrated['tier'],           '' )
         self.assertEqual( migrated['retention'],      0 )
         self.assertEqual( migrated['volume'],         0 )
@@ -95,7 +105,7 @@ class TestTouchbizGifts( unittest.TestCase ):
 
         # No default rep
         with self.assertRaises( KeyError ):
-            migrated = migrator.migrate_columns( owners[2] ) 
+            migrated = migrator.migrate_columns( unknown[0] ) 
 
 
     def test_migrate( self ):
@@ -106,9 +116,9 @@ class TestTouchbizGifts( unittest.TestCase ):
         migrator.migrate()
 
         with tbz.loader() as l:
-            touchbiz = l.query( tbz.Touchbiz ).all()
+            touchbiz = l.query( tbz.Touchbiz ).order_by( tbz.Touchbiz.acct_id ).all()
 
-        self.assertEqual( len( touchbiz ), 3 )
+        self.assertEqual( len( touchbiz ), 5 )
 
         entry = touchbiz[0]
         self.assertEqual( entry.acct_id,        1000 )
@@ -137,6 +147,28 @@ class TestTouchbizGifts( unittest.TestCase ):
         self.assertEqual( entry.sales_rep_id,   1 )
         self.assertEqual( entry.created,        datetime( 2014, 5, 5, 7 ) )
         self.assertEqual( entry.modified,       datetime( 2014, 5, 5, 7 ) )
+        self.assertEqual( entry.tier,           '' )
+        self.assertEqual( entry.retention,      0 )
+        self.assertEqual( entry.volume,         '0' )
+        self.assertEqual( entry.sub_rate,       0 )
+        self.assertEqual( entry.billing_period, '' )
+       
+        entry = touchbiz[3]
+        self.assertEqual( entry.acct_id,        1004 )
+        self.assertEqual( entry.sales_rep_id,   5 )
+        self.assertEqual( entry.created,        datetime( 2014, 10, 10, 7 ) )
+        self.assertEqual( entry.modified,       datetime( 2014, 10, 10, 7 ) )
+        self.assertEqual( entry.tier,           '' )
+        self.assertEqual( entry.retention,      0 )
+        self.assertEqual( entry.volume,         '0' )
+        self.assertEqual( entry.sub_rate,       0 )
+        self.assertEqual( entry.billing_period, '' )
+        
+        entry = touchbiz[4]
+        self.assertEqual( entry.acct_id,        1004 )
+        self.assertEqual( entry.sales_rep_id,   2 )
+        self.assertEqual( entry.created,        datetime( 2015, 1, 6, 8, 1 ) )
+        self.assertEqual( entry.modified,       datetime( 2015, 1, 6, 8, 1 ) )
         self.assertEqual( entry.tier,           '' )
         self.assertEqual( entry.retention,      0 )
         self.assertEqual( entry.volume,         '0' )
