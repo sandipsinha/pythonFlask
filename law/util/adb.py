@@ -12,7 +12,7 @@ from law                        import config
 from sqlalchemy                 import (create_engine, Column, 
                                         Integer, DateTime, Date,
                                         Boolean, String,
-                                        Float, Numeric, ForeignKey,
+                                        Numeric, ForeignKey,
                                         Index)
 from sqlalchemy.dialects.mysql  import BIGINT, SMALLINT, MEDIUMINT
 from sqlalchemy.ext.declarative import declarative_base
@@ -155,16 +155,16 @@ class AAWSBase( object ):
     stNam     = Column( String(length=6) )
     pStNam    = Column( String(length=20) )
 
-    fGB       = Column( Numeric( asdecimal=False ) )
+    fGB       = Column( Numeric( 14, 1 ) )
     fDays     = Column( SMALLINT( unsigned=True ) )
-    frate     = Column( Float )
+    frate     = Column( MEDIUMINT )
     fPlan     = Column( SMALLINT( unsigned=True ) )
     fPer      = Column( String(length=2) )
     fBC       = Column( SMALLINT( unsigned=True ) )
 
-    tGB       = Column( Numeric( asdecimal=False ) )
+    tGB       = Column( Numeric( 14, 1 ) )
     tDays     = Column( SMALLINT( unsigned=True ) )
-    trate     = Column( Float )
+    trate     = Column( MEDIUMINT )
     tPlan     = Column( SMALLINT( unsigned=True ) )
     tPer      = Column( String(length=2) )
     tBC       = Column( SMALLINT( unsigned=True ) )
@@ -277,10 +277,10 @@ class AccountState( Base ):
     updated   = Column( DateTime, primary_key=True )
     subdomain = Column( String(length=100) )
     state     = Column( 'stNam', String(length=10) )
-    tRate     = Column( 'trate', Float )
-    fRate     = Column( 'frate', Float )
+    tRate     = Column( 'trate', MEDIUMINT )
+    fRate     = Column( 'frate', MEDIUMINT )
     tPlan_id  = Column( 'tPlan', Integer, ForeignKey( 'subscription_plan.id' ) )
-    tGB       = Column( Numeric( asdecimal=False ) )
+    tGB       = Column( Numeric( 14, 1 ) )
     tDays     = Column( Integer )
     tPlan     = relationship("Tier", 
                              lazy='joined',
@@ -304,10 +304,10 @@ class AccountStateUncompressed( Base ):
     updated   = Column( DateTime, primary_key=True )
     subdomain = Column( String(length=100) )
     state     = Column( 'stNam', String(length=10) )
-    tRate     = Column( 'trate', Float )
-    fRate     = Column( 'frate', Float )
+    tRate     = Column( 'trate', MEDIUMINT )
+    fRate     = Column( 'frate', MEDIUMINT )
     tPlan_id  = Column( 'tPlan', Integer, ForeignKey( 'subscription_plan.id' ) )
-    tGB       = Column( Numeric( asdecimal=False ) )
+    tGB       = Column( Numeric( 14, 1 ) )
     tDays     = Column( Integer )
     tPlan     = relationship("Tier", 
                              lazy='joined',
