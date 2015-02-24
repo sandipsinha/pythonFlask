@@ -366,19 +366,31 @@ class TestTouchbiz( unittest.TestCase ):
             for col in columns:
                 self.assertEqual( getattr( source[i], col ), getattr( owners[i], col ) )
 
-        self.assertEqual( len( owners ), 10 )
+        self.assertEqual( len( owners ), 14 )
 
+        # Cust 1000
         self.assertEqual( owners[0].owner, 'Hoover Loggly' )
         self.assertEqual( owners[1].owner, 'Hoover Loggly' )
         self.assertEqual( owners[2].owner, 'Angela Eichner' )
         self.assertEqual( owners[3].owner, 'Angela Eichner' )
 
+        # Cust 1001
         self.assertEqual( owners[4].owner, 'Hoover Loggly' )
         self.assertEqual( owners[5].owner, 'Stephanie Skuratowicz' )
         self.assertEqual( owners[6].owner, 'Stephanie Skuratowicz' )
         
+        # Cust 1002
         self.assertEqual( owners[7].owner, 'Hoover Loggly' )
         self.assertEqual( owners[8].owner, 'Hoover Loggly' )
+        
+        # Cust 1003
+        self.assertEqual( owners[9].owner, 'Angela Eichner' )
+
+        # Cust 1010
+        self.assertEqual( owners[10].owner, 'Hoover Loggly' )
+        self.assertEqual( owners[11].owner, 'Angela Eichner' )
+        self.assertEqual( owners[12].owner, 'Angela Eichner' )
+        self.assertEqual( owners[13].owner, 'Stephanie Skuratowicz' )
 
     def test_add_touchbiz( self ):
         pass
