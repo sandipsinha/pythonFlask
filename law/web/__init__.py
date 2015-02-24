@@ -2,12 +2,14 @@
 " Copyright:    Loggly, Inc.
 " Author:       Scott Griffin
 " Email:        scott@loggly.com
-" Last Updated: 01/22/2015
+" Last Updated: 02/23/2015
 "
 " Flask interface for the web module
 "
 """
 from datetime            import datetime, date
+from decimal             import Decimal
+
 from flask               import Flask, url_for
 from flask.json          import JSONEncoder
 from law                 import config
@@ -49,6 +51,8 @@ class JSONLawDEncoder( JSONEncoder ):
     def default( self, obj ):
         if isinstance( obj, ( datetime, date ) ):
             return obj.strftime( config.get( 'api', 'dtformat' ) )
+        elif isinstance( obj, Decimal ):
+            return float( str( obj ) )
         else:
             super( JSONLawDEncoder, self ).default( obj )
 
