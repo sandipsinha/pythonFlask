@@ -13,6 +13,7 @@ from tests.fixtures import populate
 from law.util import touchbizdb as tbz
 from law.util import adb
 from law.util import touchbiz
+from law.util import touchbiz_cli
 
 def fixtures():
     teardown_module()
@@ -20,9 +21,12 @@ def fixtures():
     adb.Base.metadata.create_all( 
         bind=tbz.engine,
         tables = [
-            adb.AccountState.__table__,
+            adb.AccountStateUncompressed.__table__,
+            adb.AAWSC.__table__,
             adb.Tier.__table__,
             adb.Account.__table__,
+            adb.AccountActivity.__table__,
+            adb.AAOwner.__table__,
         ]
     )
     
@@ -30,7 +34,13 @@ def fixtures():
         populate( s, model_names=['SalesReps', 'Touchbiz'] )
 
     with adb.session_context() as s:
-        populate( s, model_names=['AccountState', 'Tier', 'Account'] )
+        populate( s, model_names=[
+                        'AccountStateUncompressed', 
+                        'AAWSC',
+                        'Tier', 
+                        'Account', 
+                        'AccountActivity']
+        )
 
 
 def setup_module():
@@ -49,9 +59,12 @@ def teardown_module():
     adb.Base.metadata.drop_all( 
         bind=tbz.engine,
         tables=[
-            adb.AccountState.__table__,
+            adb.AccountStateUncompressed.__table__,
+            adb.AAWSC.__table__,
             adb.Tier.__table__,
             adb.Account.__table__,
+            adb.AccountActivity.__table__,
+            adb.AAOwner.__table__,
         ]
     )
 
@@ -61,8 +74,8 @@ class TestTouchbiz( unittest.TestCase ):
     def test_apply_touchbiz( self ):
 
         with adb.loader() as l:
-            sub_entries = l.query( adb.AccountState )\
-                           .filter( adb.AccountState.acct_id == 1000 )\
+            sub_entries = l.query( adb.AccountStateUncompressed )\
+                           .filter( adb.AccountStateUncompressed.acct_id == 1000 )\
                            .all()
 
         with tbz.loader() as l:
@@ -85,15 +98,15 @@ class TestTouchbiz( unittest.TestCase ):
         self.assertEqual( applied[0].owner.sfdc_alias, company.sfdc_alias )
         self.assertEqual( applied[0].status, 'won' )
         self.assertEqual( applied[1].owner.sfdc_alias, company.sfdc_alias )
-        self.assertEqual( applied[0].status, 'won' )
+        self.assertEqual( applied[1].status, 'won' )
         self.assertEqual( applied[2].owner.sfdc_alias, aeich.sfdc_alias )
-        self.assertEqual( applied[0].status, 'won' )
+        self.assertEqual( applied[2].status, 'won' )
         self.assertEqual( applied[3].owner.sfdc_alias, aeich.sfdc_alias )
-        self.assertEqual( applied[0].status, 'won' )
+        self.assertEqual( applied[3].status, 'won' )
 
         with adb.loader() as l:
-            sub_entries = l.query( adb.AccountState )\
-                           .filter( adb.AccountState.acct_id == 1001 )\
+            sub_entries = l.query( adb.AccountStateUncompressed )\
+                           .filter( adb.AccountStateUncompressed.acct_id == 1001 )\
                            .all()
 
         with tbz.loader() as l:
@@ -125,6 +138,41 @@ class TestTouchbiz( unittest.TestCase ):
         self.assertEqual( applied[2].status, 'won' )
         self.assertEqual( applied[3].owner.sfdc_alias, skura.sfdc_alias )
         self.assertEqual( applied[3].status, 'pending' )
+
+    def test_apply_expired(self):
+        with adb.loader() as l:
+            sub_entries = l.query( adb.AccountStateUncompressed )\
+                           .filter( adb.AccountStateUncompressed.acct_id == 1003 )\
+                           .all()
+
+        with tbz.loader() as l:
+            company = l.query( tbz.SalesReps )\
+                       .filter( tbz.SalesReps.sfdc_alias == 'integ' )\
+                       .one()
+
+            aeich = l.query( tbz.SalesReps )\
+                     .filter( tbz.SalesReps.sfdc_alias == 'aeich' )\
+                     .one()
+            
+
+            tb_entries = l.query( tbz.Touchbiz )\
+                          .filter( tbz.Touchbiz.acct_id == 1003 )\
+                          .all()
+
+        applied = touchbiz.apply_touchbiz( sub_entries, tb_entries )
+       
+        self.assertEqual( len( applied ), 5 )
+        self.assertEqual( applied[0].owner.sfdc_alias, company.sfdc_alias )
+        self.assertEqual( applied[0].status, 'won' )
+        self.assertEqual( applied[1].owner.sfdc_alias, aeich.sfdc_alias )
+        self.assertEqual( applied[1].status, 'won' )
+        self.assertEqual( applied[2].owner.sfdc_alias, company.sfdc_alias )
+        self.assertEqual( applied[2].status, 'ownership expired' )
+        self.assertEqual( applied[3].owner.sfdc_alias, company.sfdc_alias )
+        self.assertEqual( applied[3].status, 'ownership expired' )
+        self.assertEqual( applied[4].owner.sfdc_alias, aeich.sfdc_alias )
+        self.assertEqual( applied[4].status, 'won' )
+
 
     def test_touchbiz_by_account_id( self ): 
         with tbz.loader() as l:
@@ -279,10 +327,70 @@ class TestTouchbiz( unittest.TestCase ):
         self.assertEqual( row.rate, 109 )
         self.assertEqual( row.owner, aeich.sfdc_alias )
 
+    def test_aaowners( self ):
+        creator = touchbiz.AAOwnerCreator()
+        creator.apply_ownership()
 
+        with adb.loader() as l:
+            source = l.query( adb.AccountActivity )\
+                      .order_by( adb.AccountActivity.acct_id, adb.AccountActivity.updated )\
+                      .all()
+            owners = l.query( adb.AAOwner )\
+                      .order_by( adb.AAOwner.acct_id, adb.AAOwner.updated )\
+                      .all()
 
-    def test_touchbiz_table( self ):
-        pass
+        columns = [ 
+            'acct_id',
+            'created',
+            'updated',
+            'from_vol_bytes',
+            'from_ret_days',
+            'from_sub_rate',
+            'from_plan_id',
+            'from_sched_id',
+            'from_bill_per',
+            'from_bill_chan',
+            'to_vol_bytes',
+            'to_ret_days',
+            'to_sub_rate',
+            'to_plan_id',
+            'to_sched_id',
+            'to_bill_per',
+            'to_bill_chan',
+            'trial_exp',
+        ]
+
+        # Make sure that every column except the 'owner' col is the exact same
+        # in the dest table (AAOwner) as the source table (account activity)
+        for i in xrange( len( source ) ):
+            for col in columns:
+                self.assertEqual( getattr( source[i], col ), getattr( owners[i], col ) )
+
+        self.assertEqual( len( owners ), 14 )
+
+        # Cust 1000
+        self.assertEqual( owners[0].owner, 'Hoover Loggly' )
+        self.assertEqual( owners[1].owner, 'Hoover Loggly' )
+        self.assertEqual( owners[2].owner, 'Angela Eichner' )
+        self.assertEqual( owners[3].owner, 'Angela Eichner' )
+
+        # Cust 1001
+        self.assertEqual( owners[4].owner, 'Hoover Loggly' )
+        self.assertEqual( owners[5].owner, 'Stephanie Skuratowicz' )
+        self.assertEqual( owners[6].owner, 'Stephanie Skuratowicz' )
+        
+        # Cust 1002
+        self.assertEqual( owners[7].owner, 'Hoover Loggly' )
+        self.assertEqual( owners[8].owner, 'Hoover Loggly' )
+        
+        # Cust 1003
+        self.assertEqual( owners[9].owner, 'Angela Eichner' )
+
+        # Cust 1010
+        self.assertEqual( owners[10].owner, 'Hoover Loggly' )
+        self.assertEqual( owners[11].owner, 'Angela Eichner' )
+        self.assertEqual( owners[12].owner, 'Angela Eichner' )
+        self.assertEqual( owners[13].owner, 'Stephanie Skuratowicz' )
 
     def test_add_touchbiz( self ):
         pass
@@ -292,3 +400,43 @@ class TestTouchbiz( unittest.TestCase ):
     
     def test_sync_stages( self ):
         pass
+
+
+class TestTouchbizCLI( unittest.TestCase ):
+
+    @classmethod
+    def setup_class( cls ):
+        adb.Base.metadata.create_all( 
+            bind=tbz.engine,
+            tables = [
+                adb.AAWSCOwner.__table__,
+            ]
+        )
+
+    @classmethod
+    def teardown_class( cls ):
+        adb.Base.metadata.drop_all( 
+            bind=tbz.engine,
+            tables=[
+                adb.AAWSCOwner.__table__,
+            ]
+        )
+
+    def test_apply( self ):
+        touchbiz_cli.cli( ['apply'] )
+
+        with adb.loader() as l:
+            rows = l.query( adb.AAWSCOwner ).all()
+
+        self.assertTrue( len( rows ) > 0 )
+        for row in rows:
+            self.assertIsNotNone( row.owner )
+
+        touchbiz_cli.cli( ['apply', '--localize'] )
+
+        with adb.loader() as l:
+            rows = l.query( adb.AAWSCOwner ).all()
+
+        self.assertTrue( len( rows ) > 0 )
+        for row in rows:
+            self.assertIsNotNone( row.owner )

@@ -29,13 +29,14 @@ db_url = '{dialect}://{user}:{passwd}@{host}:{port}/{dbname}'.format(
 engine = create_engine( 
             db_url, 
             echo=config.getboolean( 'touchbizdb', 'debug' ), 
-            pool_recycle=3600 
+            pool_recycle=config.getint( 'touchbizdb', 'pool_recycle' ), 
          )
 
 Session = sessionmaker( bind=engine )
 
 class Touchbiz( Base ):
-    __tablename__ = 'sales_touchbiz'
+    __tablename__  = 'sales_touchbiz_migration'
+    __table_args__ = {'mysql_engine':'InnoDB'}
 
     acct_id        = Column( MEDIUMINT(unsigned=True), primary_key=True )
     sales_rep_id   = Column( MEDIUMINT(unsigned=True), ForeignKey( 'sales_reps.id' ) )
@@ -59,7 +60,8 @@ class Touchbiz( Base ):
         )
 
 class SalesReps( Base ):
-    __tablename__ = 'sales_reps'
+    __tablename__  = 'sales_reps'
+    __table_args__ = {'mysql_engine':'InnoDB'}
 
     id         = Column( MEDIUMINT(unsigned=True), primary_key=True )
     first      = Column( String(length=100) )
@@ -67,6 +69,10 @@ class SalesReps( Base ):
     email      = Column( String(length=200) )
     sfdc_alias = Column( String(length=10) )
     active     = Column( Integer )
+
+    @property
+    def full_name(self):
+        return '{} {}'.format( self.first, self.last )
              
     def __repr__(self):
         return "<SalesReps({},{} {},{})>".format(
@@ -77,7 +83,8 @@ class SalesReps( Base ):
         )
 
 class SalesStages( Base ):
-    __tablename__ = 'sales_stages'
+    __tablename__  = 'sales_stages'
+    __table_args__ = {'mysql_engine':'InnoDB'}
 
     id   = Column( MEDIUMINT(unsigned=True ), primary_key=True )
     name = Column( String(length=100) )
