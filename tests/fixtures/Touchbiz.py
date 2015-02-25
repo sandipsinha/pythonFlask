@@ -87,4 +87,26 @@ FIXTURES = [
     'sub_rate'      : 49,
     'billing_period': 'monthly',
 },
+{
+    'acct_id'       : 1010,
+    'sales_rep_id'  : 2, # Angela
+    'created'       : datetime( 2015, 3, 1 ),
+    'modified'      : datetime( 2015, 3, 1 ),
+    'tier'          : 'Development',
+    'retention'     : 7,
+    'volume'        : 100000000000,
+    'sub_rate'      : 49,
+    'billing_period': 'monthly',
+},
+{
+    'acct_id'       : 1010,
+    'sales_rep_id'  : 3, # Steph
+    'created'       : datetime( 2015, 3, 22 ),
+    'modified'      : datetime( 2015, 3, 22 ),
+    'tier'          : 'Production',
+    'retention'     : 15,
+    'volume'        : 7000000000,
+    'sub_rate'      : 349,
+    'billing_period': 'monthly',
+},
 ]

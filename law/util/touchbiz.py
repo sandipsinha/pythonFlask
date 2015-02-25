@@ -30,6 +30,9 @@ PENDING     = 'pending'
 WON         = 'won'
 EXPIRED     = 'ownership expired'
 
+UPSTATES    = ('SUP', 'TWP', 'TWF', 'FWP', 'PWU')
+DOWNSTATES  = ('PWF', 'PWD')
+
 # Used to create a single ad-hoc'd object containing the most pertinent fields.
 FlatTouchbiz = namedtuple( 'FlatTouchbiz', [
     'created', 
@@ -90,14 +93,29 @@ def acct_id_for_subdomain( subdomain ):
     return acct.acct_id
 
 def ownership_expired( prev_sub, current_sub, tb_entry ):
-    upstates = ('SUP', 'TWP', 'TWF', 'FWP', 'PWU')
     if prev_sub is not None:
-        if prev_sub.status == EXPIRED and current_sub.state not in upstates:
+        if prev_sub.status == EXPIRED and current_sub.state not in UPSTATES:
             return True
-        if (current_sub.updated - prev_sub.updated).days >= EXPIRE_DAYS and current_sub.state not in upstates:
+        if (current_sub.updated - prev_sub.updated).days >= EXPIRE_DAYS and current_sub.state not in UPSTATES:
             return True
 
     return False
+
+def is_downgrade( sub ):
+    if hasattr( sub, 'state' ):
+        return True if sub.state in DOWNSTATES else False
+    elif hasattr( sub, 'from_sub_rate' ) and hasattr( sub, 'to_sub_rate' ):
+        return True if sub.from_sub_rate - sub.to_sub_rate > 0 else False
+
+    raise Exception( 'Cannot decide on subscription transition state' )
+
+def is_paid_or_upgrade( sub ):
+    if hasattr( sub, 'state' ):
+        return True if sub.state in UPSTATES else False
+    elif hasattr( sub, 'from_sub_rate' ) and hasattr( sub, 'to_sub_rate' ):
+        return True if sub.from_sub_rate - sub.to_sub_rate < 0 else False
+
+    raise Exception( 'Cannot decide on subscription transition state' )
 
 def apply_touchbiz( sub_entries, tb_entries, initial_entry=None, localize=False, with_pending=True ):
     """ Applies touchbiz rows to the supplied standard rows.
@@ -119,7 +137,8 @@ def apply_touchbiz( sub_entries, tb_entries, initial_entry=None, localize=False,
     applied = []
     key = tbkeys.pop()
 
-    prev_sub = None
+    last_paid = default
+    prev_sub  = None
     for sub in subs:
         # While there are still touchbiz entries that occured before this
         # sub iterate through them until we find the one that occured right
@@ -132,9 +151,13 @@ def apply_touchbiz( sub_entries, tb_entries, initial_entry=None, localize=False,
         if ownership_expired( prev_sub, sub, tbd[key] ):
             sub.owner = default.owner
             sub.status = EXPIRED
+        elif is_downgrade( sub ):
+            sub.owner = last_paid.owner
+            sub.status = WON
         else:
             sub.owner = tbd[key].owner
             sub.status = WON
+            last_paid = tbd[key] if is_paid_or_upgrade( sub ) else last_paid
 
         applied.append( sub )
         prev_sub = sub
