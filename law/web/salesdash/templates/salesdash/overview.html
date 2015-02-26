@@ -1,0 +1,8 @@
+{% extends 'salesdash/base.html' %}
+{% block content %}
+    <ul style='font-size: 16px'>
+    {% for url in urls %}
+        <li><a href='{{url.url}}'/>{{url.name}}</a></li>
+    {% endfor %}
+    </ul>
+{% endblock %}

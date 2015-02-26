@@ -2,7 +2,7 @@
 " Copyright:    Loggly, Inc.
 " Author:       Scott Griffin
 " Email:        scott@loggly.com
-" Last Updated: 07/22/2014
+" Last Updated: 11/11/2014
 "
 """
 from contextlib import contextmanager
@@ -59,13 +59,19 @@ class AccountState( Base ):
     acct_id   = Column( Integer, primary_key=True )
     updated   = Column( Integer, primary_key=True )
     subdomain = Column( String )
+    state     = Column( 'stNam', String )
     tRate     = Column( 'trate', Float )
+    fRate     = Column( 'frate', Float )
     tPlan_id  = Column( 'tPlan', Integer, ForeignKey( 'subscription_plan.id' ) )
     tGB       = Column( Numeric( asdecimal=False ) )
     tDays     = Column( Integer )
     tPlan     = relationship("Tier", 
                              lazy='joined',
                              backref=backref("AAWSC", uselist=False))
+
+    @property
+    def rate_delta( self ):
+        return self.tRate - self.fRate 
 
     def __repr__(self):
         return "<AccountState({},{})>".format(
@@ -99,7 +105,7 @@ class VolumeAccepted( Base ):
             self.bytes)
 
 class VolumeDropped( Base ):
-    __tablename__ = 'chopper_account_volumes_denied'
+    __tablename__ = 'chopper_account_volumes_dropped'
 
     acct_id = Column( Integer, primary_key=True )
     date    = Column( 'vol_date', DateTime, primary_key=True )
@@ -138,6 +144,23 @@ class EventsDropped( Base ):
             self.date, 
             self.events)
 
+class Owners( Base ):
+    __tablename__ = 'account_owners'
+
+    acct_id    = Column( Integer )
+    subdomain  = Column( String, primary_key=True )
+    owner      = Column( String )
+    start_date = Column( DateTime, primary_key=True )
+    end_date   = Column( DateTime )
+
+    def __repr__(self):
+        return "<Owners({},{},{},{},{})>".format(
+            self.acct_id, 
+            self.subdomain, 
+            self.owner,
+            self.start_date,
+            self.end_date)
+
 @contextmanager
 def session_context():
     """ Because ADB is read only we do not need commit """
@@ -155,3 +178,5 @@ def session_context():
         raise
     finally:
         session.close()
+
+

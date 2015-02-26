@@ -1,0 +1,21 @@
+<div class='chart'></div>
+<script type='text/javascript'>
+
+    var chart = c3.generate({
+        bindto: '.chart',
+        data: {
+            x: 'x',
+            columns: [ 
+                ['x'].concat( {{keys|tojson|safe}} ) 
+            ].concat( {{series|tojson|safe}} )
+        },
+        axis: {
+            x: {
+                type: 'timeseries',
+                tick: {
+                    format: '%Y-%m-%d'
+                }
+            }
+        }
+    });
+</script>

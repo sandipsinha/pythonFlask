@@ -1,0 +1,11 @@
+{% extends 'salesdash/base.html' %}
+{% block content %}
+<div class='chart' width='90%'>
+    <svg height='300px'></svg>
+</div>
+<script>
+require( ['charts'], function( charts ) {
+    charts.barChart( '.chart svg', {{series|tojson|safe}}, true ) ;
+});
+</script>
+{% endblock %}

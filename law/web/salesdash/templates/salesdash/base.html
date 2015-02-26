@@ -1,0 +1,16 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <script src={{ url_for( 'salesdash.static', filename='js/require.js' ) }} data-main={{ url_for( 'salesdash.static', filename='js/app' ) }} charset='utf-8'></script>
+    <link href={{ url_for( 'salesdash.static', filename='stylesheets/nv.d3.css' ) }} rel='stylesheet' type='text/css'/>
+    <link href={{ url_for( 'salesdash.static', filename='stylesheets/iThing.css' ) }} rel='stylesheet' type='text/css'/>
+    <link href={{ url_for( 'salesdash.static', filename='stylesheets/salesdash.css' ) }} rel='stylesheet' type='text/css'/>
+    <link href='//code.jquery.com/ui/1.11.2/themes/smoothness/jquery-ui.css' rel='stylesheet' type='text/css'/>
+    <style type='text/css'>
+        body { font-size: 62.5%; }
+    </style>
+</head>
+<body>
+    {% block content %}{% endblock %}
+</body>
+</html>

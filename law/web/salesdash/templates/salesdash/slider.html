@@ -1,0 +1,10 @@
+{% extends 'salesdash/base.html' %}
+{% block content %}
+<div class='slider'></div>
+<script>
+require( ['slider'], function( slider ) {
+    slider.dateSlider( '.slider', '{{start}}', '{{end}}' ) ;
+
+});
+</script>
+{% endblock %}

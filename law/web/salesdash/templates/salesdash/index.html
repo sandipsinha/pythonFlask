@@ -1,0 +1,22 @@
+{% extends 'salesdash/base.html' %}
+{% block content %}
+<div class='slider' style='margin-left: auto; margin-right: auto; width: 90%;'></div>
+<div class='chart_biz' width='90%'>
+    <svg height='300px'></svg>
+</div>
+<div class='chart_mrr' width='90%'>
+    <svg height='300px'></svg>
+</div>
+<script>
+require( ['charts', 'jquery'], function( charts, $ ) {
+    $('.chart').each( function() {
+        charts.barChart( '.chart svg', {{series|tojson|safe}}, true ) ;
+    })
+});
+<script>
+require( ['slider'], function( slider ) {
+    slider.dateSlider( '.slider', '{{start}}', '{{end}}' ) ;
+
+});
+</script>
+{% endblock %}

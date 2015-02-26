@@ -1,0 +1,51 @@
+{% extends 'salesdash/base.html' %}
+{% block content %}
+<div class='slider'></div>
+<div id='chart_upsell_newbiz' class='chart' width='90%'>
+    <h2>Upsell+Newbiz</h4>
+    <svg height='300px'></svg>
+</div>
+<div id='chart_mrr' class='chart' width='90%'>
+    <h2>Sales MRR</h4>
+    <svg height='300px'></svg>
+</div>
+<div id='chart_product_mrr' class='chart' width='90%'>
+    <h2>Product MRR</h4>
+    <svg height='300px'></svg>
+</div>
+<script>
+require( ['charts', 'slider'], function( charts, slider ) {
+    ds = slider.dateSlider( '.slider', '{{start}}', '{{end}}' ) ;
+    charts.BarChart( 
+        '#chart_upsell_newbiz.chart svg', 
+        null, 
+        { 
+            dateSlider: ds, 
+            timeBuckets: ['day','week','month','quarter','year'],
+            dataUrl: '{{upsell_newbiz_data_url}}',
+            name: 'Upsell + Newbiz'
+        } 
+    ) ;
+    charts.BarChart( 
+        '#chart_mrr.chart svg', 
+        null, 
+        { 
+            dateSlider: ds, 
+            timeBuckets: ['day','week','month','quarter','year'],
+            dataUrl: '{{mrr_data_url}}',
+            name: 'Sales MRR'
+        } 
+    ) ;
+    charts.BarChart( 
+        '#chart_product_mrr.chart svg', 
+        null, 
+        { 
+            dateSlider: ds, 
+            timeBuckets: ['day','week','month','quarter','year'],
+            dataUrl: '{{product_mrr_data_url}}',
+            name: 'Product MRR'
+        } 
+    ) ;
+});
+</script>
+{% endblock %}

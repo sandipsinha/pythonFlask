@@ -2,16 +2,16 @@
 " Copyright:    Loggly, Inc.
 " Author:       Scott Griffin
 " Email:        scott@loggly.com
-" Last Updated: 07/23/2014
+" Last Updated: 10/31/2014
 "
 " Flask interface for the web module
 "
 """
 from datetime            import datetime, date
-from flask               import Flask, render_template
+from flask               import Flask, url_for
 from flask.json          import JSONEncoder
 from law                 import config
-from law.web             import views, subscription
+from law.web             import views, subscription, volumes, salesdash
 from law.util.adb        import Session, AccountState, Tier
 from law.util.lawdb      import db_url, db, security
 from flask.ext.login     import current_user, current_app, login_user
@@ -24,11 +24,14 @@ app.register_blueprint( views.blueprint )
 
 app.register_blueprint( subscription.views.blueprint, url_prefix = '/subscription' )
 app.register_blueprint( subscription.rest.blueprint, url_prefix = '/apiv1/subscription' )
+app.register_blueprint( volumes.views.blueprint, url_prefix = '/volumes' )
+app.register_blueprint( salesdash.views.blueprint, url_prefix = '/sales' )
 
 # Config items
 app.config['SECRET_KEY']              = config.get( 'flask-security', 'secret_key' )
 app.config['SECURITY_PASSWORD_HASH']  = config.get( 'flask-security', 'password_hash' )
 app.config['SECURITY_PASSWORD_SALT']  = config.get( 'flask-security', 'password_salt' )
+app.config['SECURITY_LOGIN_USER_TEMPLATE'] = 'security/login.html'
 app.config['SECURITY_TRACKABLE']      = True
 
 app.config['SQLALCHEMY_ECHO' ]        = config.getboolean( 'lawdb', 'debug' )
@@ -65,4 +68,6 @@ def secure_blueprints( blueprints ):
 secure_blueprints([
     subscription.views.blueprint,
     subscription.rest.blueprint,
+    volumes.views.blueprint,
+    salesdash.views.blueprint
 ])

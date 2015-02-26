@@ -1,0 +1,35 @@
+<div class='chart' width='90%'>
+    <svg height='300px'></svg>
+</div>
+<script type='text/javascript'>
+    nv.addGraph( function() {
+        var utc_offset = new Date().getTimezoneOffset() * 60 * 1000 ;
+        var chart = nv.models.stackedAreaChart()
+                        .margin( {right:150} )
+                        .x( function(d) { return d[0] })
+                        .y( function(d) { return d[1] })
+                        .useInteractiveGuideline( true )
+                        .rightAlignYAxis(true) 
+                        .transitionDuration( 500 )
+                        .showControls( true )
+                        .color( ['#236B9E', '#9E5623'] )
+                        .controlsData( ['Stacked', 'Expanded'] )
+                        .clipEdge( true ); 
+
+        chart.xAxis.tickFormat( function( d ) {
+            return d3.time.format( '%Y-%m-%d' )(new Date(d + utc_offset ) )
+        });
+
+        chart.yAxis.tickFormat( function( d ) {
+            return d3.format( ',.2f' )( d / 1000 / 1000 / 1000 ) + ' GB'
+        });
+
+        d3.select( '.chart svg' )
+            .datum( {{series|tojson|safe}} )
+            .call( chart );
+
+        nv.utils.windowResize( chart.update ) ;
+
+        return chart;
+    });
+</script>
