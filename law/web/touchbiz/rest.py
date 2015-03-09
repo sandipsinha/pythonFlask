@@ -45,12 +45,6 @@ def rest_endpoint( route, methods=None ):
 
 @rest_endpoint( '/subdomain/<string:subd>' )
 def history( subd ):
-#    columns = ['updated', 'tRate', 'tPlan.name', 'tGB', 'tDays', 'owner.sfdc_alias', 'stage.name']
-#    column_map = {'tPlan.name':'Tier', 'owner.sfdc_alias':'owner', 'stage.name':'stage'}
-#    rows = [ dict( pair ) for pair in touchbiz.tuplify( 
-#                                        touchbiz.touchbiz_by_account( subd ), 
-#                                        columns, 
-#                                        column_map )]
     rows = [ touchbiz.flatten( row )._asdict() for row in touchbiz.touchbiz_by_account( subd )]
     return rows
 
@@ -93,8 +87,3 @@ def new( subd ):
         'status':'success',
         'new'   : latest,
     }
-
-#@blueprint.route( '/subdomain/<string:subd>' )
-#def touchbiz_by_account( subd ):
-#    rows = history( subd )
-#    return jsonify({ 'data':rows })
