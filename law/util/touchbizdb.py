@@ -35,7 +35,7 @@ engine = create_engine(
 Session = sessionmaker( bind=engine )
 
 class Touchbiz( Base ):
-    __tablename__  = 'sales_touchbiz_migration'
+    __tablename__  = 'sales_touchbiz'
     __table_args__ = {'mysql_engine':'InnoDB'}
 
     acct_id        = Column( MEDIUMINT(unsigned=True), primary_key=True )
