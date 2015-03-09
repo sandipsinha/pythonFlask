@@ -168,4 +168,27 @@ FIXTURES = [
     'tGB'       : 1000000000,
     'tDays'     : 7,
 },
+# Cust 1004
+{
+    'acct_id'   : 1004,
+    'updated'   : datetime( 2014, 4, 8 ),
+    'subdomain' : 'touchbiztest4',
+    'state'     : 'SUT',
+    'tRate'     : 0,
+    'fRate'     : 0,
+    'tPlan_id'  : 1,
+    'tGB'       : 0,
+    'tDays'     : 15,
+},
+{
+    'acct_id'   : 1004,
+    'updated'   : datetime( 2014, 5, 8, 1 ),
+    'subdomain' : 'touchbiztest4',
+    'state'     : 'TWF',
+    'tRate'     : 0,
+    'fRate'     : 0,
+    'tPlan_id'  : 2,
+    'tGB'       : 200000000,
+    'tDays'     : 7,
+},
 ]

@@ -172,6 +172,37 @@ class TestTouchbiz( unittest.TestCase ):
         self.assertEqual( applied[3].status, 'ownership expired' )
         self.assertEqual( applied[4].owner.sfdc_alias, aeich.sfdc_alias )
         self.assertEqual( applied[4].status, 'won' )
+    
+    def test_apply_pending_applicable(self):
+        with adb.loader() as l:
+            sub_entries = l.query( adb.AccountStateUncompressed )\
+                           .filter( adb.AccountStateUncompressed.acct_id == 1004 )\
+                           .all()
+
+        with tbz.loader() as l:
+            company = l.query( tbz.SalesReps )\
+                       .filter( tbz.SalesReps.sfdc_alias == 'integ' )\
+                       .one()
+
+            aeich = l.query( tbz.SalesReps )\
+                     .filter( tbz.SalesReps.sfdc_alias == 'aeich' )\
+                     .one()
+            
+
+            tb_entries = l.query( tbz.Touchbiz )\
+                          .filter( tbz.Touchbiz.acct_id == 1004 )\
+                          .all()
+
+        applied = touchbiz.apply_touchbiz( sub_entries, tb_entries )
+       
+        self.assertEqual( len( applied ), 3 )
+        self.assertEqual( applied[0].owner.sfdc_alias, company.sfdc_alias )
+        self.assertEqual( applied[0].status, 'won' )
+        self.assertEqual( applied[1].owner.sfdc_alias, aeich.sfdc_alias )
+        self.assertEqual( applied[1].status, 'won' )
+        self.assertEqual( applied[2].owner.sfdc_alias, aeich.sfdc_alias )
+        self.assertEqual( applied[2].status, 'pending' )
+
 
 
     def test_touchbiz_by_account_id( self ): 
