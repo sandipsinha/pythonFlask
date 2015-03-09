@@ -88,6 +88,17 @@ FIXTURES = [
     'billing_period': 'monthly',
 },
 {
+    'acct_id'       : 1004,
+    'sales_rep_id'  : 2, # Angela
+    'created'       : datetime( 2014, 4, 22 ),
+    'modified'      : datetime( 2014, 4, 22 ),
+    'tier'          : 'Development',
+    'retention'     : 7,
+    'volume'        : 100000000000,
+    'sub_rate'      : 49,
+    'billing_period': 'monthly',
+},
+{
     'acct_id'       : 1010,
     'sales_rep_id'  : 2, # Angela
     'created'       : datetime( 2015, 3, 1 ),

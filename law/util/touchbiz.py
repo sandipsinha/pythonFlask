@@ -32,6 +32,7 @@ EXPIRED     = 'ownership expired'
 
 UPSTATES    = ('SUP', 'TWP', 'TWF', 'FWP', 'PWU')
 DOWNSTATES  = ('PWF', 'PWD')
+PENDING_APPLICABLE  = ('TWF')
 
 # Used to create a single ad-hoc'd object containing the most pertinent fields.
 FlatTouchbiz = namedtuple( 'FlatTouchbiz', [
@@ -117,6 +118,15 @@ def is_paid_or_upgrade( sub ):
 
     raise Exception( 'Cannot decide on subscription transition state' )
 
+def is_pending_applicable( sub, tb ):
+    """ Returns whether a subscription status could be seen as 'Pending' given
+    the touchbiz entry.
+    """
+    if hasattr( sub, 'state' ):
+        if sub.updated > tb.created and sub.state in PENDING_APPLICABLE:
+            return True
+    return False
+
 def apply_touchbiz( sub_entries, tb_entries, initial_entry=None, localize=False, with_pending=True ):
     """ Applies touchbiz rows to the supplied standard rows.
     This should add an owner column to each subscription row.
@@ -158,6 +168,11 @@ def apply_touchbiz( sub_entries, tb_entries, initial_entry=None, localize=False,
             sub.owner = tbd[key].owner
             sub.status = WON
             last_paid = tbd[key] if is_paid_or_upgrade( sub ) else last_paid
+
+        if with_pending and is_pending_applicable( sub, tbd[key] ):
+            # Shunt the touchbiz subscription by keeping the current
+            # touchbiz entry in the processing pipeline
+            tbkeys.append( key )
 
         applied.append( sub )
         prev_sub = sub
