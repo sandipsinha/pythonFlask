@@ -169,7 +169,7 @@ def apply_touchbiz( sub_entries, tb_entries, initial_entry=None, localize=False,
             sub.status = WON
             last_paid = tbd[key] if is_paid_or_upgrade( sub ) else last_paid
 
-        if with_pending and is_pending_applicable( sub, tbd[key] ):
+        if with_pending and tbd[key].owner != default.owner and is_pending_applicable( sub, tbd[key] ):
             # Shunt the touchbiz subscription by keeping the current
             # touchbiz entry in the processing pipeline
             tbkeys.append( key )
