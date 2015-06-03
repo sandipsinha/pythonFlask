@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <h3 align='center'>Loggly Analytics Web™</h3>
+    <script src="//ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
+    <script src='//cdn.datatables.net/1.10.0/js/jquery.dataTables.js'></script>
+
+    <script src="//code.jquery.com/jquery-1.10.2.js"></script>
+    <script src="//code.jquery.com/ui/1.11.4/jquery-ui.js"></script>
+
+
+    <link rel='stylesheet' type='text/css' href='//cdn.datatables.net/1.10.0/css/jquery.dataTables.css'/>
+    <link rel='stylesheet' type='text/css' href="{{ url_for('salesorder.static', filename='stylesheets/salesorder.css') }}"/>
+    <link rel="stylesheet" href="//code.jquery.com/ui/1.11.4/themes/smoothness/jquery-ui.css">
+    <link rel="stylesheet" href="/resources/demos/style.css">
+</head>
+<body>
+
+{% block content %}{% endblock %}
+<div class="flash">
+  {% for message in get_flashed_messages()%}
+    {{ message }}
+  {% endfor %}
+</div>
+<script type="text/javascript">
+$( document ).ready(function() {
+var state = $("#stateind").val();
+var order = $("#order_id").val();
+if (state == 'e'){
+ $('.flash').addClass('isa_error');
+}
+ else if (state == 'w'){
+      $('.flash').addClass('isa_warning');
+                       }
+ else
+      $('.flash').addClass('isa_info');
+
+ if (order == null || order == ""){
+    $("#sub").val("Add");
+ }
+ else
+    $("#sub").val("Update");
+    });
+</script>
+
+
+
+</body>
