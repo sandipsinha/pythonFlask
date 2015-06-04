@@ -72,13 +72,13 @@ def pointoforigin():
 
 
 @blueprint.route( '/orderdetails', methods=['GET', 'POST'] )
-def upsertorderdetails(id=None):
+def upsertorderdetails():
     if request.form.get('Inquire') != None:
         return redirect("/salesorder")
 
     form = forms.SalesOrder(request.form)
     so = Salesorder()
-    if (form.order_id.data == None or form.order_id.data == '') and request.form.get('Add') != None:
+    if (form.order_id.data == None or form.order_id.data == '') and request.form.get('Update') == 'Add':
         so.order_id = form.order_id.data
         so.subdomain = form.subdomain.data
         so.billing_channel = form.billing_channel.data
@@ -93,24 +93,27 @@ def upsertorderdetails(id=None):
         flash('The order was added', category='message')
         return render_template('salesorder/upsertorder.html', form=forms.SalesOrder())
     else:
-        if request.form.get('Update') != None:
-            with session_context() as s:
-                sord = s.query(Salesorder)\
-                        .filter(Salesorder.order_id == form.order_id.data)
+        if request.form.get('Update') == 'Update':
+            try:
+                if form.validate():
+                    with session_context() as s:
+                        sord = s.query(Salesorder)\
+                            .filter(Salesorder.order_id == form.order_id.data).one()
+                        sord.subdomain = form.subdomain.data
+                        sord.billing_channel = form.billing_channel.data
+                        sord.effective_date = form.effective_date.data
+                        sord.plan_type = form.plan_type.data
+                        sord.ret_days = form.ret_days.data
+                        sord.tier_name = form.tier_name.data
+                        sord.volume = form.volume.data
+                        sord.order_id = form.order_id.data
+                        s.commit()
+                        form.stateind.data = 's'
+                        flash('The order was updated')
+                        return render_template('salesorder/upsertorder.html', form=form)
 
-                if sord.first():
-                    s.subdomain = form.subdomain.data
-                    s.billing_channel = form.billing_channel.data
-                    s.effective_date = form.effective_date.data
-                    s.plan_type = form.plan_type.data
-                    s.ret_days = form.ret_days.data
-                    s.tier_name = form.tier_name.data
-                    s.volume = form.volume.data
-                    s.commit()
-                    flash('The order was updated')
-                    return render_template('salesorder/upsertorder.html', form=form)
-
-                else:
-                    flash('Please provide a valid ID or a subdomain to lookup')
-                    return render_template('salesorder/initiatequery.html', form=form)
+            except:
+                form.stateind.data = 'e'
+                flash('The order was not updated. It did not pass Validation checks')
+                return render_template('salesorder/upsertorder.html', form=form)
 
