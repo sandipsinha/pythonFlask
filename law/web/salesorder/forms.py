@@ -24,7 +24,7 @@ class SalesOrder(Form):
     plan_type = fields.StringField('Plan Type')
     tier_name = fields.StringField('Tier Name')
     billing_channel = fields.StringField('Billing Channel')
-    effective_date = fields.StringField('Effective Date',[validators.InputRequired()])
+    effective_date = fields.DateField('Effective Date',[validators.InputRequired()])
     order_id = fields.HiddenField(' ')
     stateind = fields.HiddenField(' ')
 
@@ -32,8 +32,8 @@ class SalesOrder(Form):
         rv = Form.validate(self)
         if not rv: raise ValidationError('Did not pass edits')
 
-        if not validate(self.effective_date.data):
-            raise ValidationError('Date is not in the right format')
+        # if not validate(self.effective_date.data):
+        #     raise ValidationError('Date is not in the right format')
 
         return True
 
