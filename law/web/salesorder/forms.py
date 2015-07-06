@@ -20,7 +20,7 @@ class OrderOption(Form):
 class SalesOrder(Form):
     subdomain = fields.StringField('Sub Domain', [validators.InputRequired(), validators.Length(max=100)])
     volume = fields.IntegerField('Volume')
-    ret_days = fields.IntegerField('Retiring Days')
+    ret_days = fields.IntegerField('Retaining Days')
     plan_type = fields.StringField('Plan Type')
     tier_name = fields.StringField('Tier Name')
     billing_channel = fields.StringField('Billing Channel')

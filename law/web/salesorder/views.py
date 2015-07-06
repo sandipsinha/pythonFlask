@@ -9,6 +9,7 @@ from flask                import Blueprint, render_template, request, flash,redi
 import forms
 from model import session_context, Salesorder, MDB
 from sqlalchemy  import and_
+from flask import jsonify
 
 
 
@@ -38,6 +39,7 @@ def pointoforigin():
                     flash('Enter a valid value of Order ID or Sub-Domain', category='info')
                     return render_template('salesorder/initiatequery.html', form=form)
            elif form.subdomain.data:
+               acct_id = MDB.get_loggly_id(form.subdomain.data)
                with session_context() as s:
                    sord = s.query( Salesorder) \
                         .filter( Salesorder.acct_id == acct_id )
@@ -136,3 +138,9 @@ def upsertorderdetails():
                 flash('The order was not updated. It did not pass Validation checks')
                 return render_template('salesorder/upsertorder.html', form=form)
 
+@blueprint.route( '/custs', methods=['GET'] )
+def autocomplete():
+    search = request.args.get('term')
+    customers = MDB.all_customers()
+    custacct = [items.acct_name for items in customers if search in items.acct_name]
+    return jsonify(json_list=custacct)
