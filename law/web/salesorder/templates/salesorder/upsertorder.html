@@ -23,16 +23,13 @@
       });
 </script>
 <script>
-$( document ).ready(function() {
-    $.ajax({
-        url: '/salesorder/custs'
-        }).done(function (data) {
-            $('#subdomain').autocomplete({
-                source: data.json_list,
-                minLength: 2
-            });
-        });
+    $(function() {
+      $("#subdomain").autocomplete({
+        source: '/salesorder/custs',
+        minLength: 2,
     });
+});
+
 </script>
 
 

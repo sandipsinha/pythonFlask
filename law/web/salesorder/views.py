@@ -5,7 +5,7 @@
 " Email:        ssinha@loggly.com
 "
 """
-from flask                import Blueprint, render_template, request, flash,redirect
+from flask                import Blueprint, render_template, request, flash,redirect, json
 import forms
 from model import session_context, Salesorder, MDB
 from sqlalchemy  import and_
@@ -114,9 +114,10 @@ def upsertorderdetails():
                     with session_context() as s:
                         sord = s.query(Salesorder)\
                             .filter(Salesorder.order_id == form.order_id.data).one()
+                        #import ipdb;ipdb.set_trace()
                         acct_id = MDB.get_loggly_id(form.subdomain.data)
                         if acct_id is not None:
-                            so.acct_id = acct_id
+                            sord.acct_id = acct_id
                         else:
                             form.stateind.data = 'e'
                             flash('Invalid sub domain specified')
@@ -140,7 +141,7 @@ def upsertorderdetails():
 
 @blueprint.route( '/custs', methods=['GET'] )
 def autocomplete():
-    search = request.args.get('term')
+    bs = request.args.get('term', '')
     customers = MDB.all_customers()
-    custacct = [items.acct_name for items in customers if search in items.acct_name]
-    return jsonify(json_list=custacct)
+    custacct = [items.acct_name for items in customers if bs in items.acct_name]
+    return json.dumps(custacct)
