@@ -1,0 +1,37 @@
+{% extends 'salesorder/base.html' %}
+{% block content %}
+<form method=post action="/salesorder/orderdetails" class="form">
+  <dl>
+    {{ form.order_id }}
+    <div>{{ form.subdomain.label}}: {{ form.subdomain}} </div>
+    <div>{{ form.volume.label}}: {{ form.volume }} </div>
+    <div>{{ form.ret_days.label}}: {{ form.ret_days }} </div>
+    <div>{{ form.plan_type.label}}: {{ form.plan_type }} </div>
+    <div>{{ form.tier_name.label}}:  {{ form.tier_name }} </div>
+    <div>{{ form.billing_channel.label}}:  {{ form.billing_channel}} </div>
+    <div>{{ form.effective_date.label}}:  {{ form.effective_date }} </div>
+    {{ form.stateind}}
+  </dl>
+  <p><input type=submit value='Update Order' name="Update" id="sub">
+  <input type=submit value='Lookup' name="Inquire" id="sub">
+</form>
+<script type="text/javascript">
+      $( document ).ready(function() {
+      $("#effective_date").datepicker({
+                 dateFormat: "yy-mm-dd"
+                });
+      });
+</script>
+<script>
+    $(function() {
+      $("#subdomain").autocomplete({
+        source: '/salesorder/custs',
+        minLength: 2,
+    });
+});
+
+</script>
+
+
+{% endblock %}
+

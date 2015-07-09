@@ -13,7 +13,7 @@ from decimal             import Decimal
 from flask               import Flask, url_for
 from flask.json          import JSONEncoder
 from law                 import config
-from law.web             import views, subscription, volumes, salesdash, touchbiz
+from law.web             import views, subscription, volumes, salesdash, touchbiz, salesorder
 from law.util.adb        import Session, AccountState, Tier
 from law.util.lawdb      import db_url, db, security
 from flask.ext.login     import current_user, current_app, login_user
@@ -28,6 +28,7 @@ app.register_blueprint( subscription.views.blueprint, url_prefix = '/subscriptio
 app.register_blueprint( volumes.views.blueprint, url_prefix = '/volumes' )
 app.register_blueprint( salesdash.views.blueprint, url_prefix = '/sales' )
 app.register_blueprint( touchbiz.views.blueprint, url_prefix = '/touchbiz' )
+app.register_blueprint( salesorder.views.blueprint, url_prefix = '/salesorder' )
 
 # API routes
 app.register_blueprint( subscription.rest.blueprint, url_prefix = '/apiv1/subscription' )
@@ -43,9 +44,11 @@ app.config['SECURITY_TRACKABLE']      = True
 app.config['SQLALCHEMY_ECHO' ]        = config.getboolean( 'lawdb', 'debug' )
 app.config['SQLALCHEMY_DATABASE_URI'] = db_url
 
+
 # LAWDB and flask-security app bindings
 db.init_app( app )
 security.init_app( app )
+
 
 class JSONLawDEncoder( JSONEncoder ):
     def default( self, obj ):

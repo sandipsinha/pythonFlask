@@ -9,3 +9,4 @@ pytz==2014.10
 
 -e git+git://github.com/sirsgriffin/conman.git@v0.3#egg=conman
 -e git+ssh://git@github.com/loggly/scry.git@v1.4#egg=scry
+-e git+ssh://git@github.com/loggly/masterdb.git@v0.3#egg=masterdb

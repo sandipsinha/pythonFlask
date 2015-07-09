@@ -1,0 +1,18 @@
+{% extends 'salesorder/base.html' %}
+{% block content %}
+
+<form method=post>
+  <dl>
+    <div>{{ form.order_id.label}}: {{ form.order_id }}</div>
+    <div>{{ form.subdomain.label}}: {{ form.subdomain}}</div>
+    {{ form.stateind }}
+  </dl>
+  <p ><input type=submit value='Order Lookup' name="lookup" class="submit">
+    <input type=submit value='Create Order' name="create" class="submit"></p>
+
+</form>
+
+{% endblock %}
+
+
+
