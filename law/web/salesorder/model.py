@@ -65,7 +65,7 @@ class Salesorder( Base ):
         return "<salesorder({},{})>".format(
             self.order_id)
 
-@contextmanager
+
 def create_salesorder_tables():
     """ Populates the sales order table """
     Base.metadata.create_all(
