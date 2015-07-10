@@ -132,12 +132,13 @@ def upsertorderdetails():
                         s.commit()
                         form.stateind.data = 's'
                         flash('The order was updated')
-                        return render_template('salesorder/upsertorder.html', form=form)
 
             except:
                 form.stateind.data = 'e'
                 flash('The order was not updated. It did not pass Validation checks')
+            finally:
                 return render_template('salesorder/upsertorder.html', form=form)
+
 
 @blueprint.route( '/custs', methods=['GET'] )
 def autocomplete():
