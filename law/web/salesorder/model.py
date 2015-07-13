@@ -66,6 +66,15 @@ class Salesorder( Base ):
             self.order_id)
 
 
+def create_salesorder_tables():
+    """ Populates the sales order table """
+    Base.metadata.create_all(
+        bind=engine,
+        tables=[
+            Salesorder.__table__,
+        ]
+    )
+
 
 @contextmanager
 def session_context():
