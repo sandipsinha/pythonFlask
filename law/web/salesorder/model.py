@@ -6,7 +6,7 @@ __author__ = 'ssinha'
 "
 """
 from contextlib import contextmanager
-from masterdb.config                          import DEV_MASTERDB, CONNECTION_URL_FORMAT
+from masterdb.config                          import CONNECTION_URL_FORMAT
 from masterdb                                 import Masterdb
 from law                        import config
 from sqlalchemy                 import (create_engine, Column,
