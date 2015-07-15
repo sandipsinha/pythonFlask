@@ -47,7 +47,7 @@ Session = sessionmaker( bind=engine )
 MDB = Masterdb( CONNECTION_URL_FORMAT % {'dialect':config.get( 'masterdb', 'dialect' ), 'host':config.get( 'masterdb', 'host' ),
                 'user':config.get( 'masterdb', 'username' ), 'password':config.get( 'masterdb', 'password' ),
                 'dbname':config.get( 'masterdb', 'dbname' ), 'port':config.get( 'masterdb', 'port' )})
-MDB._model_changes = {}
+
 
 class Salesorder( Base ):
     __tablename__  = 'sales_order'
