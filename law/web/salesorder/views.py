@@ -143,6 +143,7 @@ def upsertorderdetails():
 @blueprint.route( '/custs', methods=['GET'] )
 def autocomplete():
     bs = request.args.get('term', '')
-    customers = MDB.all_customers()
-    custacct = [items.acct_name for items in customers if bs in items.acct_name]
+    customers = MDB.get_loggly_match(bs)
+    rowlist = customers.all()
+    custacct = [items[0] for items in rowlist]
     return json.dumps(custacct)
