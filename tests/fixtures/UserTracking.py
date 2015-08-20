@@ -6,7 +6,7 @@
 """
 from datetime import datetime
 
-from law.util.queries import UserTracking
+from law.util.adb import UserTracking
 
 MODEL = UserTracking
 FIXTURES = [

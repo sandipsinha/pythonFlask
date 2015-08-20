@@ -48,7 +48,7 @@ def query_user_data(s, subdomain):
              label('Last_Login', func.max(UserTracking.login)))\
             .join( Status, and_( Users.acct_id == Status.acct_id)) \
             .join (UserTracking, and_( Users.user_id == UserTracking.user_id)) \
-            .filter( and_(( Status.subdomain.__eq__( subdomain )  )) ) \
+            .filter( and_(( Status.subdomain == subdomain )) ) \
             .group_by(Users.first_name,Users.last_name, Users.username, Users.email)
 
     return q
@@ -57,9 +57,9 @@ def query_user_data(s, subdomain):
 
 def query_user_state( subd ):
     with session_context() as s:
-        subs = query_user_data( s, subd).all()
+        users = query_user_data( s, subd).all()
         s.expunge_all()
-    return subs
+    return users
 
 
 class QueryOwners(object):

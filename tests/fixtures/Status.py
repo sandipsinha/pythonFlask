@@ -6,7 +6,7 @@
 """
 from datetime import datetime
 
-from law.util.queries import Status
+from law.util.adb import Status
 
 MODEL = Status
 FIXTURES = [
