@@ -11,7 +11,8 @@ from operator           import attrgetter
 
 from sqlalchemy         import and_, or_, not_, func
 from law.util.timeutil  import Timebucket
-from law.util.adb       import session_context, AccountState, Owners, Tier
+from sqlalchemy.sql import label
+from law.util.adb       import session_context, AccountState, Owners, Tier, Users, Status, UserTracking
 
 def state_query( s, states, start, end, g2only=True):
     # operator | or's the states together ( | is overloaded in SQLAlchemy query construction)
@@ -39,6 +40,27 @@ def query_product_state( states, products, start, end ):
         subs = q.all()
         s.expunge_all()
     return subs
+
+def query_user_data(s, subdomain):
+    # operator | or's the states together ( | is overloaded in SQLAlchemy query construction)
+    #with session_context() as s:
+    q = s.query( Users, label('Number_Of_Logins', func.count(UserTracking.login)),
+             label('Last_Login', func.max(UserTracking.login)))\
+            .join( Status, and_( Users.acct_id == Status.acct_id)) \
+            .join (UserTracking, and_( Users.user_id == UserTracking.user_id)) \
+            .filter( and_(( Status.subdomain == subdomain )) ) \
+            .group_by(Users.first_name,Users.last_name, Users.username, Users.email)
+
+    return q
+
+
+
+def query_user_state( subd ):
+    with session_context() as s:
+        users = query_user_data( s, subd).all()
+        s.expunge_all()
+    return users
+
 
 class QueryOwners(object):
 

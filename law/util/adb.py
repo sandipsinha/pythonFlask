@@ -11,7 +11,7 @@ import pytz
 from law                        import config
 from sqlalchemy                 import (create_engine, Column, 
                                         Integer, DateTime, Date,
-                                        Boolean, String,
+                                        Boolean, String,Text,
                                         Numeric, ForeignKey,
                                         Index)
 from sqlalchemy.dialects.mysql  import BIGINT, SMALLINT, MEDIUMINT
@@ -423,6 +423,66 @@ class Owners( Base ):
             ]))
         )
 
+class Users( Base ):
+    __tablename__  = 'user'
+    __table_args__ = {'mysql_engine':'InnoDB'}
+
+    acct_id        = Column( MEDIUMINT, primary_key=True )
+    user_id        = Column( Integer, primary_key=True )
+    username       = Column( String(length=30) )
+    email          = Column( String(length=75) )
+    first_name     = Column( String(length=30) )
+    last_name      = Column( String(length=30) )
+
+
+    def __repr__(self):
+        return "<users({},{},{},{},{},{})>".format(
+            self.acct_id,
+            self.user_id,
+            self.username,
+            self.email,
+            self.first_name,
+            self.last_name)
+
+class Status( Base ):
+    __tablename__  = 'status_by_acct'
+    __table_args__ = {'mysql_engine':'InnoDB'}
+
+    created        = Column( DateTime)
+    acct_id        = Column( MEDIUMINT, primary_key=True )
+    subdomain      = Column( String(length=100) )
+    updated        = Column( DateTime)
+    tgb            =   Column( Numeric( 14, 1 ))
+    tdays          =   Column( SMALLINT)
+    trate          =   Column( MEDIUMINT)
+    tplan          =   Column (SMALLINT)
+    trial_exp      =   Column(Date)
+    pdstat         =   Column( String(length=6) )
+
+
+    def __repr__(self):
+        return "<status({})>".format(
+            self.acct_id
+            )
+
+class UserTracking( Base ):
+    __tablename__  = 'user_tracking'
+    __table_args__ = {'mysql_engine':'InnoDB'}
+
+    user_id         = Column( Integer, primary_key=True )
+    username        = Column( String(length=30) )
+    session_id      = Column( String(length=50), primary_key=True )
+    login           = Column( DateTime)
+    logout          = Column( DateTime)
+    pageviews       = Column( SMALLINT)
+    referer         =   Column(Text)
+    email          = Column( String(length=75) )
+
+
+    def __repr__(self):
+        return "<user_tracking ({})>".format(
+            self.login
+            )
 @contextmanager
 def session_context():
     """ Because ADB is read only we do not need commit """

@@ -53,3 +53,5 @@ coverage.xml
 docs/_build/
 
 environnment/
+
+**/.DS_Store
