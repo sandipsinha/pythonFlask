@@ -34,6 +34,7 @@ app.register_blueprint( salesorder.views.blueprint, url_prefix = '/salesorder' )
 # API routes
 app.register_blueprint( subscription.rest.blueprint, url_prefix = '/apiv1/subscription' )
 app.register_blueprint( touchbiz.rest.blueprint, url_prefix = '/apiv1/touchbiz' )
+app.register_blueprint( userinfo.rest.blueprint, url_prefix = '/apiv1/clientinfo' )
 
 # Config items
 app.config['SECRET_KEY']              = config.get( 'flask-security', 'secret_key' )
