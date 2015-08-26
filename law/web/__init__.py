@@ -85,4 +85,5 @@ secure_blueprints([
     salesdash.views.blueprint,
     touchbiz.views.blueprint,
     touchbiz.rest.blueprint,
+    userinfo.views.blueprint,
 ])

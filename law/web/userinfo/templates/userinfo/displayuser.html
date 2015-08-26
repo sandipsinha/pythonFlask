@@ -14,6 +14,7 @@ $(function () {
             { field: 'Last_Login', caption: 'Last Login Date', size: '20%' },
         ],
         postData : {subdomain:{{grid2|tojson|safe}}}
+
     });
 });
 grid.sort('userid', 'asc');
