@@ -67,7 +67,7 @@ def query_client_data(s, acctid):
     # operator | or's the states together ( | is overloaded in SQLAlchemy query construction)
     #with session_context() as s:
     q = s.query( AccountProfile ) \
-            .filter( and_(( AccountProfile.acct_id == acctid )) )
+            .filter( ( AccountProfile.acct_id == acctid ))
     return q
 
 

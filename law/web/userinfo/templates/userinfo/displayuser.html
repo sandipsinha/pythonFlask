@@ -1,0 +1,25 @@
+{% extends 'userinfo/base.html' %}
+{% block content %}
+<script>
+$(function () {
+    $('#grid').w2grid({
+        name: 'grid',
+        header: 'List of Names',
+        url    : '/user/logindata',
+        columns: [
+            { field: 'userid', caption: 'User ID', size: '20%' },
+            { field: 'username', caption: 'User Name', size: '20%' },
+            { field: 'email', caption: 'Email', size: '20%' },
+            { field: 'Number_Of_Logins', caption: 'Number Of Logins', size: '20%' },
+            { field: 'Last_Login', caption: 'Last Login Date', size: '20%' },
+        ],
+        postData : {subdomain:{{grid2|tojson|safe}}}
+    });
+});
+grid.sort('userid', 'asc');
+</script>
+
+<div id="grid" style="width: 100%; height: 150px;">
+
+</div>
+{% endblock %}
