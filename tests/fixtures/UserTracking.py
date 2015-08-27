@@ -41,15 +41,15 @@ FIXTURES = [
 {
     'user_id'    : 2002,
     'username'   : 'iamsports',
-    'session_id' : 'User21',
+    'session_id' : 'User212',
     'login'      :  datetime( 2014, 3, 9 ),
     'email'      : 'carl.lewis@loggly.com',
 },
 {
     'user_id'    : 2002,
     'username'   : 'iamsports',
-     'session_id' : 'User22',
-    'login'      :  datetime( 2013, 7, 9 ),
+     'session_id' : 'User213',
+    'login'      :  datetime( 2015, 7, 9 ),
     'email'      : 'carl.lewis@loggly.com',
 },
 {

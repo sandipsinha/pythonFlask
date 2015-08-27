@@ -5,19 +5,21 @@ $(function () {
     $('#grid').w2grid({
         name: 'grid',
         header: 'List of Names',
-        url    : '/user/logindata',
+        show: { lineNumbers: true },
         columns: [
-            { field: 'userid', caption: 'User ID', size: '20%' },
-            { field: 'username', caption: 'User Name', size: '20%' },
-            { field: 'email', caption: 'Email', size: '20%' },
-            { field: 'Number_Of_Logins', caption: 'Number Of Logins', size: '20%' },
-            { field: 'Last_Login', caption: 'Last Login Date', size: '20%' },
+            { field: 'userid', caption: 'User ID', size: '16%', sortable: true },
+            { field: 'name', caption: 'Name', size: '20%', sortable: true },
+            { field: 'username', caption: 'User Name', size: '16%', sortable: true},
+            { field: 'email', caption: 'Email', size: '16%'},
+            { field: 'Number_Of_Logins', caption: 'Number Of Logins', size: '16%', sortable: true },
+            { field: 'Last_Login', caption: 'Last Login Date', size: '16%', sortable: true },
         ],
         postData : {subdomain:{{grid2|tojson|safe}}}
 
     });
+    w2ui['grid'].load('/user/logindata');
 });
-grid.sort('userid', 'asc');
+
 </script>
 
 <div id="grid" style="width: 100%; height: 150px;">
