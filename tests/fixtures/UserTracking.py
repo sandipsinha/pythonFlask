@@ -74,6 +74,13 @@ FIXTURES = [
     'email'      : 'albert.einstein@loggly.com',
 },
 {
+    'user_id'    : 2004,
+    'username'   : 'iamapolitician',
+    'session_id' : 'User34',
+    'login'      :  datetime( 2015, 3, 9 ),
+    'email'      : 'narendra.modi@india.com',
+},
+{
     'user_id'    : 2005,
     'username'   : 'iamscientist1',
     'session_id' : 'User33',
