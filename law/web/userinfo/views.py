@@ -18,8 +18,6 @@ blueprint = Blueprint( 'userinfo', __name__,
 
 @blueprint.route( '/<string:subd>', methods=['GET'])
 def display_user_info(subd):
-    #subd= request.args['subdomain']
-    #import ipdb;ipdb.set_trace()
     return render_template('userinfo/displayuser.html', grid2=subd)
 
 @blueprint.route( '/logindata', methods=['GET', 'POST'] )
@@ -35,7 +33,7 @@ def get_user_data():
         recid += 1
         userdat['recid'] = recid
         userdat['name'] = ' '
-        if row.Users.first_name > " " and row.Users.last_name > " ":
+        if not row.Users.first_name.strip() and not row.Users.last_name.strip():
             userdat['name'] = row.Users.first_name + ' ,' + row.Users.last_name
         userdat['userid'] = int(row.Users.user_id)
         userdat['username'] = row.Users.username

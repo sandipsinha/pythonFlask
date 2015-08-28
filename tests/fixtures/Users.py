@@ -47,7 +47,7 @@ FIXTURES = [
     'user_id'    : 2004,
     'username'   : 'iampolitician',
     'email'      : 'narendra.modi@loggly.com',
-    'first_name' : 'Narendra',
-    'last_name'  :  'Modi',
+    'first_name' : ' ',
+    'last_name'  :  ' ',
 }
 ]
