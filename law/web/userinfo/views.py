@@ -7,6 +7,7 @@
 """
 from flask                import Blueprint, render_template, request, flash,redirect, json
 from law.util.queries    import query_user_state
+from law.web.userinfo     import rest
 
 
 
@@ -44,5 +45,7 @@ def get_user_data():
         userqueue['total'] = recid
         userqueue['records'] = userlist
     return json.dumps(userqueue)
+
+
 
 

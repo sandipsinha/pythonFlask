@@ -12,7 +12,8 @@ from operator           import attrgetter
 from sqlalchemy         import and_, or_, not_, func
 from law.util.timeutil  import Timebucket
 from sqlalchemy.sql import label
-from law.util.adb       import session_context, AccountState, Owners, Tier, Users, Status, UserTracking
+from law.util.adb       import session_context, AccountState, Owners, Tier, Users, Status, \
+                        UserTracking, AccountProfile
 
 def state_query( s, states, start, end, g2only=True):
     # operator | or's the states together ( | is overloaded in SQLAlchemy query construction)
@@ -61,6 +62,21 @@ def query_user_state( subd ):
         s.expunge_all()
     return users
 
+
+def query_client_data(s, acctid):
+    # operator | or's the states together ( | is overloaded in SQLAlchemy query construction)
+    #with session_context() as s:
+    q = s.query( AccountProfile ) \
+            .filter( ( AccountProfile.acct_id == acctid ))
+    return q
+
+
+
+def query_client_state( acctid ):
+    with session_context() as s:
+        clients = query_client_data( s, acctid).one()
+        s.expunge_all()
+    return clients
 
 class QueryOwners(object):
 

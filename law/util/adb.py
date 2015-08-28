@@ -483,6 +483,23 @@ class UserTracking( Base ):
         return "<user_tracking ({})>".format(
             self.login
             )
+
+class AccountProfile( Base ):
+    __tablename__  = 'account_profile'
+    __table_args__ = {'mysql_engine':'InnoDB'}
+    acct_id        = Column( MEDIUMINT, primary_key=True )
+    usercount      = Column( MEDIUMINT )
+    groupcount     = Column( MEDIUMINT )
+    rulescount     = Column( MEDIUMINT )
+
+    def __repr__(self):
+        return "<account_profile ({}, {}, {}, {})>".format(
+            self.acct_id,
+            self.usercount,
+            self.groupcount,
+            self.rulescount
+            )
+
 @contextmanager
 def session_context():
     """ Because ADB is read only we do not need commit """
