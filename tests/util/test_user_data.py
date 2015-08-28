@@ -95,7 +95,7 @@ class TestUserDataInfo( unittest.TestCase ):
         try:
             self.assertEqual(len(userdata), 1)
             self.assertEqual(' ' , userdata[0].Users.name)
-            #The Attribute error trap is raised to make sure that there is no name field in the dataset 
+            #The Attribute error trap is raised to make sure that there is no name field in the dataset
         except AttributeError:
             self.assertEqual('narendra.modi@loggly.com' , userdata[0].Users.email)
 
