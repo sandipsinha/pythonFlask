@@ -51,7 +51,7 @@ class TestClientAPI( unittest.TestCase ):
 
     def test_client_api(self):
         app=self.create_app()
-        response =   app.get('/apiv1/clientinfo/sfdcapi/1001')
+        response =   app.get('/apiv1/clientinfo/sfdcapi/facebook')
 
         self.assertEqual(response.status_code, 200)
         respdata = json.loads(response.data)
@@ -60,7 +60,7 @@ class TestClientAPI( unittest.TestCase ):
         self.assertEqual(respdata['groupcount'], 5)
         self.assertEqual(respdata['usercount'], 7)
 
-        response =   app.get('/apiv1/clientinfo/sfdcapi/1000')
+        response =   app.get('/apiv1/clientinfo/sfdcapi/heroku')
 
         self.assertEqual(response.status_code, 200)
         respdata = json.loads(response.data)
@@ -69,7 +69,7 @@ class TestClientAPI( unittest.TestCase ):
         self.assertEqual(respdata['groupcount'], 7)
         self.assertEqual(respdata['usercount'], 5)
 
-        response =   app.get('/apiv1/clientinfo/sfdcapi/1002')
+        response =   app.get('/apiv1/clientinfo/sfdcapi/google')
 
         self.assertEqual(response.status_code, 200)
         respdata = json.loads(response.data)

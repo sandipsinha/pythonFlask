@@ -487,7 +487,8 @@ class UserTracking( Base ):
 class AccountProfile( Base ):
     __tablename__  = 'account_profile'
     __table_args__ = {'mysql_engine':'InnoDB'}
-    acct_id        = Column( MEDIUMINT, primary_key=True )
+    subdomain      = Column( String(length=30), primary_key=True )
+    acct_id        = Column( MEDIUMINT )
     usercount      = Column( MEDIUMINT )
     groupcount     = Column( MEDIUMINT )
     rulescount     = Column( MEDIUMINT )

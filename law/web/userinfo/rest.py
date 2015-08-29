@@ -1,12 +1,12 @@
 __author__ = 'ssinha'
 from flask              import Blueprint, jsonify, request, Response, json
-from flask.ext.security import login_required
 from law.util.queries   import query_client_state
+from law.util           import requires_auth
 
 
 blueprint = Blueprint( 'rest.userinfo', __name__ )
 
-#@login_required
+#@requires_auth
 @blueprint.route( '/sfdcapi/<int:acctid>', methods = ['GET'])
 def account_history(acctid ):
     client_id= acctid
