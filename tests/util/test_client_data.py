@@ -45,7 +45,6 @@ def drop_tables():
 class TestClientAPI( unittest.TestCase ):
 
 
-
     def create_app(self):
         app = mainc.test_client()
         return app
