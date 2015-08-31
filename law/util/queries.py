@@ -59,7 +59,7 @@ def query_user_data(s, subdomain):
 def query_user_state( subd ):
     with session_context() as s:
         users = query_user_data( s, subd).all()
-
+        s.expunge_all()
     return users
 
 
