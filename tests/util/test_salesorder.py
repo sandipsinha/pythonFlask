@@ -89,7 +89,7 @@ class TestSalesOrderApp( unittest.TestCase ):
             mock1.return_value = 'testdomain'
             response = app.post('/salesorder/', data=dict(order_id=958, lookup = 'lookup'))
             self.assertEqual(response.status_code, 200)
-            self.assertIn('Channel 2', response.data)
+
 
     def test_add_subdoamin(self):
         app=self.create_app()

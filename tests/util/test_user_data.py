@@ -91,7 +91,7 @@ class TestUserDataInfo( unittest.TestCase ):
         with adb.loader() as s:
             users = query_user_data(s, subd)
             userdata = users.all()
-        import ipdb;ipdb.set_trace()
+
         try:
             self.assertEqual(len(userdata), 1)
             self.assertEqual(' ' , userdata[0].Users.name)
