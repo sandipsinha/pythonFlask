@@ -34,7 +34,7 @@ def get_user_data():
         recid += 1
         userdat['recid'] = recid
         userdat['name'] = ' '
-        if not row.Users.first_name.strip() and not row.Users.last_name.strip():
+        if row.Users.first_name.strip() and row.Users.last_name.strip():
             userdat['name'] = row.Users.first_name + ' ,' + row.Users.last_name
         userdat['userid'] = int(row.Users.user_id)
         userdat['username'] = row.Users.username
