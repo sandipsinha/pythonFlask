@@ -3,6 +3,8 @@ from law.web import app as mainc
 from law.util import adb
 from tests.fixtures import populate
 from flask import json
+from base64 import b64encode
+from law    import config
 
 
 
@@ -51,7 +53,10 @@ class TestClientAPI( unittest.TestCase ):
 
     def test_client_api(self):
         app=self.create_app()
-        response =   app.get('/apiv1/clientinfo/sfdcapi/facebook')
+        headers = {
+                    'Authorization': 'Basic ' + b64encode("{0}:{1}".format(config.get( 'adb', 'userid' ), config.get( 'adb', 'passcode' )))
+                   }
+        response =   app.get('/apiv1/clientinfo/sfdcapi/facebook', headers=headers)
 
         self.assertEqual(response.status_code, 200)
         respdata = json.loads(response.data)
@@ -60,7 +65,7 @@ class TestClientAPI( unittest.TestCase ):
         self.assertEqual(respdata['groupcount'], 5)
         self.assertEqual(respdata['usercount'], 7)
 
-        response =   app.get('/apiv1/clientinfo/sfdcapi/heroku')
+        response =   app.get('/apiv1/clientinfo/sfdcapi/heroku', headers=headers)
 
         self.assertEqual(response.status_code, 200)
         respdata = json.loads(response.data)
@@ -69,7 +74,7 @@ class TestClientAPI( unittest.TestCase ):
         self.assertEqual(respdata['groupcount'], 7)
         self.assertEqual(respdata['usercount'], 5)
 
-        response =   app.get('/apiv1/clientinfo/sfdcapi/google')
+        response =   app.get('/apiv1/clientinfo/sfdcapi/google', headers=headers)
 
         self.assertEqual(response.status_code, 200)
         respdata = json.loads(response.data)

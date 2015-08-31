@@ -18,6 +18,8 @@ from law.util.adb        import Session, AccountState, Tier
 from law.util.lawdb      import db_url, db, security
 from flask.ext.login     import current_user, current_app, login_user
 
+
+
 app = Flask( config.get( 'webapp', 'name' ) )
 app.debug = config.getboolean( 'webapp', 'debug' )
 
@@ -85,5 +87,7 @@ secure_blueprints([
     salesdash.views.blueprint,
     touchbiz.views.blueprint,
     touchbiz.rest.blueprint,
-    userinfo.views.blueprint,
+
 ])
+
+

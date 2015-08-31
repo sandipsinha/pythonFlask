@@ -63,11 +63,11 @@ def query_user_state( subd ):
     return users
 
 
-def query_client_data(s, acctid):
+def query_client_data(s, subd):
     # operator | or's the states together ( | is overloaded in SQLAlchemy query construction)
     #with session_context() as s:
     q = s.query( AccountProfile ) \
-            .filter( ( AccountProfile.subdomain == acctid ))
+            .filter( ( AccountProfile.subdomain == subd ))
     return q
 
 
