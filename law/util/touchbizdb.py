@@ -134,6 +134,18 @@ def loader():
     finally:
         session.close()
 
+@contextmanager
+def sales_rep_session():
+    session = Session()
+    try:
+        yield session
+        session.commit()
+    except:
+        session.rollback()
+        raise
+    finally:
+        session.close()
+
 def create_touchbiz_tables():
     """ Populates the sales stages table """
     Base.metadata.create_all( 

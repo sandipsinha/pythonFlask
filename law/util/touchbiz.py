@@ -22,6 +22,9 @@ from law.util.adb           import (loader as adb_loader,
                                     AAOwner,
                                     Account,)
 
+from sqlalchemy.orm.exc             import NoResultFound
+from sqlalchemy import or_
+
 LOG = make_logger( 'sales-touchbiz' )
 
 TIMEZONE    = pytz.timezone( 'US/Pacific' ) 
@@ -86,6 +89,7 @@ def initial_touchbiz_entry():
     return initial
 
 def acct_id_for_subdomain( subdomain ):
+
     with adb_loader() as l:
         acct = l.query( Account )\
                 .filter( Account.subdomain == subdomain )\
@@ -203,6 +207,29 @@ def touchbiz_by_account_id( acct_id, localize=True ):
 
 def touchbiz_by_account( subdomain ):
     return touchbiz_by_account_id( acct_id_for_subdomain( subdomain ) )
+
+def tbrows_by_acct_id(acct_id):
+    with tb_loader() as l:
+        tb_entries = l.query( Touchbiz )\
+                      .filter( Touchbiz.acct_id == acct_id )\
+                      .all()
+    return tb_entries
+
+def get_sales_rep_name(id):
+    with tb_loader() as l:
+        reps = l.query( SalesReps ).filter( SalesReps.id == id ).one()
+        return reps.full_name
+
+def get_sales_rep_details(name):
+    repname = '%' + name + '%'
+
+    with tb_loader() as l:
+        try:
+            reps = l.query( SalesReps.first,SalesReps.last, SalesReps.id ).filter(or_( SalesReps.last.like(repname), SalesReps.first.like(repname))).limit(10)
+            return reps
+
+        except NoResultFound as e:
+                return None
 
 def flatten( row ):
     if isinstance( row, AccountStateUncompressed ):

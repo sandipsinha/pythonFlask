@@ -1,0 +1,164 @@
+{% extends 'touchbiz/base.html' %}
+{% block content %}
+<form method=post action="/touchbiz/updatetb" class="form" id="salesrepform">
+   <dl>
+
+    {{ form.acct_id }}
+    <div>{{ form.created.label}}: {{ form.created (class_="selectfld")}} </div>
+    <div>{{ form.volume.label}}: {{ form.volume(class_="selectfld") }} </div>
+    <div>{{ form.tier.label}}: {{ form.tier(class_="selectfld")}} </div>
+    <div>{{ form.retention.label}}: {{ form.retention(class_="selectfld") }} </div>
+    <div>{{ form.sub_rate.label}}:  {{ form.sub_rate (class_="selectfld")}} </div>
+    <div>{{ form.billing_period.label}}:  {{ form.billing_period (class_="selectfld")}}</div>
+    <div>{{ form.rep_name.label}}:  {{ form.rep_name (class_="selectfld")}}</div>
+
+    {{ form.subdomain }}
+    {{ form.sales_rep_id }}
+    {{ form.orig_created }}
+    {{ form.mode }}
+
+   </dl>
+
+  <p><input type=submit value='Update' name="Update" id="Update">
+    <input type=submit value='Insert' name="Insert" id="Insert"></p>
+  </form>
+
+<script>
+$(function () {
+
+    var sel ;
+
+    $('#grid').w2grid({
+        name: 'grid',
+        header: 'List of Names',
+        show : {
+            header         : false,
+            toolbar        : true,
+            footer         : true,
+            columnHeaders  : true,
+            lineNumbers    : true,
+            expandColumn   : false,
+            selectColumn   : false,
+            emptyRecords   : true,
+            toolbarReload  : false,
+            toolbarColumns : true,
+            toolbarSearch  : true,
+            toolbarAdd     : true,
+            toolbarEdit    : true,
+            toolbarDelete  : false,
+            toolbarSave    : true,
+            selectionBorder: true,
+            recordTitles   : true,
+            skipRecords    : false
+        },
+        columns: [
+            { field: 'acct_id', hidden: true },
+            { field: 'created', caption: 'Created', size: '20%', sortable: true,editable: { type: 'text' }, style:'color:black', attr:"id='created'" },
+            { field: 'tier', caption: 'Tier', size: '13%', sortable: true,editable: { type: 'text' } },
+            { field: 'retention', caption: 'Retention', size: '13%', sortable: true,editable: { type: 'text' }},
+            { field: 'volume', caption: 'Volume', size: '13%',editable: { type: 'text' }},
+            { field: 'sub_rate', caption: 'Subscription Rate', size: '13%', sortable: true,editable: { type: 'int' } },
+            { field: 'billing_period', caption: 'Billing Period', size: '13%', sortable: true,editable: { type: 'text' } },
+            { field: 'rep_name', caption: 'Sales Rep Name', size: '15%', sortable: true,editable: { type: 'select' } }
+        ],
+        postData : {subdomain:{{grid2|tojson|safe}}}
+
+    });
+    w2ui['grid'].load('/touchbiz/getrep');
+
+    w2ui.grid.on('edit', function(event) {
+    var grid = this;
+    sel = grid.getSelection();
+    var selObj = JSON.parse(JSON.stringify((w2ui.grid.get(sel))));
+    $("#created").val(selObj.created);
+    $("#volume").val(selObj.volume);
+    $("#tier").val(selObj.tier);
+    $("#retention").val(selObj.retention);
+    $("#sub_rate").val(selObj.sub_rate);
+    $("#rep_name").val(selObj.rep_name);
+    $("#billing_period").val(selObj.billing_period);
+    $("#sales_rep_id").val(selObj.rep_id);
+    $("#rep_name").val(selObj.rep_name);
+    $("#orig_created").val(selObj.created);
+    $("#acct_id").val(selObj.acct_id);
+    $("#subdomain").val({{grid2|tojson|safe}});
+    $("#salesrepform").show();
+    $("#grid").hide();
+    $("#Insert").hide();
+    });
+
+    $("#mode").val({{mode|tojson|safe}});
+
+    w2ui.grid.on('add', function(event) {
+     $("#grid").hide();
+     $("#subdomain").val({{grid2|tojson|safe}});
+     $("#salesrepform").show();
+     $("#mode").val('a');
+     $("#Update").hide();
+    });
+    
+    if ($("#mode").val() == 'i')
+        {
+        $("#salesrepform").hide();
+        w2ui['grid'].reload();
+        $("#grid").show();
+        }
+        else if ($("#mode").val() == 'e') {
+            $("#salesrepform").show();
+            $("#grid").hide();
+            $("#Insert").hide();
+             }
+            else if ($("#mode").val() == 'a') {
+                $("#salesrepform").show();
+                $("#grid").hide();
+                $("#Update").hide();
+                 }
+
+
+});
+
+</script>
+<script>
+    $(function() {
+
+$('#rep_name').autocomplete({
+	source: function( request, response ) {
+  		$.ajax({
+  			url : '/apiv1/touchbiz/salesrepid',
+  			dataType: "json",
+  			data: {term:$('#rep_name').val()},
+			success: function( data ) {
+				 response( $.map( data, function( item ) {
+				 	var code = item.split("|");
+				 	return {
+						label: code[0],
+						value: code[0],
+						data : item
+					}
+
+				}));
+			}
+  		});
+  	},
+  	autoFocus: true,
+  	minLength: 2,
+    select: function( event, ui ) {
+		var names = ui.item.data.split("|");
+		$('#rep_name').val(names[0]);
+		$('#sales_rep_id').val(names[1]);
+
+	}
+});
+
+
+});
+
+
+
+ AnyTime.picker( "created",
+    { format: "%Y-%m-%d %T"} );
+</script>
+<div id="grid" style="width: 100%; height:190px;">
+
+</div>
+{% endblock %}
