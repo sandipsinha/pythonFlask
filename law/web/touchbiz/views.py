@@ -116,7 +116,7 @@ def upserttb():
         mod = 'a' if request.form.get('Insert') == 'Insert' else 'e'
         flash('Sales Rep fields did not pass validation checks', category='info')
         return render_template('touchbiz/touchbiz_add_rep.html', grid2=tbform.subdomain.data,form=forms.tbrep(),mode='i')
-    flash('')
+
     return render_template('touchbiz/touchbiz_add_rep.html', grid2=tbform.subdomain.data,form=forms.tbrep(),mode='i')
 
 

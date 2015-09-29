@@ -65,6 +65,7 @@ $(function () {
 
     });
     w2ui['grid'].load('/touchbiz/getrep');
+
     w2ui.grid.on('edit', function(event) {
     var grid = this;
     sel = grid.getSelection();
@@ -87,6 +88,7 @@ $(function () {
     });
 
     $("#mode").val({{mode|tojson|safe}});
+
     w2ui.grid.on('add', function(event) {
      $("#grid").hide();
      $("#subdomain").val({{grid2|tojson|safe}});
@@ -94,8 +96,7 @@ $(function () {
      $("#mode").val('a');
      $("#Update").hide();
     });
-
-
+    
     if ($("#mode").val() == 'i')
         {
         $("#salesrepform").hide();
