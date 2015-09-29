@@ -3,11 +3,29 @@
 <head>
     <script src="//ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
     <script src='//cdn.datatables.net/1.10.0/js/jquery.dataTables.js'></script>
+    <link rel="stylesheet" type="text/css" href="{{ url_for('touchbiz.static', filename='stylesheets/w2ui-1.4.3.min.css') }}" />
 
+    <script type="text/javascript" src="{{ url_for('touchbiz.static', filename='js/jquery-1.11.3.min.js') }}"></script>
+
+    <script type="text/javascript" src="{{ url_for('touchbiz.static', filename='js/jquery-ui.js') }}"></script>
+    <script type="text/javascript" src="{{ url_for('touchbiz.static', filename='js/w2ui-1.4.3.min.js') }}"></script>
+
+    <script type="text/javascript" src="{{ url_for('touchbiz.static', filename='js/anytime512.min.js') }}"></script>
+
+    <link rel='stylesheet' type='text/css' href="{{ url_for('touchbiz.static', filename='stylesheets/anytime512.min.css') }}"/>
+
+
+    <link rel='stylesheet' type='text/css' href="{{ url_for('touchbiz.static', filename='stylesheets/touchbiz.css') }}"/>
+    <link rel='stylesheet' type='text/css' href="{{ url_for('touchbiz.static', filename='stylesheets/jquery-ui.css') }}"/>
     <link rel='stylesheet' type='text/css' href='//cdn.datatables.net/1.10.0/css/jquery.dataTables.css'/>
     <link rel='stylesheet' type='text/css' href="{{ url_for('touchbiz.static', filename='stylesheets/touchbiz.css') }}"/>
 </head>
 <body>
     {% block content %}{% endblock %}
+    <div class="flash">
+    {% for message in get_flashed_messages()%}
+    {{ message }}
+    {% endfor %}
+</div>
 </body>
 </html>

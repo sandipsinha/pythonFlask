@@ -7,7 +7,7 @@
 from functools             import wraps
 from datetime              import datetime
 
-from flask                 import Blueprint, jsonify, request, url_for
+from flask                 import Blueprint, jsonify, request, url_for, json
 from flask.ext.login       import current_user
 from law.util.touchbizdb   import (session_context as tb_session, loader as tb_loader, 
                                   Touchbiz, SalesReps )
@@ -87,3 +87,19 @@ def new( subd ):
         'status':'success',
         'new'   : latest,
     }
+
+def get_tb_rows(subd):
+    acct_id  = touchbiz.acct_id_for_subdomain( subd )
+    if acct_id is not None:
+        return touchbiz.tbrows_by_acct_id(acct_id), acct_id
+    else:
+        return None
+
+@blueprint.route( '/salesrepid', methods=['GET'] )
+def autocomplete():
+    bs = request.args.get('term', '')
+    salesrep = touchbiz.get_sales_rep_details(bs)
+    rowlist = salesrep.all()
+    custacct = [items[0] + ',' + items[1] + '|' + str(items[2])  for items in rowlist]
+    return json.dumps(custacct)
+
