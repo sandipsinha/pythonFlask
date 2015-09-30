@@ -1,4 +1,4 @@
-{% extends 'touchbiz/base.html' %}
+{% extends 'touchbiz/w2grid.html' %}
 {% block content %}
 <form method=post action="/touchbiz/updatetb" class="form" id="salesrepform">
    <dl>
@@ -76,7 +76,7 @@ $(function () {
     $("#retention").val(selObj.retention);
     $("#sub_rate").val(selObj.sub_rate);
     $("#rep_name").val(selObj.rep_name);
-    $("#billing_period").val(selObj.billing_period);
+    document.getElementById("billing_period").value = selObj.billing_period;
     $("#sales_rep_id").val(selObj.rep_id);
     $("#rep_name").val(selObj.rep_name);
     $("#orig_created").val(selObj.created);
