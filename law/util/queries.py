@@ -50,7 +50,7 @@ def query_user_data(s, subdomain):
             .join( Status, and_( Users.acct_id == Status.acct_id)) \
             .join (UserTracking, and_( Users.user_id == UserTracking.user_id)) \
             .filter( and_(( Status.subdomain == subdomain )) ) \
-            .group_by(Users.first_name,Users.last_name, Users.username, Users.email)
+            .group_by(Users.first_name,Users.last_name, Users.username, Users.email, Users.acct_id, Users.user_id)
 
     return q
 
