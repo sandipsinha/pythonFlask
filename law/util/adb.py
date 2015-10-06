@@ -501,6 +501,35 @@ class AccountProfile( Base ):
             self.rulescount
             )
 
+
+
+class DownGrades( Base ):
+    __tablename__  = 'downgrades'
+    __table_args__ = {'mysql_engine':'InnoDB'}
+    acct_id        = Column( MEDIUMINT, primary_key=True )
+    subdomain      = Column( String(length=30) )
+    down_dt        = Column( Date )
+    stNam          = Column( String(length=6) )
+
+    def __repr__(self):
+        return "<DownGrade ({}, {}, {}, {})>".format(
+            self.acct_id,
+            self.subdomain,
+            self.down_dt,
+            self.stNam,
+            self.down_wt
+            )
+
+    @property
+    def down_wt(self):
+        if self.stNam == 'TWF':
+            return 2
+        elif self.stNam == 'PWD':
+            return 6
+        elif self.stNam == 'PWF':
+            return 8
+
+
 @contextmanager
 def session_context():
     """ Because ADB is read only we do not need commit """
