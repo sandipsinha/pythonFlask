@@ -8,12 +8,14 @@
 """
 from collections        import defaultdict
 from operator           import attrgetter
-
-from sqlalchemy         import and_, or_, not_, func
+from datetime import datetime, date
+from sqlalchemy         import and_, or_, not_, func, distinct
 from law.util.timeutil  import Timebucket
 from sqlalchemy.sql import label
 from law.util.adb       import session_context, AccountState, Owners, Tier, Users, Status, \
-                        UserTracking, AccountProfile
+                        UserTracking, AccountProfile, DownGrades, AccountActivity, VolumeAccepted
+from law.util.touchbiz import acct_id_for_subdomain
+from sqlalchemy.orm.exc             import NoResultFound
 
 def state_query( s, states, start, end, g2only=True):
     # operator | or's the states together ( | is overloaded in SQLAlchemy query construction)
@@ -78,6 +80,63 @@ def query_client_state( subd ):
         s.expunge_all()
     return clients
 
+def find_downgrade_weights():
+    with session_context() as s:
+        dg = s.query(DownGrades).filter(DownGrades.down_dt + 30 >= date.today() ).all()
+        s.expunge_all
+        riskarray = [{'subdomain':g.subdomain,'weight':g.down_wt} for g in dg]
+    return riskarray
+
+def get_total_recvd(acctid):
+    with session_context() as s:
+        smdata = s.query(label('total_bytes', func.sum(VolumeAccepted.bytes)))\
+            .filter(VolumeAccepted.date + 30 >= date.today())\
+            .filter(VolumeAccepted.acct_id == acctid).one()
+        return smdata.total_bytes/30
+
+def get_subscription_rate(subd):
+    acct_id = acct_id_for_subdomain(subd)
+    with session_context() as s:
+        subsdata = s.query(label('Last Change Date', func.max(AccountActivity.created)),
+                           label('current_subs', AccountActivity.to_vol_bytes))\
+            .filter(AccountActivity.acct_id == acct_id).group_by(AccountActivity.acct_id).one()
+        subsrate = subsdata.current_subs
+        s.expunge_all
+    averagedata = get_total_recvd(acct_id)
+    if subsrate == 0:
+        return 0
+    percsentdata = float(averagedata)/subsrate
+    if percsentdata >= .8:
+        return 0
+    elif percsentdata >= .6:
+        return 5
+    else:
+        return 8
+
+def get_user_count(subd):
+    acct_id = acct_id_for_subdomain(subd)
+    try:
+        with session_context() as s:
+            userdata = s.query(label('activecount',func.count(distinct(UserTracking.user_id))))\
+                .filter(Users.user_id == UserTracking.user_id)\
+                .filter(UserTracking.login + 30 >= date.today())\
+                .filter(Users.acct_id == acct_id).one()
+            usercnt = int(userdata.activecount)
+            u = s.query(AccountProfile).filter(AccountProfile.subdomain == subd).one()
+            ma = int(u.usercount)
+            userpercent = float(usercnt)/ma
+            s.expunge_all
+        if userpercent >= .8:
+            return 0
+        elif userpercent >= .6:
+            return 5
+        else:
+            return 8
+    except NoResultFound:
+        return 8
+
+
+
 class QueryOwners(object):
 
     def __init__( self, states, start, end, owners=None ):
@@ -126,4 +185,6 @@ class QueryOwners(object):
             owners[name] = bucket_func( Timebucket( owners[name], 'updated' ) )()
 
         return owners
+
+
 

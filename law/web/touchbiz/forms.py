@@ -14,11 +14,12 @@ def validate(date_text):
 
 class tbrep(Form):
 
-    tier = fields.SelectField('Tier',choices=[('Pro','Pro'),('Standard','Standard')])
-    volume = fields.StringField('Volume')
+    tier = fields.SelectField('Tier',choices=[('pro','pro'),('standard','standard'),('lite','lite'),('development','development'),('trial','trial')])
+    volume = fields.StringField('Volume', description = "Volume")
     retention = fields.IntegerField('Retention')
     sub_rate = fields.IntegerField('Subscription Rate')
-    billing_period = fields.SelectField('Billing Period', choices=[('Annual','Annual'),('Monthly','Monthly')])
+    billing_period = fields.SelectField('Billing Period',
+                                        choices=[('annual','annual'),('monthly','monthly')])
     created  = fields.StringField('Created Date',[validators.InputRequired()])
     rep_name  = fields.StringField('Rep Name')
     acct_id = fields.HiddenField(' ')

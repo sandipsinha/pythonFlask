@@ -24,10 +24,12 @@ from law.util.adb           import (loader as adb_loader,
 
 from sqlalchemy.orm.exc             import NoResultFound
 from sqlalchemy import or_
+import time
 
 LOG = make_logger( 'sales-touchbiz' )
 
-TIMEZONE    = pytz.timezone( 'US/Pacific' ) 
+TIMEZONE    = pytz.timezone( 'US/Pacific' )
+TIME_FORMAT = '%Y-%m-%d %H:%M:%S'
 EXPIRE_DAYS = config.getint( 'touchbiz', 'expire_days' )
 PENDING     = 'pending'
 WON         = 'won'
@@ -60,6 +62,16 @@ def localized_tb( tb_entries, timezone=TIMEZONE ):
         return tb
 
     return (localized( tb ) for tb in tb_entries )
+
+def localize_time(date_obj):
+    #import ipdb;ipdb.set_trace()
+    localtz = TIMEZONE
+    if date_obj.tzinfo is None:
+        dt_aware = localtz.localize(date_obj)
+        datetime_obj_utc = dt_aware.astimezone(pytz.utc)
+        return datetime_obj_utc
+    else:
+        return date_obj
 
 def owner_id( email ):
     with tb_loader() as l:
@@ -216,16 +228,28 @@ def tbrows_by_acct_id(acct_id):
     return tb_entries
 
 def get_sales_rep_name(id):
-    with tb_loader() as l:
-        reps = l.query( SalesReps ).filter( SalesReps.id == id ).one()
-        return reps.full_name
+    try:
+        with tb_loader() as l:
+            reps = l.query( SalesReps ).filter( SalesReps.id == id ).one()
+            return reps.sfdc_alias
+    except NoResultFound as e:
+            return 'loggly'
+
+def get_sales_rep_id(name):
+    repname = '%' + name + '%'
+    try:
+        with tb_loader() as l:
+            reps = l.query( SalesReps ).filter( SalesReps.sfdc_alias.like(repname)).one()
+            return reps.id
+    except NoResultFound as e:
+            return 1
 
 def get_sales_rep_details(name):
     repname = '%' + name + '%'
 
     with tb_loader() as l:
         try:
-            reps = l.query( SalesReps.first,SalesReps.last, SalesReps.id ).filter(or_( SalesReps.last.like(repname), SalesReps.first.like(repname))).limit(10)
+            reps = l.query( SalesReps.first,SalesReps.last,SalesReps.sfdc_alias, SalesReps.id ).filter(or_( SalesReps.last.like(repname), SalesReps.first.like(repname))).limit(10)
             return reps
 
         except NoResultFound as e:

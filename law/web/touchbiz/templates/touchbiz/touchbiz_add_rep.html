@@ -5,7 +5,7 @@
 
     {{ form.acct_id }}
     <div>{{ form.created.label}}: {{ form.created (class_="selectfld")}} </div>
-    <div>{{ form.volume.label}}: {{ form.volume(class_="selectfld") }} </div>
+    <div>{{ form.volume.label}}: {{ form.volume(class_="selectfld")}} </div>
     <div>{{ form.tier.label}}: {{ form.tier(class_="selectfld")}} </div>
     <div>{{ form.retention.label}}: {{ form.retention(class_="selectfld") }} </div>
     <div>{{ form.sub_rate.label}}:  {{ form.sub_rate (class_="selectfld")}} </div>
@@ -53,6 +53,8 @@ $(function () {
         },
         columns: [
             { field: 'acct_id', hidden: true },
+            { field: 'acct_id', hidden: true },
+            { field: 'tb_created_dt', hidden: true },
             { field: 'created', caption: 'Created', size: '20%', sortable: true,editable: { type: 'text' }, style:'color:black', attr:"id='created'" },
             { field: 'tier', caption: 'Tier', size: '13%', sortable: true,editable: { type: 'text' } },
             { field: 'retention', caption: 'Retention', size: '13%', sortable: true,editable: { type: 'text' }},
@@ -67,24 +69,41 @@ $(function () {
     w2ui['grid'].load('/touchbiz/getrep');
 
     w2ui.grid.on('edit', function(event) {
+
     var grid = this;
     sel = grid.getSelection();
     var selObj = JSON.parse(JSON.stringify((w2ui.grid.get(sel))));
-    $("#created").val(selObj.created);
+    var date = Date.parseExact(selObj.created, 'yyyy-MM-dd HH:mm:ss');
+    date.addSeconds(-1);
+    var newdate = date.toString('yyyy-mm-dd HH:mm:ss');
+
+    $("#created").val(newdate);
     $("#volume").val(selObj.volume);
-    $("#tier").val(selObj.tier);
+    document.getElementById("tier").value = selObj.tier;
     $("#retention").val(selObj.retention);
     $("#sub_rate").val(selObj.sub_rate);
     $("#rep_name").val(selObj.rep_name);
     document.getElementById("billing_period").value = selObj.billing_period;
+
+
     $("#sales_rep_id").val(selObj.rep_id);
-    $("#rep_name").val(selObj.rep_name);
     $("#orig_created").val(selObj.created);
     $("#acct_id").val(selObj.acct_id);
     $("#subdomain").val({{grid2|tojson|safe}});
     $("#salesrepform").show();
     $("#grid").hide();
-    $("#Insert").hide();
+
+    if (selObj.statemode == 'u'){
+        $("#Insert").hide();
+        $("#Update").show();
+        $("#created").val(selObj.tb_created_dt);
+        $("#orig_created").val(selObj.tb_created_dt);
+        }
+    else
+        {
+        $("#Update").hide();
+        $("#Insert").show();
+        }
     });
 
     $("#mode").val({{mode|tojson|safe}});
@@ -96,7 +115,6 @@ $(function () {
      $("#mode").val('a');
      $("#Update").hide();
     });
-
     if ($("#mode").val() == 'i')
         {
         $("#salesrepform").hide();
@@ -132,7 +150,7 @@ $('#rep_name').autocomplete({
 				 	var code = item.split("|");
 				 	return {
 						label: code[0],
-						value: code[0],
+						value: code[1],
 						data : item
 					}
 
@@ -145,7 +163,7 @@ $('#rep_name').autocomplete({
     select: function( event, ui ) {
 		var names = ui.item.data.split("|");
 		$('#rep_name').val(names[0]);
-		$('#sales_rep_id').val(names[1]);
+		$('#sales_rep_id').val(names[2]);
 
 	}
 });

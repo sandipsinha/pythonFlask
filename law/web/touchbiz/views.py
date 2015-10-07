@@ -10,7 +10,9 @@ from law.util             import touchbiz
 from datetime import datetime
 import forms
 from law.util.touchbizdb   import (sales_rep_session,Touchbiz, SalesReps )
+from law.util.touchbiz import acct_id_for_subdomain, localize_time
 from sqlalchemy.sql import and_
+
 
 blueprint = Blueprint( 'touchbiz', __name__, 
                         template_folder = 'templates',
@@ -45,21 +47,42 @@ def re_align( ):
     tblqueue = {}
 
     #import ipdb;ipdb.set_trace()
-    tbrows, keyval = rest.get_tb_rows( subd )
-
-    for row in tbrows:
+    keyval = acct_id_for_subdomain(subd)
+    #import ipdb;ipdb.set_trace()
+    data = rest.history( subd )
+    #import ipdb;ipdb.set_trace()
+    for row in list(reversed(data)):
         tbqueue = {}
+        #import ipdb;ipdb.set_trace()
+        if row.get('created') != 'pending' and row.get('created') != None:
+            get_tb_data = rest.get_tb_rows(keyval, touchbiz.localize_time(row.get('created')) )
+        else:
+            get_tb_data = None
+        #import ipdb;ipdb.set_trace()
+        if get_tb_data is None:
+            tbqueue['statemode'] = 'i'
+            tbqueue['rep_name'] = row.get('owner')
+            #tbqueue['rep_name'] = get_sales_rep_id(row.get('owner'))
+            tbqueue['tier'] = row.get('tier')
+            tbqueue['retention'] = row.get('retention')
+            tbqueue['volume'] = row.get('volume')
+            tbqueue['billing_period'] = row.get('period')
+            tbqueue['sub_rate'] = row.get('rate')
+        else:
+            tbqueue['statemode'] = 'u'
+            tbqueue['sales_rep_id'] = get_tb_data.sales_rep_id
+            tbqueue['tb_created_dt'] = get_tb_data.created
+            tbqueue['rep_name'] = touchbiz.get_sales_rep_name(get_tb_data.sales_rep_id)
+            tbqueue['tier'] = get_tb_data.tier
+            tbqueue['retention'] = get_tb_data.retention
+            tbqueue['volume'] = get_tb_data.volume
+            tbqueue['billing_period'] = get_tb_data.billing_period
+            tbqueue['sub_rate'] = get_tb_data.sub_rate
+
         recid += 1
         tbqueue['recid'] = recid
         tbqueue['acct_id'] = keyval
-        tbqueue['created'] = row.created
-        tbqueue['tier'] = row.tier
-        tbqueue['retention'] = row.retention
-        tbqueue['volume'] = row.volume
-        tbqueue['sub_rate'] = row.sub_rate
-        tbqueue['billing_period'] = row.billing_period
-        tbqueue['rep_name'] = touchbiz.get_sales_rep_name(row.sales_rep_id)
-        tbqueue['rep_id'] = row.sales_rep_id
+        tbqueue['created'] = row.get('created')
         tblist.append(tbqueue)
     if recid > 0:
         tblqueue['status'] = 'success'
@@ -72,7 +95,7 @@ def re_align( ):
 @blueprint.route( '/updatetb/<string:subd>/<string:created>', methods=['GET', 'POST'] )
 def upserttb():
     tbform = forms.tbrep(request.form)
-
+    #import ipdb;ipdb.set_trace()
     if request.form.get('Update') is None and request.form.get('Insert') is None:
         return render_template('touchbiz/touchbiz_add_rep.html', grid2=tbform.subdomain.data,form=forms.tbrep(),mode='i')
 
@@ -84,7 +107,6 @@ def upserttb():
                 tbrep.sales_rep_id = tbform.sales_rep_id.data
                 tbrep.volume = tbform.volume.data
                 tbrep.acct_id = tbform.acct_id.data
-                tbrep.volume = tbform.volume.data
                 tbrep.billing_period = tbform.billing_period.data
                 tbrep.retention = tbform.retention.data
                 tbrep.sub_rate = tbform.sub_rate.data
