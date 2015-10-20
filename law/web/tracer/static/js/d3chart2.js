@@ -1,4 +1,4 @@
-function createNintyEightChart(postData) {
+function createNintyNineChart(postData) {
 
     var dataGroup = d3.nest()
     .key(function(d) {
@@ -7,7 +7,7 @@ function createNintyEightChart(postData) {
     .entries(postData);
 
     //var dataGroups = JSON.parse(JSON.stringify(dataGroup))
-    var vis = d3.select("#visualisation1"),
+    var vis = d3.select("#visualisation2"),
     WIDTH = 680,
     HEIGHT = 500,
     PADDING = 100,
@@ -41,7 +41,7 @@ function createNintyEightChart(postData) {
     var parseDate = d3.time.format("%Y-%m-%d").parse;
 
 
-    var ninty_eight = function(d) { return d['98th_perc'] };
+    var ninty_eight = function(d) { return d['99th_perc'] };
 
 
     var xScale = d3.time.scale()
@@ -57,7 +57,7 @@ function createNintyEightChart(postData) {
     var line = d3.svg.line()
           .interpolate("basis")
           .x(function (d) { return x(parseDate(d['start_date'])) })
-          .y(function (d) { return y(d['98th_perc']); });
+          .y(function (d) { return y(d['99th_perc']); });
 
     var color = d3.scale.category10();
     color.domain(postDataKeys);
@@ -116,7 +116,7 @@ function createNintyEightChart(postData) {
         .style("font-size", "16px")
         .style("text-decoration", "underline")
         .style("font-weight", "bold")
-        .text("Ninty Eight Percentile");
+        .text("Ninty Nine Percentile");
 
     var color = d3.scale.ordinal()
       .range(["#0000FF","#FF00FF","#00FF00","#FFFF00","#00FFFF","#845B47","#0080FF","#FF8000","#F4A460","#FFDEAD", "#D2691E","#C71585","#800080","#48D1CC","#006400","#B8860B","#FF4500","#FF6347"]);
@@ -158,7 +158,7 @@ function createNintyEightChart(postData) {
         return xScale(parseDate(d.start_date));
       })
       .y(function(d) {
-        return yScale(d['98th_perc']);
+        return yScale(d['99th_perc']);
       }).interpolate("basis");
 
      vis.selectAll(".line").remove();

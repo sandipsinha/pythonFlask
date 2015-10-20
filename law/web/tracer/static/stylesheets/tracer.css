@@ -122,3 +122,20 @@ float:right;
 	            background: yellow;
 	            box-shadow: 2px 2px 1px #888;
             }
+
+#charts{
+padding-top: 20px;
+height:650px;
+width:700px;
+overflow:auto;
+}
+
+.chart{
+height: 650px;
+width:690px;
+}
+
+#grid{
+height: 650px;
+width:690px;
+}

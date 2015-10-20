@@ -24,7 +24,12 @@ $(function () {
 
     $("#style9").submit( function( event ){
       event.preventDefault();
+      var sdate = '';
       sdate =  $('#date').val();
+      sdate = (sdate.length==0?'*':sdate);
+      var scluster = '';
+      scluster = $('#cluster').val();
+
       var url =  '/apiv1/tracer/tracergrid/' + sdate + '/' + scluster;
       w2ui['grid'].load(url);
 

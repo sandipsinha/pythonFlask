@@ -9,6 +9,7 @@
 				  var processedData = JSON.parse(JSON.stringify(data));
 				  createNintyFiveChart(processedData);
 				  createNintyEightChart(processedData);
+				  createNintyNineChart(processedData);
 
 			}
   		});
