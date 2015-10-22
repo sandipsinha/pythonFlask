@@ -7,15 +7,17 @@
 "
 """
 from collections        import defaultdict
+from datetime           import datetime, timedelta
 from operator           import attrgetter
-from datetime import datetime, date
 from sqlalchemy         import and_, or_, not_, func, distinct
 from law.util.timeutil  import Timebucket
-from sqlalchemy.sql import label
+from sqlalchemy.sql import label, text
 from law.util.adb       import session_context, AccountState, Owners, Tier, Users, Status, \
-                        UserTracking, AccountProfile, DownGrades, AccountActivity, VolumeAccepted
+                        UserTracking, AccountProfile, DownGrades, AccountActivity, VolumeAccepted, \
+                        TracerBullet, TracerPercentiles, engine
 from law.util.touchbiz import acct_id_for_subdomain
 from sqlalchemy.orm.exc             import NoResultFound
+
 
 def state_query( s, states, start, end, g2only=True):
     # operator | or's the states together ( | is overloaded in SQLAlchemy query construction)
@@ -56,7 +58,40 @@ def query_user_data(s, subdomain):
 
     return q
 
+def query_tracer_bullet(lookupdt , cluster):
 
+    with session_context() as s:
+        q = s.query(TracerBullet)\
+            .filter(TracerBullet.applies_start_time.between(lookupdt + timedelta(days=-7), lookupdt ))
+        if cluster != '*':
+            q.filter(TracerBullet.newcluster == cluster )
+        datas = q.all()
+        s.expunge_all()
+    return datas
+
+def query_tracer_percentile(lookupdt , cluster):
+
+    with session_context() as s:
+        q = s.query(TracerPercentiles)\
+            .filter(and_(TracerPercentiles.start_date.between(lookupdt + timedelta(days=-7), lookupdt )))\
+            .filter(TracerPercentiles.period == 'day')\
+
+        if cluster != '*':
+            q.filter(TracerPercentiles.repcluster == cluster )
+        datas = q.all()
+        s.expunge_all()
+    return datas
+
+def get_cluster_names(pref):
+    clusterexp = '%' + pref + '%'
+    querytorun='select distinct concat(a.cluster, substr(a.index_type,1)) newcluster, concat(a.cluster, substr(a.index_type,1,1)) clusterdata from tracer_percentiles a where ' \
+               'concat(a.cluster, substr(a.index_type,1,1)) like :clsexp'
+    with session_context() as q:
+        try:
+            q = engine.execute(text(querytorun),clsexp = clusterexp )
+            return q
+        except NoResultFound as e:
+                return None
 
 def query_user_state( subd ):
     with session_context() as s:

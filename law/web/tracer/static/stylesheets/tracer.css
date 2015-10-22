@@ -1,0 +1,156 @@
+#main-wrap > div{min-height:450px;}
+
+#header,
+#footer{
+    min-height:50px;
+    }
+
+/*Layout*/
+#main-wrap{
+overflow:hidden;
+}
+
+#leftcol{
+float:left;
+width:50%;
+}
+
+#rightcol{
+float: right;
+width: 50%}
+
+.left{
+  max-width:100px;
+  float:left;
+}
+
+.right{
+  max-width:100px;
+  float:right;
+}
+
+.clear{
+  clear:both;
+}
+
+
+div.mainform {width:100%;
+              border:1px solid #000;
+              padding: 20px;
+              height: 60px;
+              }
+
+
+.style9{
+max-width:500px;
+padding:10px;
+margin:10px auto;
+border-radius:10px;
+border: 6px solid #305A72;
+box-shadow: 1px 1px 25px rgba(0, 0, 0, 0.35);
+}
+
+.style9 ul{
+padding:0;
+margin:0;
+list-style:none;
+}
+
+.style9 ul li{
+display:block;
+margin-bottom:10px;
+min-height:20px;
+}
+
+.style9 ul li input.align-left{
+float:left;
+}
+
+.style9 ul li input.align-right{
+float:right;
+}
+
+
+
+.style9 ul li .field-split{
+    width: 46%;
+}
+
+.style9 ul li input[type="button"],
+.style9 ul li input[type="submit"] {
+    -moz-box-shadow: inset 0px 1px 0px 0px #3985B1;
+    -webkit-box-shadow: inset 0px 1px 0px 0px #3985B1;
+    box-shadow: inset 0px 1px 0px 0px #3985B1;
+    background-color: #216288;
+    border: 1px solid #17445E;
+    display: inline-block;
+    cursor: pointer;
+    color: #FFFFFF;
+    padding: 8px 18px;
+    text-decoration: none;
+    font: 12px Arial, Helvetica, sans-serif;
+}
+.style9 ul li input[type="button"]:hover,
+.style9 ul li input[type="submit"]:hover {
+    background: linear-gradient(to bottom, #2D77A2 5%, #337DA8 100%);
+    background-color: #28739E;
+}
+#cluster{
+  background-color:#D7D7D7;
+  opacity:0.3;
+  color: #000000;
+  font-weight: bold;
+  }
+
+.axis path {
+    fill: none;
+    stroke: #777;
+    shape-rendering: crispEdges;
+}
+.axis text {
+    font-family: Lato;
+    font-size: 13px;
+}
+
+.legend {
+	            padding: 5px;
+	            font: 10px sans-serif;
+	            background: yellow;
+	            box-shadow: 2px 2px 1px #888;
+            }
+
+#charts{
+height:900px;
+width:890px;
+overflow:auto;
+}
+
+.sep{
+height: 100px;
+
+}
+
+.chart{
+height: 900px;
+width:870px;
+padding-top:30px;
+}
+
+#grid{
+height: 900px;
+width:800px;
+padding-left: 20px
+}
+
+span {
+
+    text-align: center;
+    display: block;
+    line-height:20px;
+    font-weight: bold;
+    height: 20px;
+
+}
+
+
+

@@ -1,0 +1,47 @@
+{% extends 'tracer/displaychart.html' %}
+{% block header %}
+<div id="mainform">
+<form class="style9" id="style9">
+ <ul>
+    <li>
+            <input id="date" name="date" type="text" placeholder="Date" class="style10 field-split align-left">
+
+            <input id="cluster" name="cluster" type="text" placeholder="Cluster" class="style10 field-split align-right" >
+    </li>
+
+  </ul>
+<div class="action">
+    <input type="submit" value="Update">
+</div>
+
+</form>
+</div>
+{% endblock %}
+
+{% block rightcol %}
+<div id="charts">
+<div id="graph" class="chart">
+<span>Ninty Five Percentile</span>
+
+  <svg id="visualisation"  class="chart"></svg>
+</div>
+<span>Ninty Eight Percentile</span>
+<div id="graph1"  >
+<svg id="visualisation1"  class="chart"></svg>
+</div>
+<span>Ninty Nine Percentile</span>
+<div id="graph2"  >
+   <svg id="visualisation2"  class="chart"></svg>
+</div>
+</div>
+{% endblock %}
+{% block leftcol %}
+<div id="grid">
+
+</div>
+
+<script>
+    AnyTime.picker( "date",{format:"%Y-%m-%d %T"} );
+
+</script>
+{% endblock %}
