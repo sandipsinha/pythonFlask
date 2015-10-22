@@ -1,15 +1,9 @@
-function createNintyNineChart(postData) {
+function createNintyNineChart(postData,dataGroup, postDataKeys, postDataValues, postvarData ) {
 
-    var dataGroup = d3.nest()
-    .key(function(d) {
-        return d['cluster']
-    })
-    .entries(postData);
 
-    //var dataGroups = JSON.parse(JSON.stringify(dataGroup))
     var vis = d3.select("#visualisation2"),
-    WIDTH = 680,
-    HEIGHT = 500,
+    WIDTH = 840,
+    HEIGHT = 700,
     PADDING = 100,
     MARGINS = {
         top: 20,
@@ -17,23 +11,6 @@ function createNintyNineChart(postData) {
         bottom: 20,
         left: 100
     };
-    var postDataKeys = [];
-    for(i in dataGroup){
-
-    var key = dataGroup[i].key;
-    var val = dataGroup[i].values;
-    for(j in val){
-
-        var sub_key = j;
-        var sub_val = val[j];
-        //console.log(JSON.parse(JSON.stringify(sub_val)));
-
-    }
-
-    postDataKeys.push(key)
-}
-
-
 
     var format = d3.time.format("%Y-%m-%d");
     //var dateFN = function(d) { return format.parse(d['start_date']) };
@@ -109,14 +86,14 @@ function createNintyNineChart(postData) {
           vis.selectAll(".yaxis").transition().duration(1500).call(yAxis)
         }
 
-    vis.append("text")
+/*    vis.append("text")
         .attr("x", (WIDTH / 2))
         .attr("y", (MARGINS.top))
         .attr("text-anchor", "middle")
-        .style("font-size", "16px")
+        .style("font-size", "14px")
         .style("text-decoration", "underline")
         .style("font-weight", "bold")
-        .text("Ninty Nine Percentile");
+        .text("Ninty Nine Percentile");*/
 
     var color = d3.scale.ordinal()
       .range(["#0000FF","#FF00FF","#00FF00","#FFFF00","#00FFFF","#845B47","#0080FF","#FF8000","#F4A460","#FFDEAD", "#D2691E","#C71585","#800080","#48D1CC","#006400","#B8860B","#FF4500","#FF6347"]);
@@ -159,19 +136,53 @@ function createNintyNineChart(postData) {
       })
       .y(function(d) {
         return yScale(d['99th_perc']);
-      }).interpolate("basis");
+      }).interpolate("monotone");
 
-     vis.selectAll(".line").remove();
-     dataGroup.forEach(function(d, i) {
+    vis.selectAll(".line").remove();
+    dataGroup.forEach(function(d, i) {
         vis.append('svg:path')
         .data(dataGroup)
         .attr('d', lineGen(d['values']))
-         .attr("stroke", function(d) {return color(postDataKeys[i]); })
+        .attr("stroke", function(d) {return color(postDataKeys[i]); })
         .attr('stroke-width', 2)
         .transition().duration(1500)
         .attr("class","line")
         .attr('fill', 'none');
 
       });
+    vis.selectAll(".linePoint").remove();
+    vis.selectAll(".linePoint")
+       .data(postvarData)
+       .enter().append("circle")
+       .attr("class", "linePoint")
+       .attr("cx", function (d,i) { return xScale(parseDate(d.start_date) ); })
+       .attr("cy", function (d,i) { return yScale(d['99th_perc']); })
+       .attr("r", "5px")
+       .style("fill", function (d,i) { return color(d.cluster); })
+       .style("stroke", "grey")
+       .style("stroke-width", "1px")
+       .on("mouseover", function (d,i) { showPopover.call(this, d); })
+       .on("mouseout",  function (d,i) { removePopovers(); })
+
+    function removePopovers () {
+          $('.popover').each(function() {
+            $(this).remove();
+          });
+        }
+
+    function showPopover (d) {
+          $(this).popover({
+           title: d.cluster,
+           container: 'body',
+           placement: 'auto top',
+           trigger: 'manual',
+           html : true,
+           content: function() {
+           return "Date: " + d.start_date +
+                  "<br/>95th Percentile: " + d['95th_perc']; }
+                      });
+           $(this).popover('show')
+        }
+
 };
 

@@ -84,7 +84,7 @@ def query_tracer_percentile(lookupdt , cluster):
 
 def get_cluster_names(pref):
     clusterexp = '%' + pref + '%'
-    querytorun='select distinct concat(a.cluster, substr(a.index_type,1)) newcluster, concat(a.cluster, substr(a.index_type,1,1)) clusterdata from tracer_bullet a where ' \
+    querytorun='select distinct concat(a.cluster, substr(a.index_type,1)) newcluster, concat(a.cluster, substr(a.index_type,1,1)) clusterdata from tracer_percentiles a where ' \
                'concat(a.cluster, substr(a.index_type,1,1)) like :clsexp'
     with session_context() as q:
         try:

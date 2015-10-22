@@ -36,12 +36,13 @@ width: 50%}
 
 div.mainform {width:100%;
               border:1px solid #000;
-              padding: 20px
+              padding: 20px;
+              height: 60px;
               }
 
 
 .style9{
-max-width:400px;
+max-width:500px;
 padding:10px;
 margin:10px auto;
 border-radius:10px;
@@ -69,12 +70,7 @@ float:left;
 float:right;
 }
 
-.tooltip {
-  position: absolute;
-  width: 200px;
-  height: 28px;
-  pointer-events: none;
-}
+
 
 .style9 ul li .field-split{
     width: 46%;
@@ -124,18 +120,37 @@ float:right;
             }
 
 #charts{
-padding-top: 20px;
-height:650px;
-width:700px;
+height:900px;
+width:890px;
 overflow:auto;
 }
 
+.sep{
+height: 100px;
+
+}
+
 .chart{
-height: 650px;
-width:690px;
+height: 900px;
+width:870px;
+padding-top:30px;
 }
 
 #grid{
-height: 650px;
-width:690px;
+height: 900px;
+width:800px;
+padding-left: 20px
 }
+
+span {
+
+    text-align: center;
+    display: block;
+    line-height:20px;
+    font-weight: bold;
+    height: 20px;
+
+}
+
+
+
