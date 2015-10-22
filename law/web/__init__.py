@@ -13,8 +13,7 @@ from decimal             import Decimal
 from flask               import Flask, url_for
 from flask.json          import JSONEncoder
 from law                 import config
-from law.web             import views, subscription, volumes, salesdash, touchbiz, salesorder, userinfo, riskchart, \
-                        tracer
+from law.web             import views, subscription, volumes, salesdash, touchbiz, salesorder, userinfo, tracer
 from law.util.adb        import Session, AccountState, Tier
 from law.util.lawdb      import db_url, db, security
 from flask.ext.login     import current_user, current_app, login_user
@@ -33,7 +32,6 @@ app.register_blueprint( salesdash.views.blueprint, url_prefix = '/sales' )
 app.register_blueprint( userinfo.views.blueprint, url_prefix = '/user' )
 app.register_blueprint( touchbiz.views.blueprint, url_prefix = '/touchbiz' )
 app.register_blueprint( salesorder.views.blueprint, url_prefix = '/salesorder' )
-app.register_blueprint( riskchart.views.blueprint, url_prefix = '/risk' )
 app.register_blueprint( tracer.views.blueprint, url_prefix = '/tracer' )
 # API routes
 app.register_blueprint( subscription.rest.blueprint, url_prefix = '/apiv1/subscription' )
