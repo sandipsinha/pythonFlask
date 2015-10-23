@@ -3,7 +3,7 @@ function createNintyNineChart(postData,dataGroup, postDataKeys, postDataValues, 
 
     var vis = d3.select("#visualisation2"),
     WIDTH = 840,
-    HEIGHT = 700,
+    HEIGHT = 710,
     PADDING = 100,
     MARGINS = {
         top: 20,
