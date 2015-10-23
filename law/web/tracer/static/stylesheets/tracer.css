@@ -12,12 +12,12 @@ overflow:hidden;
 
 #leftcol{
 float:left;
-width:50%;
+width:720px;
 }
 
 #rightcol{
 float: right;
-width: 50%}
+width: 720px}
 
 .left{
   max-width:100px;
@@ -120,8 +120,8 @@ float:right;
             }
 
 #charts{
-height:900px;
-width:890px;
+height:800px;
+width:700px;
 overflow:auto;
 }
 
@@ -131,15 +131,15 @@ height: 100px;
 }
 
 .chart{
-height: 900px;
-width:870px;
+height: 800px;
+width:700px;
 padding-top:30px;
 }
 
 #grid{
-height: 900px;
-width:800px;
-padding-left: 20px
+height: 800px;
+width:720px;
+
 }
 
 span {

@@ -5,7 +5,7 @@ function createNintyFiveChart(postData,dataGroup, postDataKeys, postDataValues, 
 
 
     var vis = d3.select("#visualisation"),
-    WIDTH = 840,
+    WIDTH = 710,
     HEIGHT = 700,
     PADDING = 100,
     MARGINS = {
