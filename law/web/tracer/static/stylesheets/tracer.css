@@ -12,12 +12,12 @@ overflow:hidden;
 
 #leftcol{
 float:left;
-width:720px;
+width:50%;
 }
 
 #rightcol{
 float: right;
-width: 720px}
+width: 50%}
 
 .left{
   max-width:100px;
@@ -134,6 +134,7 @@ height: 100px;
 height: 800px;
 width:700px;
 padding-top:30px;
+padding-bottom:40px;
 }
 
 #grid{
