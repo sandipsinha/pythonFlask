@@ -52,6 +52,7 @@ $(function () {
       sdate = (sdate.length==0?'*':sdate);
       var scluster = '';
       scluster = $('#cluster').val();
+      scluster = (scluster.length==0?'*':scluster);
       postData = JSON.stringify({'Date': sdate, 'Cluster':scluster})
 
       var url =  '/apiv1/tracer/tracergrid/' + sdate + '/' + scluster;

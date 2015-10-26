@@ -5,7 +5,7 @@ function createNintyEightChart(postData,dataGroup, postDataKeys, postDataValues,
     //var dataGroups = JSON.parse(JSON.stringify(dataGroup))
     var vis = d3.select("#visualisation1"),
     WIDTH = 710,
-    HEIGHT = 700,
+    HEIGHT = 690,
     PADDING = 100,
     MARGINS = {
         top: 20,
