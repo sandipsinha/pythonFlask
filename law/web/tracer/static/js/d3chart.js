@@ -5,14 +5,14 @@ function createNintyFiveChart(postData,dataGroup, postDataKeys, postDataValues, 
 
 
     var vis = d3.select("#visualisation"),
-    WIDTH = 710,
+    WIDTH = 690,
     HEIGHT = 690,
     PADDING = 100,
     MARGINS = {
         top: 20,
         right: 20,
         bottom: 20,
-        left: 100
+        left: 40
     };
 
     var format = d3.time.format("%Y-%m-%d");
@@ -25,11 +25,11 @@ function createNintyFiveChart(postData,dataGroup, postDataKeys, postDataValues, 
 
 
     var xScale = d3.time.scale()
-                     .range([MARGINS.left+ 5, WIDTH - MARGINS.right - MARGINS.left])
+                     .range([MARGINS.left -5 , WIDTH - MARGINS.right - MARGINS.left])
                      .domain(d3.extent(postData, function(d) { return parseDate(d.start_date); }));
 
     var yScale = d3.scale.linear()
-                     .range([HEIGHT - MARGINS.top, MARGINS.bottom])
+                     .range([HEIGHT - MARGINS.top-MARGINS.bottom-20, MARGINS.bottom])
                      .domain(d3.extent(postData, ninty_five));
 
     //defines a function to be used to append the title to the tooltip.  you can set how you want it to display here.
@@ -51,7 +51,7 @@ function createNintyFiveChart(postData,dataGroup, postDataKeys, postDataValues, 
 
      if (vis.selectAll(".xaxis")[0].length < 1 ){
         vis.append("g")
-        .attr("transform", "translate(0," + (HEIGHT - MARGINS.bottom ) + ")")
+        .attr("transform", "translate(0," + (HEIGHT - MARGINS.bottom - MARGINS.top - 18 ) + ")")
         .attr("class","xaxis")
        .call(xAxis)
        .selectAll("text")
@@ -71,7 +71,7 @@ function createNintyFiveChart(postData,dataGroup, postDataKeys, postDataValues, 
 
     vis.append("text")      // text label for the x axis
     .attr("x", WIDTH/2 - MARGINS.right +30)
-    .attr("y",  HEIGHT + MARGINS.bottom + MARGINS.top + 7 )
+    .attr("y",  HEIGHT + MARGINS.bottom  )
     .style("text-anchor", "middle")
     .text("Date");
 
@@ -85,14 +85,6 @@ function createNintyFiveChart(postData,dataGroup, postDataKeys, postDataValues, 
           vis.selectAll(".yaxis").transition().duration(1500).call(yAxis)
         }
 
-    /*vis.append("text")
-        .attr("x", (WIDTH / 2))
-        .attr("y", (MARGINS.top) - 10)
-        .attr("text-anchor", "middle")
-        .style("font-size", "14px")
-        .style("text-decoration", "underline")
-        .style("font-weight", "bold")
-        .text("Ninty Five Percentile");*/
 
     var color = d3.scale.ordinal()
       .range(["#0000FF","#FF00FF","#00FF00","#FFFF00","#00FFFF","#845B47","#0080FF","#FF8000","#F4A460","#FFDEAD", "#D2691E","#C71585","#800080","#48D1CC","#006400","#B8860B","#FF4500","#FF6347"]);
