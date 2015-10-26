@@ -120,8 +120,8 @@ float:right;
             }
 
 #charts{
-height:800px;
-width:700px;
+height:780px;
+width:100%;
 overflow:auto;
 }
 
@@ -131,15 +131,15 @@ height: 100px;
 }
 
 .chart{
-height: 800px;
-width:700px;
+height: 780px;
+width:100%;
 padding-top:30px;
 padding-bottom:40px;
 }
 
 #grid{
 height: 800px;
-width:720px;
+width:100%;
 
 }
 
