@@ -86,14 +86,7 @@ function createNintyNineChart(postData,dataGroup, postDataKeys, postDataValues, 
           vis.selectAll(".yaxis").transition().duration(1500).call(yAxis)
         }
 
-/*    vis.append("text")
-        .attr("x", (WIDTH / 2))
-        .attr("y", (MARGINS.top))
-        .attr("text-anchor", "middle")
-        .style("font-size", "14px")
-        .style("text-decoration", "underline")
-        .style("font-weight", "bold")
-        .text("Ninty Nine Percentile");*/
+
 
     var color = d3.scale.ordinal()
       .range(["#0000FF","#FF00FF","#00FF00","#FFFF00","#00FFFF","#845B47","#0080FF","#FF8000","#F4A460","#FFDEAD", "#D2691E","#C71585","#800080","#48D1CC","#006400","#B8860B","#FF4500","#FF6347"]);
@@ -179,7 +172,7 @@ function createNintyNineChart(postData,dataGroup, postDataKeys, postDataValues, 
            html : true,
            content: function() {
            return "Date: " + d.start_date +
-                  "<br/>95th Percentile: " + d['95th_perc']; }
+                  "<br/>99th Percentile: " + d['99th_perc']; }
                       });
            $(this).popover('show')
         }

@@ -183,7 +183,7 @@ function createNintyEightChart(postData,dataGroup, postDataKeys, postDataValues,
            html : true,
            content: function() {
            return "Date: " + d.start_date +
-                  "<br/>95th Percentile: " + d['95th_perc']; }
+                  "<br/>98th Percentile: " + d['98th_perc']; }
                           });
            $(this).popover('show')
         }
