@@ -46,7 +46,7 @@ def re_align( ):
     recid = 0
     tblqueue = {}
 
-    #import ipdb;ipdb.set_trace()
+    import ipdb;ipdb.set_trace()
     keyval = acct_id_for_subdomain(subd)
     #import ipdb;ipdb.set_trace()
     data = rest.history( subd )
@@ -56,29 +56,19 @@ def re_align( ):
         #import ipdb;ipdb.set_trace()
         if row.get('created') != 'pending' and row.get('created') != None:
             get_tb_data = rest.get_tb_rows(keyval, touchbiz.localize_time(row.get('created')) )
-        else:
-            get_tb_data = None
-        #import ipdb;ipdb.set_trace()
-        if get_tb_data is None:
-            tbqueue['statemode'] = 'i'
-            tbqueue['rep_name'] = row.get('owner')
-            #tbqueue['rep_name'] = get_sales_rep_id(row.get('owner'))
-            tbqueue['tier'] = row.get('tier')
-            tbqueue['retention'] = row.get('retention')
-            tbqueue['volume'] = row.get('volume')
-            tbqueue['billing_period'] = row.get('period')
-            tbqueue['sub_rate'] = row.get('rate')
-        else:
-            tbqueue['statemode'] = 'u'
-            tbqueue['sales_rep_id'] = get_tb_data.sales_rep_id
+            modestate = 'u'
             tbqueue['tb_created_dt'] = get_tb_data.created
-            tbqueue['rep_name'] = touchbiz.get_sales_rep_name(get_tb_data.sales_rep_id)
-            tbqueue['tier'] = get_tb_data.tier
-            tbqueue['retention'] = get_tb_data.retention
-            tbqueue['volume'] = get_tb_data.volume
-            tbqueue['billing_period'] = get_tb_data.billing_period
-            tbqueue['sub_rate'] = get_tb_data.sub_rate
+            tbqueue['tb_rep_id'] = get_tb_data.sales_rep_id
+        else:
+            modestate = 'i'
 
+        tbqueue['statemode'] = modestate
+        tbqueue['rep_name'] = row.get('owner')
+        tbqueue['tier'] = row.get('tier')
+        tbqueue['retention'] = row.get('retention')
+        tbqueue['volume'] = row.get('volume')
+        tbqueue['billing_period'] = row.get('period')
+        tbqueue['sub_rate'] = row.get('rate')
         recid += 1
         tbqueue['recid'] = recid
         tbqueue['acct_id'] = keyval
