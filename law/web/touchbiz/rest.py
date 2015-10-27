@@ -92,18 +92,36 @@ def new( subd ):
 
 def get_tb_rows(acctid, created):
     #import ipdb;ipdb.set_trace()
-    try:
-        with tb_session() as s:
-            q = s.query(label('created',func.max(Touchbiz.created)), Touchbiz.billing_period,
-                          Touchbiz.sub_rate, Touchbiz.retention, Touchbiz.tier, Touchbiz.volume,
-                          Touchbiz.tier, Touchbiz.sales_rep_id, Touchbiz.modified).\
-                filter(and_(Touchbiz.acct_id == acctid, Touchbiz.created < created))\
-                .group_by(Touchbiz.acct_id).one()
+    if created != 'pending':
+        createdtime = touchbiz.localize_time(created)
+        try:
+            with tb_session() as s:
+                q = s.query(label('created',func.max(Touchbiz.created)), Touchbiz.billing_period,
+                              Touchbiz.sub_rate, Touchbiz.retention, Touchbiz.tier, Touchbiz.volume,
+                              Touchbiz.tier, Touchbiz.sales_rep_id, Touchbiz.modified).\
+                    filter(and_(Touchbiz.acct_id == acctid, Touchbiz.created < createdtime)).group_by(Touchbiz.acct_id)\
+                    .one()
+
+
 
             s.expunge_all()
-        return q
-    except Exception as e:
-        return None
+            return q
+        except Exception as e:
+            return None
+    else:
+        try:
+            with tb_session() as s:
+                q = s.query(label('created',func.max(Touchbiz.created)), Touchbiz.billing_period,
+                              Touchbiz.sub_rate, Touchbiz.retention, Touchbiz.tier, Touchbiz.volume,
+                              Touchbiz.tier, Touchbiz.sales_rep_id, Touchbiz.modified).\
+                    filter(and_(Touchbiz.acct_id == acctid))\
+                    .group_by(Touchbiz.acct_id).one()
+
+            s.expunge_all()
+            return q
+        except Exception as e:
+            return None
+
 
 @blueprint.route( '/salesrepid', methods=['GET'] )
 def autocomplete():

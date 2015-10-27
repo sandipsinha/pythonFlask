@@ -45,29 +45,34 @@ def re_align( ):
     tblist = []
     recid = 0
     tblqueue = {}
-
-    import ipdb;ipdb.set_trace()
     keyval = acct_id_for_subdomain(subd)
-    #import ipdb;ipdb.set_trace()
+    import ipdb;ipdb.set_trace()
     data = rest.history( subd )
     #import ipdb;ipdb.set_trace()
     for row in list(reversed(data)):
         tbqueue = {}
         #import ipdb;ipdb.set_trace()
-        if row.get('created') != 'pending' and row.get('created') != None:
-            get_tb_data = rest.get_tb_rows(keyval, touchbiz.localize_time(row.get('created')) )
+        get_tb_data = rest.get_tb_rows(keyval,  row.get('created') )
+        if get_tb_data is None or len(get_tb_data) == 0:
+            modestate = 'i'
+        else:
             modestate = 'u'
             tbqueue['tb_created_dt'] = get_tb_data.created
             tbqueue['tb_rep_id'] = get_tb_data.sales_rep_id
-        else:
-            modestate = 'i'
+
 
         tbqueue['statemode'] = modestate
         tbqueue['rep_name'] = row.get('owner')
-        tbqueue['tier'] = row.get('tier')
+        if modestate == 'u':
+            tbqueue['tier'] = row.get('tier') if len(get_tb_data.tier) == 0 else get_tb_data.tier
+            tbqueue['billing_period'] = row.get('period') if len(get_tb_data.billing_period) == 0 else get_tb_data.billing_period
+        else:
+            tbqueue['tier'] = row.get('tier')
+            tbqueue['billing_period'] = row.get('period')
         tbqueue['retention'] = row.get('retention')
         tbqueue['volume'] = row.get('volume')
-        tbqueue['billing_period'] = row.get('period')
+
+
         tbqueue['sub_rate'] = row.get('rate')
         recid += 1
         tbqueue['recid'] = recid
@@ -85,7 +90,7 @@ def re_align( ):
 @blueprint.route( '/updatetb/<string:subd>/<string:created>', methods=['GET', 'POST'] )
 def upserttb():
     tbform = forms.tbrep(request.form)
-    #import ipdb;ipdb.set_trace()
+    import ipdb;ipdb.set_trace()
     if request.form.get('Update') is None and request.form.get('Insert') is None:
         return render_template('touchbiz/touchbiz_add_rep.html', grid2=tbform.subdomain.data,form=forms.tbrep(),mode='i')
 
