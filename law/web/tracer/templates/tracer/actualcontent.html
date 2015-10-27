@@ -4,10 +4,21 @@
 <form class="style9" id="style9">
  <ul>
     <li>
-            <input id="date" name="date" type="text" placeholder="Date" class="style10 field-split align-left">
+            <input id="fdate" name="fdate" type="text" placeholder="From Date" class="style10 field-split align-left">
 
-            <input id="cluster" name="cluster" type="text" placeholder="Cluster" class="style10 field-split align-right" >
+            <input id="tdate" name="tdate" type="text" placeholder="End Date" class="style10 field-split align-right" >
     </li>
+    <li>
+
+            <input id="cluster" name="cluster" type="text" placeholder="Cluster" class="style10 field-split align-left" >
+
+            <select id="tstype" class="style10 field-split align-right">
+              <option value="d">Daily</option>
+              <option value="w">Weekly</option>
+              <option value="m">Monthly</option>
+            </select>
+    </li>
+
 
   </ul>
 <div class="action">
@@ -43,7 +54,13 @@
 </div>
 
 <script>
-    AnyTime.picker( "date",{format:"%Y-%m-%d %T"} );
+    <!--AnyTime.picker( "date",{format:"%Y-%m-%d %T"} );-->
+    $("#fdate").datepicker({
+                 dateFormat: "yy-mm-dd"
+                });
+    $("#tdate").datepicker({
+                 dateFormat: "yy-mm-dd"
+                });
 
 </script>
 {% endblock %}

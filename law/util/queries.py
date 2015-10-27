@@ -58,23 +58,25 @@ def query_user_data(s, subdomain):
 
     return q
 
-def query_tracer_bullet(lookupdt , cluster):
+def query_tracer_bullet(fdate, tdate, cluster):
 
     with session_context() as s:
         q = s.query(TracerBullet)\
-            .filter(TracerBullet.applies_start_time.between(lookupdt + timedelta(days=-7), lookupdt ))
+            .filter(TracerBullet.applies_start_time.between(fdate, tdate ))
+
+
         if cluster != '*':
             q.filter(TracerBullet.newcluster == cluster )
         datas = q.all()
         s.expunge_all()
     return datas
 
-def query_tracer_percentile(lookupdt , cluster):
+def query_tracer_percentile(fromDate, endDate , cluster, period):
 
     with session_context() as s:
         q = s.query(TracerPercentiles)\
-            .filter(and_(TracerPercentiles.start_date.between(lookupdt + timedelta(days=-7), lookupdt )))\
-            .filter(TracerPercentiles.period == 'day')\
+            .filter(and_(TracerPercentiles.start_date.between(fromDate, endDate )))\
+            .filter(TracerPercentiles.period == period)\
 
         if cluster != '*':
             q.filter(TracerPercentiles.repcluster == cluster )

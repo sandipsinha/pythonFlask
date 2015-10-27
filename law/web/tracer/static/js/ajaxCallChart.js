@@ -1,10 +1,10 @@
- function DrawChart(){
+ function DrawChart(tsvalue){
     $.ajax({
   			url : '/apiv1/tracer/tracerpercentile/',
   			contentType: "application/json",
   			dataType: "json",
   			type: "POST",
-  			data: JSON.stringify({Date:$('#date').val(), Cluster:$('#cluster').val()}),
+  			data: JSON.stringify({fdate:$('#fdate').val(), Cluster:$('#cluster').val(),tdate:$('#tdate').val(), tstype: tsvalue}),
 			success: function( data ) {
 				  var processedData = JSON.parse(JSON.stringify(data));
 				  var dataGroup = d3.nest()
