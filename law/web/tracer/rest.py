@@ -9,7 +9,6 @@ blueprint = Blueprint( 'rest.tracer', __name__ )
 
 @blueprint.route( '/tracergrid/', methods = ['GET', 'POST'])
 def tracer_data():
-    #import ipdb;ipdb.set_trace()
     fdate = request.form.get('fdate')
     tdate = request.form.get('tdate')
     scluster = request.form.get('cluster')
@@ -57,7 +56,6 @@ def tracer_data():
 
 @blueprint.route( '/tracerpercentile/', methods = ['GET', 'POST'])
 def tracer_percentile():
-    #import ipdb;ipdb.set_trace()
     datas = request.json
     tstype = datas.get('tstype')
     tdate = datetime.now() if len(datas['tdate']) == 0 else datetime.strptime(datas['tdate'],'%Y-%m-%d')
