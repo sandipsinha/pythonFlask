@@ -64,13 +64,14 @@ def re_align( ):
         tbqueue['statemode'] = modestate
         tbqueue['rep_name'] = row.get('owner')
         if modestate == 'u':
+            tbqueue['volume'] = row.get('volume')
             tbqueue['tier'] = row.get('tier') if len(get_tb_data.tier) == 0 else get_tb_data.tier
             tbqueue['billing_period'] = row.get('period') if len(get_tb_data.billing_period) == 0 else get_tb_data.billing_period
         else:
             tbqueue['tier'] = row.get('tier')
             tbqueue['billing_period'] = row.get('period')
         tbqueue['retention'] = row.get('retention')
-        tbqueue['volume'] = row.get('volume')
+
 
 
         tbqueue['sub_rate'] = row.get('rate')
