@@ -2,6 +2,7 @@ __author__ = 'ssinha'
 from flask              import Blueprint, jsonify, request, Response, json
 from law.util.queries   import query_tracer_bullet, get_cluster_names, query_tracer_percentile
 from datetime           import datetime, timedelta
+from law.util             import touchbiz
 
 
 
@@ -27,7 +28,7 @@ def tracer_data():
     fromDate = (endDate - dateDiff) if (fdate is None or len(fdate) == 0 and len(fdate) == 0) else datetime.strptime(fdate,'%Y-%m-%d')
 
     clusterchosen = '*' if (scluster is None or len(scluster) == 0) else scluster
-    tracers = query_tracer_bullet(fromDate, endDate, clusterchosen)
+    tracers = query_tracer_bullet(touchbiz.localize_time(fromDate), touchbiz.localize_time(endDate), clusterchosen)
     clientdict = {}
     clientdict['bullet'] = tracers
     
@@ -85,7 +86,7 @@ def tracer_percentile():
     elif tstype == 'm':
         period = 'month'
 
-    tiledata = query_tracer_percentile(fdate, tdate, clusterchosen, period)
+    tiledata = query_tracer_percentile(touchbiz.localize_time(fdate), touchbiz.localize_time(tdate), clusterchosen, period)
     graphlist = []
     for rows in tiledata:
         graphitem = {}
