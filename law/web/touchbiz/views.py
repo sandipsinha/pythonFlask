@@ -46,14 +46,14 @@ def re_align( ):
     recid = 0
     tblqueue = {}
     keyval = acct_id_for_subdomain(subd)
-    import ipdb;ipdb.set_trace()
+    #import ipdb;ipdb.set_trace()
     data = rest.history( subd )
     #import ipdb;ipdb.set_trace()
     for row in list(reversed(data)):
         tbqueue = {}
         #import ipdb;ipdb.set_trace()
         get_tb_data = rest.get_tb_rows(keyval,  row.get('created') )
-        if get_tb_data is None or len(get_tb_data) == 0:
+        if get_tb_data is None == 0:
             modestate = 'i'
         else:
             modestate = 'u'
@@ -90,7 +90,7 @@ def re_align( ):
 @blueprint.route( '/updatetb/<string:subd>/<string:created>', methods=['GET', 'POST'] )
 def upserttb():
     tbform = forms.tbrep(request.form)
-    import ipdb;ipdb.set_trace()
+    #import ipdb;ipdb.set_trace()
     if request.form.get('Update') is None and request.form.get('Insert') is None:
         return render_template('touchbiz/touchbiz_add_rep.html', grid2=tbform.subdomain.data,form=forms.tbrep(),mode='i')
 
@@ -108,7 +108,9 @@ def upserttb():
                 tbrep.tier = tbform.tier.data
                 tbrep.created = tbform.created.data
                 tbrep.modified = datetime.now()
+                s.add(tbrep)
                 s.commit()
+                s.close
 
         if request.form.get('Insert') == 'Insert':
 
@@ -129,6 +131,7 @@ def upserttb():
                     tbrep.modified = datetime.now()
                     s.add(tbrep)
                     s.commit()
+                    s.close
     else:
         mod = 'a' if request.form.get('Insert') == 'Insert' else 'e'
         flash('Sales Rep fields did not pass validation checks', category='info')

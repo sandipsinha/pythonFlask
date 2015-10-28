@@ -10,7 +10,7 @@ from datetime              import datetime
 from flask                 import Blueprint, jsonify, request, url_for, json
 from flask.ext.login       import current_user
 from law.util.touchbizdb   import (session_context as tb_session, loader as tb_loader, 
-                                  Touchbiz, SalesReps )
+                                  Touchbiz, Session )
 from law.util              import touchbiz
 from law.util.timeutil     import iso8601_to_dt
 from sqlalchemy         import and_, or_, not_, func, distinct
@@ -95,18 +95,12 @@ def get_tb_rows(acctid, created):
     if created != 'pending':
         createdtime = touchbiz.localize_time(created)
         try:
-            with tb_session() as s:
-                q = s.query(label('created',func.max(Touchbiz.created)), Touchbiz.billing_period,
-                              Touchbiz.sub_rate, Touchbiz.retention, Touchbiz.tier, Touchbiz.volume,
-                              Touchbiz.tier, Touchbiz.sales_rep_id, Touchbiz.modified).\
-                    filter(and_(Touchbiz.acct_id == acctid, Touchbiz.created < createdtime)).group_by(Touchbiz.acct_id)\
-                    .one()
-
-
-
-            s.expunge_all()
+            session = Session()
+            max_date = session.query(func.max(Touchbiz.created)).filter(and_(Touchbiz.acct_id == acctid, Touchbiz.created < createdtime))
+            q=session.query(Touchbiz).filter(and_(Touchbiz.acct_id == acctid, Touchbiz.created == max_date)).one()
             return q
         except Exception as e:
+            print e
             return None
     else:
         try:
