@@ -9,7 +9,7 @@ blueprint = Blueprint( 'rest.tracer', __name__ )
 
 @blueprint.route( '/tracergrid/', methods = ['GET', 'POST'])
 def tracer_data():
-    import ipdb;ipdb.set_trace()
+    #import ipdb;ipdb.set_trace()
     fdate = request.form.get('fdate')
     tdate = request.form.get('tdate')
     scluster = request.form.get('cluster')
@@ -21,7 +21,7 @@ def tracer_data():
         elif tstype == 'w':
             dateDiff = timedelta(weeks = 1)
         elif tstype == 'm':
-            dateDiff = timedelta(days = 30)
+            dateDiff = timedelta(weeks = 24)
         else:
             dateDiff = timedelta(hours = 1)
 
@@ -57,20 +57,23 @@ def tracer_data():
 
 @blueprint.route( '/tracerpercentile/', methods = ['GET', 'POST'])
 def tracer_percentile():
-    import ipdb;ipdb.set_trace()
+    #import ipdb;ipdb.set_trace()
     datas = request.json
     tstype = datas.get('tstype')
     tdate = datetime.now() if len(datas['tdate']) == 0 else datetime.strptime(datas['tdate'],'%Y-%m-%d')
-    if (len(datas['fdate']) == 0 and len(datas['tdate']) == 0):
-        if len(tstype.strip()) == 0:
-            dateDiff = timedelta(weeks = 1)
-        elif tstype == 'w':
-            dateDiff = timedelta(weeks = 1)
-        elif tstype == 'm':
-            dateDiff = timedelta(days = 30)
-        else:
-            dateDiff = timedelta(weeks = 1)
-    fdate = (datetime.now() - dateDiff)  if len(datas['fdate']) == 0 else datetime.strptime(datas['fdate'],'%Y-%m-%d')
+
+    if len(tstype.strip()) == 0:
+        dateDiff = timedelta(weeks = 50)
+    elif tstype == 'w':
+        dateDiff = timedelta(weeks = 50)
+    elif tstype == 'm':
+        dateDiff = timedelta(weeks = 24)
+    elif tstype == 'd':
+        dateDiff = timedelta(days = 50)
+    if (len(datas['tdate']) == 0):
+        fdate = datetime.now() - dateDiff
+    else:
+        fdate = tdate - dateDiff
 
 
     clusterchosen = '*' if len(datas['Cluster']) == 0 else datas['Cluster']
