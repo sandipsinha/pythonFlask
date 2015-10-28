@@ -4,9 +4,15 @@ $(function () {
 
     var processed;
 
+    var e = document.getElementById("tstype");
+    var tsvalue = e.options[e.selectedIndex].value;
+
+    var PostData = JSON.parse(JSON.stringify(({'fdate':$('#fdate').val(),'tdate':$('#tdate').val(), 'cluster':$('#cluster').val(),'tstype':tsvalue})))
+
     $('#grid').w2grid({
         name: 'grid',
         header: 'List of Names',
+        url: '/apiv1/tracer/tracergrid/',
         show : {
             header         : false,
             toolbar        : true,
@@ -20,7 +26,7 @@ $(function () {
             toolbarColumns : true,
             toolbarSearch  : true,
             toolbarAdd     : false,
-            toolbarEdit    : true,
+            toolbarEdit    : false,
             toolbarDelete  : false,
             toolbarSave    : false,
             selectionBorder: true,
@@ -35,30 +41,30 @@ $(function () {
             { field: 'run_secs', caption: 'Run Time(Sec)', size: '15%', sortable: true },
             { field: 'uid', caption: 'Unique ID', size: '19%', sortable: true },
         ],
-        postData : JSON.parse(JSON.stringify(({datefilter:$('#date').val(), cluster:$('#cluster').val()})))
+        postData : PostData
 
     });
     if (processed != 'Y'){
-        w2ui['grid'].load('/apiv1/tracer/tracergrid/');
+        w2ui['grid'].load();
     }
 
-    DrawChart();
+    DrawChart(tsvalue);
 
     $("#style9").submit( function( event ){
       event.preventDefault();
       processed = 'Y';
-      var sdate = '';
-      sdate =  $('#date').val();
-      sdate = (sdate.length==0?'*':sdate);
-      var scluster = '';
-      scluster = $('#cluster').val();
-      scluster = (scluster.length==0?'*':scluster);
-      postData = JSON.stringify({'Date': sdate, 'Cluster':scluster})
+      tsvalue = e.options[e.selectedIndex].value;
+      PostData = JSON.parse(JSON.stringify(({'fdate':$('#fdate').val(),'tdate':$('#tdate').val(),
+            'cluster':$('#cluster').val(),'tstype':tsvalue})))
 
-      var url =  '/apiv1/tracer/tracergrid/' + sdate + '/' + scluster;
-      w2ui['grid'].load(url);
 
-      DrawChart();
+      var url =  '/apiv1/tracer/tracergrid/';
+      w2ui['grid'].postData  = PostData;
+      w2ui['grid'].reload();
+
+
+
+      DrawChart(tsvalue);
 
     });
 

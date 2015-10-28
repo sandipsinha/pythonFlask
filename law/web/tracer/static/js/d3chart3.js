@@ -1,10 +1,7 @@
+function createLessThan30Chart(postData,dataGroup, postDataKeys, postDataValues, postvarData, tsvalue ) {
 
 
-
-function createNintyFiveChart(postData,dataGroup, postDataKeys, postDataValues, postvarData, tsvalue ) {
-
-
-    var vis = d3.select("#visualisation"),
+    var vis = d3.select("#visualisation3"),
     WIDTH = 690,
     HEIGHT = 690,
     PADDING = 100,
@@ -21,27 +18,28 @@ function createNintyFiveChart(postData,dataGroup, postDataKeys, postDataValues, 
     var parseDate = d3.time.format("%Y-%m-%d").parse;
 
 
-    var ninty_five = function(d) { return d['95th_perc'] };
+    var lt30 = function(d) { return  d['pcnt_LT30'] };
 
 
     var xScale = d3.time.scale()
                      .range([MARGINS.left -5 , WIDTH - MARGINS.right - MARGINS.left])
-                     .domain(d3.extent(postData, function(d) { return parseDate(d.start_date); }))
-                     ;
+                     .domain(d3.extent(postData, function(d) { return parseDate(d.start_date); }));
 
     var yScale = d3.scale.linear()
                      .range([HEIGHT - MARGINS.top-MARGINS.bottom-20, MARGINS.bottom])
-                     .domain(d3.extent(postData, ninty_five));
+                     .domain(d3.extent(postData, lt30));
 
     //defines a function to be used to append the title to the tooltip.  you can set how you want it to display here.
 
+    var line = d3.svg.line()
+          .interpolate("basis")
+          .x(function (d) { return x(parseDate(d['start_date'])) })
+          .y(function (d) { return y(d['pcnt_LT30']); });
 
     var color = d3.scale.category10();
-
     color.domain(postDataKeys);
 
     xAxis = formatXaxis(xScale, tsvalue);
-
 
     yAxis = d3.svg.axis()
             .scale(yScale)
@@ -69,7 +67,7 @@ function createNintyFiveChart(postData,dataGroup, postDataKeys, postDataValues, 
 
     vis.append("text")      // text label for the x axis
     .attr("x", WIDTH/2 - MARGINS.right +30)
-    .attr("y",  HEIGHT + MARGINS.bottom  )
+    .attr("y",  HEIGHT + MARGINS.bottom   )
     .style("text-anchor", "middle")
     .text("Date");
 
@@ -84,23 +82,26 @@ function createNintyFiveChart(postData,dataGroup, postDataKeys, postDataValues, 
         }
 
 
+
     var color = d3.scale.ordinal()
       .range(["#0000FF","#FF00FF","#00FF00","#FFFF00","#00FFFF","#845B47","#0080FF","#FF8000","#F4A460","#FFDEAD", "#D2691E","#C71585","#800080","#48D1CC","#006400","#B8860B","#FF4500","#FF6347"]);
 
     vis.append("text")
             .attr("text-anchor", "middle")  // this makes it easy to centre the text as the transform is applied to the anchor
             .attr("transform", "translate("+ (PADDING/2) +","+(HEIGHT/2)+")rotate(-90)")  // text is drawn off the screen top left, move down and out and rotate
-            .text("95th Percentile");
+            .text("pcnt_LT30");
 
     vis.selectAll(".legend").remove();
+
     var legend = vis.selectAll(".legend")
             .data(postDataKeys)
             .enter().append("g")
             .attr("class", "legend")
-            .attr("transform", function (d, i) { return "translate(38," + i * 20 + ")"; });
+            .attr("transform", function (d, i) { return "translate(55," + i * 20 + ")"; });
+
 
     legend.append("rect")
-        .attr("x", WIDTH - 56)
+        .attr("x", WIDTH - 62)
         .attr("y", function(d, i){ return i *  15;})
         .attr("width", 10)
         .attr("height", 10)
@@ -108,10 +109,6 @@ function createNintyFiveChart(postData,dataGroup, postDataKeys, postDataValues, 
         .style("fill", function(d, i) {
          return color(postDataKeys[i]);
       });
-
-    var tooltip = d3.select("body").append("div")
-    .attr("class", "tooltip")
-    .style("opacity", 0);
 
     legend.append("text")
         .attr("x", WIDTH - 80)
@@ -126,19 +123,20 @@ function createNintyFiveChart(postData,dataGroup, postDataKeys, postDataValues, 
         return xScale(parseDate(d.start_date));
       })
       .y(function(d) {
-        return yScale(d['95th_perc']);
-      }).interpolate("monotone")
-      ;
+        return yScale(d['pcnt_LT30']);
+      }).interpolate("monotone");
 
     vis.selectAll(".line").remove();
     dataGroup.forEach(function(d, i) {
         vis.append('svg:path')
+        .data(dataGroup)
         .attr('d', lineGen(d['values']))
         .attr("stroke", function(d) {return color(postDataKeys[i]); })
         .attr('stroke-width', 2)
         .transition().duration(1500)
         .attr("class","line")
-        .attr('fill', 'none')
+        .attr('fill', 'none');
+
       });
     vis.selectAll(".linePoint").remove();
     vis.selectAll(".linePoint")
@@ -146,7 +144,7 @@ function createNintyFiveChart(postData,dataGroup, postDataKeys, postDataValues, 
        .enter().append("circle")
        .attr("class", "linePoint")
        .attr("cx", function (d,i) { return xScale(parseDate(d.start_date) ); })
-       .attr("cy", function (d,i) { return yScale(d['95th_perc']); })
+       .attr("cy", function (d,i) { return yScale(d['pcnt_LT30']); })
        .attr("r", "5px")
        .style("fill", function (d,i) { return color(d.cluster); })
        .style("stroke", "grey")
@@ -154,24 +152,24 @@ function createNintyFiveChart(postData,dataGroup, postDataKeys, postDataValues, 
        .on("mouseover", function (d,i) { showPopover.call(this, d); })
        .on("mouseout",  function (d,i) { removePopovers(); })
 
-       function removePopovers () {
+    function removePopovers () {
           $('.popover').each(function() {
             $(this).remove();
           });
         }
 
-        function showPopover (d) {
+    function showPopover (d) {
           $(this).popover({
-            title: d.cluster,
-            container: 'body',
-            placement: 'auto top',
-            trigger: 'manual',
-            html : true,
-            content: function() {
-              return "Date: " + d.start_date +
-                     "<br/>95th Percentile: " + d['95th_perc']; }
+           title: d.cluster,
+           container: 'body',
+           placement: 'auto top',
+           trigger: 'manual',
+           html : true,
+           content: function() {
+           return "Date: " + d.start_date +
+                  "<br/>Less than 30: " + d['pcnt_LT30']; }
                       });
-          $(this).popover('show')
+           $(this).popover('show')
         }
 
 };

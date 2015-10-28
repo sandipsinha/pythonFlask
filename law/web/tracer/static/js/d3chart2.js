@@ -1,4 +1,4 @@
-function createNintyNineChart(postData,dataGroup, postDataKeys, postDataValues, postvarData ) {
+function createNintyNineChart(postData,dataGroup, postDataKeys, postDataValues, postvarData, tsvalue ) {
 
 
     var vis = d3.select("#visualisation2"),
@@ -39,12 +39,7 @@ function createNintyNineChart(postData,dataGroup, postDataKeys, postDataValues, 
     var color = d3.scale.category10();
     color.domain(postDataKeys);
 
-    xAxis = d3.svg.axis()
-           .scale(xScale)
-           .ticks(d3.time.day, 1)
-           .tickFormat(d3.time.format('%b %d'))
-           .tickPadding(5)
-           .orient("bottom");
+    xAxis = formatXaxis(xScale, tsvalue);
 
     yAxis = d3.svg.axis()
             .scale(yScale)

@@ -37,7 +37,7 @@ width: 50%}
 div.mainform {width:100%;
               border:1px solid #000;
               padding: 20px;
-              height: 60px;
+              height: 90px;
               }
 
 
@@ -58,8 +58,12 @@ list-style:none;
 
 .style9 ul li{
 display:block;
-margin-bottom:10px;
+margin-bottom:20px;
 min-height:20px;
+
+}
+li.menu-item {
+   margin:0 0 20px 0;
 }
 
 .style9 ul li input.align-left{
@@ -70,6 +74,9 @@ float:left;
 float:right;
 }
 
+.style9 ul li select.align-right{
+float:right;
+}
 
 
 .style9 ul li .field-split{
@@ -95,12 +102,7 @@ float:right;
     background: linear-gradient(to bottom, #2D77A2 5%, #337DA8 100%);
     background-color: #28739E;
 }
-#cluster{
-  background-color:#D7D7D7;
-  opacity:0.3;
-  color: #000000;
-  font-weight: bold;
-  }
+
 
 .axis path {
     fill: none;
@@ -126,7 +128,7 @@ overflow:auto;
 }
 
 .sep{
-height: 100px;
+height: 80px;
 
 }
 

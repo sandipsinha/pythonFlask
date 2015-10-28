@@ -1,10 +1,10 @@
- function DrawChart(){
+ function DrawChart(tsvalue){
     $.ajax({
   			url : '/apiv1/tracer/tracerpercentile/',
   			contentType: "application/json",
   			dataType: "json",
   			type: "POST",
-  			data: JSON.stringify({Date:$('#date').val(), Cluster:$('#cluster').val()}),
+  			data: JSON.stringify({Cluster:$('#cluster').val(),tdate:$('#tdate').val(), tstype: tsvalue}),
 			success: function( data ) {
 				  var processedData = JSON.parse(JSON.stringify(data));
 				  var dataGroup = d3.nest()
@@ -29,9 +29,10 @@
                   }
                   var postvarData = _.flatten(postDataValues);
 
-				  createNintyFiveChart(processedData,dataGroup, postDataKeys, postDataValues , postvarData);
-				  createNintyEightChart(processedData,dataGroup, postDataKeys, postDataValues , postvarData);
-				  createNintyNineChart(processedData,dataGroup, postDataKeys, postDataValues , postvarData);
+				  createNintyFiveChart(processedData,dataGroup, postDataKeys, postDataValues , postvarData,tsvalue);
+				  createNintyEightChart(processedData,dataGroup, postDataKeys, postDataValues , postvarData,tsvalue);
+				  createNintyNineChart(processedData,dataGroup, postDataKeys, postDataValues , postvarData,tsvalue);
+				  createLessThan30Chart(processedData,dataGroup, postDataKeys, postDataValues , postvarData,tsvalue);
 
 			}
   		});
