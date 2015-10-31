@@ -22,6 +22,9 @@ blueprint = Blueprint( 'tracer', __name__,
 def display_tracer_data():
     return render_template('tracer/actualcontent.html' )
 
+@blueprint.route( '/date', methods=['GET'])
+def display_date_data():
+    return render_template('tracer/test.html' )
 
 
 

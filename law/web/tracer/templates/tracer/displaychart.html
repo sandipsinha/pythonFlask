@@ -1,7 +1,30 @@
 {% extends 'tracer/base.html' %}
 {% block main %}
 <div id="header">{% block header %}{% endblock %}</div>
-<div  class="sep"> </div>
+<div id="first-wrap">
+<div id="leftdiv"> </div>
+<div id="rightdiv">
+<form data-persist="garlic" id="nextmain" >
+<div  >
+
+            <label>
+            <select id="tstype" >
+              <option value="d">Daily</option>
+              <option value="w">Weekly</option>
+              <option value="m">Monthly</option>
+                <option value="rw">Rolling 7 days</option>
+              <option value="rm">Rolling 30 days</option>
+            </select>
+            </label>
+            <label>Periods:
+            <input id="period" type="number" placeholder="30" min="2">
+            </label>
+</div>
+
+
+</form>
+</div>
+</div>
 <div id="main-wrap">
     <div id="leftcol">
         {% block leftcol %}{% endblock %}
@@ -12,4 +35,5 @@
     </div>
 
 </div>
+
 {% endblock %}
