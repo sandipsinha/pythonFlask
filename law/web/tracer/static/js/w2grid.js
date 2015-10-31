@@ -1,13 +1,32 @@
-$(function () {
+$(window).load(function () {
 
     var sel ;
 
     var processed;
 
-    var e = document.getElementById("tstype");
-    var tsvalue = e.options[e.selectedIndex].value;
 
-    var PostData = JSON.parse(JSON.stringify(({'fdate':$('#fdate').val(),'tdate':$('#tdate').val(), 'cluster':$('#cluster').val(),'tstype':tsvalue})))
+    //var e = document.getElementById("datesel");
+    //var tsvalue = e.options[e.selectedIndex].value;
+    var tsvalue = $("#datesel").val();
+    //startDt = '';
+    if (!startDt){
+       endDt = moment().format('YYYY-MM-DD HH:mm:ss');
+       startDt = moment().subtract(1,'h').format('YYYY-MM-DD HH:mm:ss');
+       if ($("#datesel").val() == 'custom'){
+       $("#datesel").val('last1h');
+       }
+    }
+    period = $("#period").val();
+    if (period == "" || !$.isNumeric(period)) {
+      period = 30;
+    }
+    //e = document.getElementById("tstype");
+    //tstype = e.options[e.selectedIndex].value;
+    tstype = $("#tstype").val();
+    var urlx = '/apiv1/tracer/tracergrid/';
+
+
+    var PostData = JSON.parse(JSON.stringify(({'fdate':startDt,'tdate':endDt, 'cluster':$('#cluster').val(),'tstype':tsvalue})))
 
     $('#grid').w2grid({
         name: 'grid',
@@ -44,17 +63,26 @@ $(function () {
         postData : PostData
 
     });
-    if (processed != 'Y'){
-        w2ui['grid'].load();
-    }
+    /*if (processed != 'Y'){
+        w2ui['grid'].load('/apiv1/tracer/tracergrid/');
+    }*/
 
-    DrawChart(tsvalue);
+    DrawChart(period, tstype, tsvalue);
 
-    $("#style9").submit( function( event ){
+    $('#submit').click(function(event){
       event.preventDefault();
       processed = 'Y';
-      tsvalue = e.options[e.selectedIndex].value;
-      PostData = JSON.parse(JSON.stringify(({'fdate':$('#fdate').val(),'tdate':$('#tdate').val(),
+      //e = document.getElementById("datesel");
+      //tsvalue = e.options[e.selectedIndex].value;
+      tsvalue = $("#datesel").val();
+
+      tstype = $("#tstype").val()
+
+      period = $("#period").val();
+      if (period == "" || !$.isNumeric(period)) {
+         period = 30;
+      }
+      PostData = JSON.parse(JSON.stringify(({'fdate':startDt,'tdate':endDt,
             'cluster':$('#cluster').val(),'tstype':tsvalue})))
 
 
@@ -62,9 +90,7 @@ $(function () {
       w2ui['grid'].postData  = PostData;
       w2ui['grid'].reload();
 
-
-
-      DrawChart(tsvalue);
+      DrawChart(period, tstype, tsvalue);
 
     });
 

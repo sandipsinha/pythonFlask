@@ -1,15 +1,15 @@
 function createNintyNineChart(postData,dataGroup, postDataKeys, postDataValues, postvarData, tsvalue ) {
 
 
-    var vis = d3.select("#visualisation2"),
-    WIDTH = 690,
+    var vis = d3.select("#visualisation3"),
+    WIDTH = 700,
     HEIGHT = 690,
     PADDING = 100,
     MARGINS = {
         top: 20,
         right: 20,
         bottom: 20,
-        left: 40
+        left: 100
     };
 
     var format = d3.time.format("%Y-%m-%d");
@@ -145,10 +145,11 @@ function createNintyNineChart(postData,dataGroup, postDataKeys, postDataValues, 
        .attr("class", "linePoint")
        .attr("cx", function (d,i) { return xScale(parseDate(d.start_date) ); })
        .attr("cy", function (d,i) { return yScale(d['99th_perc']); })
-       .attr("r", "5px")
+       .attr("r", "12")
        .style("fill", function (d,i) { return color(d.cluster); })
        .style("stroke", "grey")
        .style("stroke-width", "1px")
+       .style('opacity', 1e-6)//1e-6
        .on("mouseover", function (d,i) { showPopover.call(this, d); })
        .on("mouseout",  function (d,i) { removePopovers(); })
 

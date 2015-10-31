@@ -2,6 +2,7 @@ __author__ = 'ssinha'
 from flask              import Blueprint, jsonify, request, Response, json
 from law.util.queries   import query_tracer_bullet, get_cluster_names, query_tracer_percentile
 from datetime           import datetime, timedelta
+from law.util             import touchbiz
 
 
 
@@ -12,22 +13,12 @@ def tracer_data():
     fdate = request.form.get('fdate')
     tdate = request.form.get('tdate')
     scluster = request.form.get('cluster')
-    tstype = request.form.get('tstype')
-    endDate = datetime.now() if (tdate is None or len(tdate) == 0) else datetime.strptime(tdate,'%Y-%m-%d')
-    if (len(fdate) == 0 and len(tdate) == 0):
-        if len(tstype.strip()) == 0:
-            dateDiff = timedelta(hours = 1)
-        elif tstype == 'w':
-            dateDiff = timedelta(weeks = 1)
-        elif tstype == 'm':
-            dateDiff = timedelta(weeks = 24)
-        else:
-            dateDiff = timedelta(hours = 1)
+    fromDate = datetime.strptime(fdate,'%Y-%m-%d %H:%M:%S')
+    endDate = datetime.strptime(tdate,'%Y-%m-%d %H:%M:%S')
 
-    fromDate = (endDate - dateDiff) if (fdate is None or len(fdate) == 0 and len(fdate) == 0) else datetime.strptime(fdate,'%Y-%m-%d')
 
     clusterchosen = '*' if (scluster is None or len(scluster) == 0) else scluster
-    tracers = query_tracer_bullet(fromDate, endDate, clusterchosen)
+    tracers = query_tracer_bullet(touchbiz.localize_time(fromDate), touchbiz.localize_time(endDate), clusterchosen)
     clientdict = {}
     clientdict['bullet'] = tracers
     
@@ -57,17 +48,18 @@ def tracer_data():
 @blueprint.route( '/tracerpercentile/', methods = ['GET', 'POST'])
 def tracer_percentile():
     datas = request.json
-    tstype = datas.get('tstype')
-    tdate = datetime.now() if len(datas['tdate']) == 0 else datetime.strptime(datas['tdate'],'%Y-%m-%d')
+    dateind = datas.get('dateind')
+    period = int(datas.get('periods'))
+    tdate = datetime.strptime(datas['tdate'],'%Y-%m-%d %H:%M:%S')
 
-    if len(tstype.strip()) == 0:
-        dateDiff = timedelta(weeks = 50)
-    elif tstype == 'w':
-        dateDiff = timedelta(weeks = 50)
-    elif tstype == 'm':
-        dateDiff = timedelta(weeks = 24)
-    elif tstype == 'd':
-        dateDiff = timedelta(days = 50)
+    if len(dateind.strip()) == 0:
+        dateDiff = timedelta(days = period)
+    elif dateind == 'w':
+        dateDiff = timedelta(weeks = period)
+    elif dateind == 'm':
+        dateDiff = timedelta(weeks = period * 4)
+    elif dateind == 'd':
+        dateDiff = timedelta(days = period)
     if (len(datas['tdate']) == 0):
         fdate = datetime.now() - dateDiff
     else:
@@ -75,17 +67,21 @@ def tracer_percentile():
 
 
     clusterchosen = '*' if len(datas['Cluster']) == 0 else datas['Cluster']
-    period = 'week'   #default value is week
-    if len(tstype) == 0:
-        period = 'week'
-    elif tstype == 'd':
-        period = 'day'
-    elif tstype == 'w':
-        period = 'week'
-    elif tstype == 'm':
-        period = 'month'
+    cperiod = 'week'   #default value is week
+    if len(dateind) == 0:
+        cperiod = 'week'
+    elif dateind == 'd':
+        cperiod = 'day'
+    elif dateind == 'w':
+        cperiod = 'week'
+    elif dateind == 'm':
+        cperiod = 'month'
+    elif dateind == 'rm':
+        cperiod = 'rolling30'
+    elif dateind == 'rw':
+        cperiod = 'rolling7'
 
-    tiledata = query_tracer_percentile(fdate, tdate, clusterchosen, period)
+    tiledata = query_tracer_percentile(touchbiz.localize_time(fdate), touchbiz.localize_time(tdate), clusterchosen, cperiod)
     graphlist = []
     for rows in tiledata:
         graphitem = {}
