@@ -30,7 +30,7 @@ function createNintyEightChart(postData,dataGroup, postDataKeys, postDataValues,
                      .domain(d3.extent(postData, function(d) { return parseDate(d.start_date); }));
 
     var yScale = d3.scale.linear()
-                     .range([HEIGHT - MARGINS.top-MARGINS.bottom-20, MARGINS.bottom])
+                     .range([HEIGHT - MARGINS.top-MARGINS.bottom-60, MARGINS.bottom])
                      .domain(d3.extent(postData, ninty_eight));
 
     //defines a function to be used to append the title to the tooltip.  you can set how you want it to display here.
@@ -51,7 +51,7 @@ function createNintyEightChart(postData,dataGroup, postDataKeys, postDataValues,
 
      if (vis.selectAll(".xaxis")[0].length < 1 ){
         vis.append("g")
-        .attr("transform", "translate(0," + (HEIGHT - MARGINS.bottom - MARGINS.top - 18 ) + ")")
+        .attr("transform", "translate(0," + (HEIGHT - MARGINS.bottom - MARGINS.top - 60 ) + ")")
         .attr("class","xaxis")
        .call(xAxis)
        .selectAll("text")
@@ -71,7 +71,8 @@ function createNintyEightChart(postData,dataGroup, postDataKeys, postDataValues,
 
     vis.append("text")      // text label for the x axis
     .attr("x", WIDTH/2 - MARGINS.right +30)
-    .attr("y",  HEIGHT + MARGINS.bottom   )
+    .attr("y",  HEIGHT + MARGINS.bottom -55   )
+    .style("font-weight", 'bold')
     .style("text-anchor", "middle")
     .text("Date");
 

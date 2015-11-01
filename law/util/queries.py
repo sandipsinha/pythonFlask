@@ -47,8 +47,6 @@ def query_product_state( states, products, start, end ):
     return subs
 
 def query_user_data(s, subdomain):
-    # operator | or's the states together ( | is overloaded in SQLAlchemy query construction)
-    #with session_context() as s:
     q = s.query( Users, label('Number_Of_Logins', func.count(UserTracking.login)),
              label('Last_Login', func.max(UserTracking.login)))\
             .join( Status, and_( Users.acct_id == Status.acct_id)) \
