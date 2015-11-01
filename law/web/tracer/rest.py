@@ -18,7 +18,7 @@ def tracer_data():
 
 
     clusterchosen = '*' if (scluster is None or len(scluster) == 0) else scluster
-    tracers = query_tracer_bullet(touchbiz.localize_time(fromDate), touchbiz.localize_time(endDate), clusterchosen)
+    tracers = query_tracer_bullet(fromDate, endDate, clusterchosen)
     clientdict = {}
     clientdict['bullet'] = tracers
     
