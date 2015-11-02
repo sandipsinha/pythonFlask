@@ -1,0 +1,98 @@
+{% extends 'tracer/displaychart.html' %}
+{% block header %}
+<div id="mainform">
+<div id="gridform" >
+<form  class="mystic" id="main" >
+
+        <div id = 'special'>
+        <label><span>Date: </span> </label>
+            <select id="datesel" name="datesel">
+                <option value="last1h">Last 1 hour</option>
+                <option value="last1d">Last 1 day</option>
+                <option value="last1w">Last 1 week</option>
+                <option value="custom">Date Range</option>
+            </select>
+
+
+            <input id="dater" name="dater" type="text" placeholder="Date Range" class="cstm">
+            <i class="glyphicon glyphicon-calendar fa fa-calendar cstm"></i>&nbsp;
+              <b class="caret cstm"></b>
+
+            <label>
+                <span>Cluster: </span>
+            <input id="cluster" name="cluster" type="text" placeholder="All" class="style10 field-split align-left" >
+            </label>
+            </div>
+
+
+
+
+
+<label>
+    <span>&nbsp;</span>
+    <input type="button" id="submit" class='button' value="Update">
+</label>
+
+</form>
+</div>
+</div>
+{% endblock %}
+
+{% block rightcol %}
+<div id="charts">
+<div id="graph" >
+
+        <span>Percent where tracer was less than 30 seconds</span>
+
+  <svg id="visualisation"  class="chart"></svg>
+</div>
+
+<div id="graph1"  >
+    <span>Tracer latency seconds to 95th Percentile</span>
+
+<svg id="visualisation1"  class="chart"></svg>
+</div>
+
+<div id="graph2"  >
+     <span>Tracer latency seconds to 98th Percentile</span>
+
+   <svg id="visualisation2"  class="chart"></svg>
+</div>
+
+    <div id="graph3"  >
+<span>Tracer latency seconds to 99th Percentile</span>
+   <svg id="visualisation3"  class="chart"></svg>
+</div>
+</div>
+{% endblock %}
+{% block leftcol %}
+<div id="grid">
+
+</div>
+
+<script>
+    var startDt;
+    var EndDt;
+    var period;
+    var tstype;
+    var datepref;
+    var GWIDTH = 700;
+    var GHEIGHT = 690;
+    var GPADDING = 100;
+    var GTOP = 20;
+    var GBOTTOM = 20;
+    var GRIGHT = 20;
+    var GLEFT = 100;
+    $("#main").formcache();
+    $( "#period" ).change(function() {
+     tsvalue = $("#datesel").val();
+     tstype = $("#tstype").val();
+     period = $("#period").val();
+     DrawChart(period, tstype, tsvalue);
+    });
+
+
+
+
+</script>
+{% endblock %}

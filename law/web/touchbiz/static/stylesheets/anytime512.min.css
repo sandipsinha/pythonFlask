@@ -82,15 +82,15 @@
 
 .AnyTime-pkr .AnyTime-cloak
 {
-  background-color:#D7D7D7;
-  opacity:0.7;
+
   position:absolute;
   filter:alpha(opacity=70);
 }
 
 /*  .AnyTime-hdr is the title bar at the top of a "window." In addition to
  *  the title label, the title bar for popup (non-inline) pickers also
- *  contains .AnyTime-x-btn.
+ *  contains .AnyTime-x-btn.   background-color:#D7D7D7;
+  opacity:0.7;
  */
 
 .AnyTime-pkr .AnyTime-hdr

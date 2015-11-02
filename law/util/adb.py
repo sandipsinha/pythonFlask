@@ -6,6 +6,7 @@
 """
 from contextlib import contextmanager
 from datetime import date, datetime
+from sqlalchemy.ext.hybrid import hybrid_property, hybrid_method
 
 import pytz
 from law                        import config
@@ -17,6 +18,7 @@ from sqlalchemy                 import (create_engine, Column,
 from sqlalchemy.dialects.mysql  import BIGINT, SMALLINT, MEDIUMINT
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm             import sessionmaker, relationship, backref
+from sqlalchemy.ext.hybrid import hybrid_method
 
 Base = declarative_base()
 # Duplicate models of the same table need another base declaration
@@ -529,6 +531,82 @@ class DownGrades( Base ):
         elif self.stNam == 'PWF':
             return 8
 
+class TracerBullet( Base):
+    __tablename__ = 'tracer_bullet'
+    __table_args__ = {'mysql_engine':'InnoDB'}
+    cluster = Column( String(length=20),primary_key=True )
+    index_type = Column( String(length=20),primary_key=True )
+    applies_start_time = Column( DateTime ,primary_key=True)
+    status = Column( String(length=20) )
+    run_start_time = Column( DateTime )
+    run_end_time = Column( DateTime )
+    run_secs =  Column( Numeric(6,1) )
+    uid = Column( String(length=18) )
+
+    @property
+    def newcluster( self ):
+        return self.cluster + self.index_type[0]
+
+    @hybrid_method
+    def clusterdtl(self, clsexp):
+        import ipdb;ipdb.set_trace()
+        dats = self.newcluster
+        return (self.newcluster)
+
+    def __repr__(self):
+        return "<TracerBullet ({}, {}, {}, {}, , {}, {}>".format(
+            self.newcluster,
+            self.status,
+            self.run_start_time,
+            self.run_end_time,
+            self.run_secs,
+            self.uid
+            )
+
+class TracerPercentiles( Base):
+    __tablename__ = 'tracer_percentiles'
+    __table_args__ = {'mysql_engine':'InnoDB'}
+    deployment         = Column( String(length=20),primary_key=True )
+    cluster            = Column( String(length=20),primary_key=True )
+    index_type         = Column( String(length=20),primary_key=True )
+    period             = Column( String(length=20),primary_key=True )
+    start_date         = Column( Date ,primary_key=True )
+    end_date           = Column( Date )
+    pcnt_LT30          = Column( Numeric(6,5))
+    min_latency        = Column( Numeric(6,1))
+    max_latency        = Column( Numeric(6,1))
+    ninty_five         = Column('95th_secs',Numeric(10,1))
+    ninty_eight        = Column('98th_secs', Numeric(10,1))
+    ninty_nine         = Column('99th_secs', Numeric(10,1))
+    reporting_secs     = Column( Numeric(10,1))
+    period_secs        = Column( Numeric(10,1))
+    percent_of_period  = Column( Numeric(6,5))
+    ndays              = Column( SMALLINT(2))
+    pcnt_LT_sec_thresh = Column( Numeric(6,5))
+
+    @property
+    def repcluster( self ):
+        return self.cluster + self.index_type[0]
+
+    @hybrid_method
+    def clusterdata(self, clusterrep):
+        return (self.cluster + self.index_type[0]) == clusterrep
+
+    def __repr__(self):
+        return "<TracerPercentiles ({}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}>".format(
+        self.repcluster,
+        self.period,
+        self.start_date,
+        self.end_date,
+        self.pcnt_LT30,
+        self.min_latency,
+        self.max_latency,
+        self.ninty_five,
+        self.ninty_eight,
+        self.ninty_nine,
+        self.reporting_secs,
+        self.period_secs
+        )
 
 @contextmanager
 def session_context():
