@@ -37,23 +37,23 @@ def latest( subd ):
 @blueprint.route( '/realign/<string:subd>', methods=['GET'])
 def display_tbrep_info(subd):
 
+
     return render_template('touchbiz/touchbiz_add_rep.html', grid2=subd,form=forms.tbrep(),mode='i')
 
 @blueprint.route( '/getrep', methods=['GET', 'POST'] )
 def re_align( ):
+
     subd = request.form.get('subdomain',' ')
     tblist = []
     recid = 0
     tblqueue = {}
     keyval = acct_id_for_subdomain(subd)
-    #import ipdb;ipdb.set_trace()
     data = rest.history( subd )
-    #import ipdb;ipdb.set_trace()
     for row in list(reversed(data)):
         tbqueue = {}
         #import ipdb;ipdb.set_trace()
         get_tb_data = rest.get_tb_rows(keyval,  row.get('created') )
-        if get_tb_data is None == 0:
+        if get_tb_data is None :
             modestate = 'i'
         else:
             modestate = 'u'

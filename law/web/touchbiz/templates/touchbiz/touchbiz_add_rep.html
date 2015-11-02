@@ -79,7 +79,7 @@ $(function () {
     if (selObj.statemode == 'i'){
         var date = Date.parseExact(selObj.created, 'yyyy-MM-dd HH:mm:ss');
         date.addSeconds(-2);
-        var newdate = date.toString('yyyy-mm-dd HH:mm:ss');
+        var newdate = date.toString('yyyy-MM-dd HH:mm:ss');
         }
     $("#created").val(newdate);
 
