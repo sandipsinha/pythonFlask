@@ -86,6 +86,8 @@ secure_blueprints([
     subscription.rest.blueprint,
     volumes.views.blueprint,
     salesdash.views.blueprint,
+    tracer.views.blueprint,
+    tracer.rest.blueprint
    # touchbiz.views.blueprint,
    # touchbiz.rest.blueprint,
 
