@@ -42,25 +42,25 @@
 <div id="charts">
 <div id="graph" >
 
-        <span>Less Than 30</span>
+        <span>Percent where tracer was less than 30 seconds</span>
 
   <svg id="visualisation"  class="chart"></svg>
 </div>
 
 <div id="graph1"  >
-    <span>Ninty Five Percentile</span>
+    <span>Tracer latency seconds to 95th Percentile</span>
 
 <svg id="visualisation1"  class="chart"></svg>
 </div>
 
 <div id="graph2"  >
-     <span>Ninty Eight Percentile</span>
+     <span>Tracer latency seconds to 98th Percentile</span>
 
    <svg id="visualisation2"  class="chart"></svg>
 </div>
 
     <div id="graph3"  >
-<span>Ninty Nine Percentile</span>
+<span>Tracer latency seconds to 99th Percentile</span>
    <svg id="visualisation3"  class="chart"></svg>
 </div>
 </div>
@@ -76,8 +76,21 @@
     var period;
     var tstype;
     var datepref;
-
+    var GWIDTH = 700;
+    var GHEIGHT = 690;
+    var GPADDING = 100;
+    var GTOP = 20;
+    var GBOTTOM = 20;
+    var GRIGHT = 20;
+    var GLEFT = 100;
     $("#main").formcache();
+    $( "#period" ).change(function() {
+     tsvalue = $("#datesel").val();
+     tstype = $("#tstype").val();
+     period = $("#period").val();
+     DrawChart(period, tstype, tsvalue);
+    });
+
 
 
 

@@ -14,6 +14,11 @@ $(window).load(function () {
        startDt = moment().subtract(1,'h').format('YYYY-MM-DD HH:mm:ss');
        if ($("#datesel").val() == 'custom'){
        $("#datesel").val('last1h');
+       $("#dater").hide();
+       var datetext = moment().format('YYYY-MM-DD HH:mm:ss').toString();
+       $('#dater').data(datetext);
+       $('#dater').data(datetext);
+
        }
     }
     period = $("#period").val();

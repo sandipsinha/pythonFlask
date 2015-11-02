@@ -4,14 +4,14 @@ function createNintyEightChart(postData,dataGroup, postDataKeys, postDataValues,
 
     //var dataGroups = JSON.parse(JSON.stringify(dataGroup))
     var vis = d3.select("#visualisation2"),
-    WIDTH = 700,
-    HEIGHT = 690,
-    PADDING = 100,
+    WIDTH = window.GWIDTH,
+    HEIGHT = window.GHEIGHT,
+    PADDING = window.GPADDING,
     MARGINS = {
-        top: 20,
-        right: 20,
-        bottom: 20,
-        left: 100
+        top: window.GTOP,
+        right: window.GRIGHT,
+        bottom: window.GBOTTOM,
+        left: window.GLEFT
     };
 
 
@@ -87,14 +87,14 @@ function createNintyEightChart(postData,dataGroup, postDataKeys, postDataValues,
         }
 
 
+    var color = LineColors();
 
-    var color = d3.scale.ordinal()
-      .range(["#0000FF","#FF00FF","#00FF00","#FFFF00","#00FFFF","#845B47","#0080FF","#FF8000","#F4A460","#FFDEAD", "#D2691E","#C71585","#800080","#48D1CC","#006400","#B8860B","#FF4500","#FF6347"]);
+    AppendText(vis, "98th Percentile secs");
 
-    vis.append("text")
+    /*vis.append("text")
             .attr("text-anchor", "middle")  // this makes it easy to centre the text as the transform is applied to the anchor
             .attr("transform", "translate("+ (PADDING/2) +","+(HEIGHT/2)+")rotate(-90)")  // text is drawn off the screen top left, move down and out and rotate
-            .text("98th Percentile");
+            .text("98th Percentile secs");*/
 
     vis.selectAll(".legend").remove();
 
@@ -102,11 +102,11 @@ function createNintyEightChart(postData,dataGroup, postDataKeys, postDataValues,
             .data(postDataKeys)
             .enter().append("g")
             .attr("class", "legend")
-            .attr("transform", function (d, i) { return "translate(55," + i * 20 + ")"; });
+            .attr("transform", function (d, i) { return "translate(38," + i * 20 + ")"; });
 
 
     legend.append("rect")
-        .attr("x", WIDTH - 62)
+        .attr("x", WIDTH - 56)
         .attr("y", function(d, i){ return i *  15;})
         .attr("width", 10)
         .attr("height", 10)

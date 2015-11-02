@@ -4,16 +4,18 @@
 function createNintyFiveChart(postData,dataGroup, postDataKeys, postDataValues, postvarData, tsvalue ) {
 
 
+
     var vis = d3.select("#visualisation1"),
-    WIDTH = 700,
-    HEIGHT = 690,
-    PADDING = 100,
+    WIDTH = window.GWIDTH,
+    HEIGHT = window.GHEIGHT,
+    PADDING = window.GPADDING,
     MARGINS = {
-        top: 20,
-        right: 20,
-        bottom: 20,
-        left: 100
+        top: window.GTOP,
+        right: window.GRIGHT,
+        bottom: window.GBOTTOM,
+        left: window.GLEFT
     };
+
 
     var format = d3.time.format("%Y-%m-%d");
     //var dateFN = function(d) { return format.parse(d['start_date']) };
@@ -84,14 +86,15 @@ function createNintyFiveChart(postData,dataGroup, postDataKeys, postDataValues, 
           vis.selectAll(".yaxis").transition().duration(1500).call(yAxis)
         }
 
-
-    var color = d3.scale.ordinal()
+    var color = LineColors();
+    /*var color = d3.scale.ordinal()
       .range(["#0000FF","#FF00FF","#00FF00","#FFFF00","#00FFFF","#845B47","#0080FF","#FF8000","#F4A460","#FFDEAD", "#D2691E","#C71585","#800080","#48D1CC","#006400","#B8860B","#FF4500","#FF6347"]);
-
-    vis.append("text")
+*/
+    AppendText(vis, "95th percentile secs");
+    /*vis.append("text")
             .attr("text-anchor", "middle")  // this makes it easy to centre the text as the transform is applied to the anchor
             .attr("transform", "translate("+ (PADDING/2) +","+(HEIGHT/2)+")rotate(-90)")  // text is drawn off the screen top left, move down and out and rotate
-            .text("95th Percentile");
+            .text("95th percentile secs");*/
 
     vis.selectAll(".legend").remove();
     var legend = vis.selectAll(".legend")

@@ -18,6 +18,7 @@ def tracer_data():
 
 
     clusterchosen = '*' if (scluster is None or len(scluster) == 0) else scluster
+    #import ipdb;ipdb.set_trace()
     tracers = query_tracer_bullet(fromDate, endDate, clusterchosen)
     clientdict = {}
     clientdict['bullet'] = tracers
@@ -56,7 +57,11 @@ def tracer_percentile():
         dateDiff = timedelta(days = period)
     elif dateind == 'w':
         dateDiff = timedelta(weeks = period)
+    elif dateind == 'rw':
+        dateDiff = timedelta(weeks = period)
     elif dateind == 'm':
+        dateDiff = timedelta(weeks = period * 4)
+    elif dateind == 'rm':
         dateDiff = timedelta(weeks = period * 4)
     elif dateind == 'd':
         dateDiff = timedelta(days = period)
@@ -65,7 +70,7 @@ def tracer_percentile():
     else:
         fdate = tdate - dateDiff
 
-
+    #import ipdb;ipdb.set_trace()
     clusterchosen = '*' if len(datas['Cluster']) == 0 else datas['Cluster']
     cperiod = 'week'   #default value is week
     if len(dateind) == 0:
@@ -81,7 +86,9 @@ def tracer_percentile():
     elif dateind == 'rw':
         cperiod = 'rolling7'
 
-    tiledata = query_tracer_percentile(touchbiz.localize_time(fdate), touchbiz.localize_time(tdate), clusterchosen, cperiod)
+    fdate = fdate.date()
+    tdate = tdate.date()
+    tiledata = query_tracer_percentile(fdate, tdate, clusterchosen, cperiod)
     graphlist = []
     for rows in tiledata:
         graphitem = {}
