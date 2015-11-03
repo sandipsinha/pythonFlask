@@ -27,6 +27,8 @@
 $(function () {
 
     var sel ;
+    var ftier;
+    var fperiod;
 
     $('#grid').w2grid({
         name: 'grid',
@@ -53,8 +55,8 @@ $(function () {
         },
         columns: [
             { field: 'acct_id', hidden: true },
-            { field: 'acct_id', hidden: true },
             { field: 'tb_created_dt', hidden: true },
+            { field: 'tb_rep_id', hidden: true },
             { field: 'created', caption: 'Created', size: '20%', sortable: true,editable: { type: 'text' }, style:'color:black', attr:"id='created'" },
             { field: 'tier', caption: 'Tier', size: '13%', sortable: true,editable: { type: 'text' } },
             { field: 'retention', caption: 'Retention', size: '13%', sortable: true,editable: { type: 'text' }},
@@ -72,23 +74,15 @@ $(function () {
 
     var grid = this;
     sel = grid.getSelection();
+
     var selObj = JSON.parse(JSON.stringify((w2ui.grid.get(sel))));
-    var date = Date.parseExact(selObj.created, 'yyyy-MM-dd HH:mm:ss');
-    date.addSeconds(-1);
-    var newdate = date.toString('yyyy-mm-dd HH:mm:ss');
-
+    if (selObj.statemode == 'i'){
+        var date = Date.parseExact(selObj.created, 'yyyy-MM-dd HH:mm:ss');
+        date.addSeconds(-2);
+        var newdate = date.toString('yyyy-MM-dd HH:mm:ss');
+        }
     $("#created").val(newdate);
-    $("#volume").val(selObj.volume);
-    document.getElementById("tier").value = selObj.tier;
-    $("#retention").val(selObj.retention);
-    $("#sub_rate").val(selObj.sub_rate);
-    $("#rep_name").val(selObj.rep_name);
-    document.getElementById("billing_period").value = selObj.billing_period;
 
-
-    $("#sales_rep_id").val(selObj.rep_id);
-    $("#orig_created").val(selObj.created);
-    $("#acct_id").val(selObj.acct_id);
     $("#subdomain").val({{grid2|tojson|safe}});
     $("#salesrepform").show();
     $("#grid").hide();
@@ -98,6 +92,18 @@ $(function () {
         $("#Update").show();
         $("#created").val(selObj.tb_created_dt);
         $("#orig_created").val(selObj.tb_created_dt);
+        $("#volume").val(selObj.volume);
+        ftier = document.getElementById("tier") ;
+        ftier.value = selObj.tier;
+        $("#tier").val(selObj.tier);
+        $("#retention").val(selObj.retention);
+        $("#sub_rate").val(selObj.sub_rate);
+        $("#rep_name").val(selObj.rep_name);
+        fperiod = document.getElementById("billing_period") ;
+        fperiod.value = selObj.billing_period;
+        $("#billing_period").val(selObj.billing_period);
+        $("#sales_rep_id").val(selObj.tb_rep_id);
+        $("#acct_id").val(selObj.acct_id);
         }
     else
         {
@@ -131,15 +137,7 @@ $(function () {
                 $("#grid").hide();
                 $("#Update").hide();
                  }
-
-
-});
-
-</script>
-<script>
-    $(function() {
-
-$('#rep_name').autocomplete({
+    $('#rep_name').autocomplete({
 	source: function( request, response ) {
   		$.ajax({
   			url : '/apiv1/touchbiz/salesrepid',
@@ -170,12 +168,11 @@ $('#rep_name').autocomplete({
 
 
 });
-
-
-
- AnyTime.picker( "created",
+AnyTime.picker( "created",
     { format: "%Y-%m-%d %T"} );
+
 </script>
+
 <div id="grid" style="width: 100%; height:190px;">
 
 </div>

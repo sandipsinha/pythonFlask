@@ -48,6 +48,7 @@ MDB = Masterdb( CONNECTION_URL_FORMAT % {'dialect':config.get( 'masterdb', 'dial
                 'user':config.get( 'masterdb', 'username' ), 'password':config.get( 'masterdb', 'password' ),
                 'dbname':config.get( 'masterdb', 'dbname' ), 'port':config.get( 'masterdb', 'port' )})
 
+
 class Salesorder( Base ):
     __tablename__  = 'sales_order'
     __table_args__ = {'mysql_engine':'InnoDB'}
