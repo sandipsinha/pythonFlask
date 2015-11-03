@@ -20,20 +20,22 @@ function createNintyFiveChart(postData,dataGroup, postDataKeys, postDataValues, 
     var format = d3.time.format("%Y-%m-%d");
     //var dateFN = function(d) { return format.parse(d['start_date']) };
 
-    var parseDate = d3.time.format("%Y-%m-%d").parse;
+
 
 
     var ninty_five = function(d) { return d['95th_perc'] };
 
 
-    var xScale = d3.time.scale()
+    var xScale = CreateTimeScale(postData);
+
+    /*var xScale = d3.time.scale()
                      .range([MARGINS.left -5 , WIDTH - MARGINS.right - MARGINS.left])
                      .domain(d3.extent(postData, function(d) { return parseDate(d.start_date); }))
-                     ;
-
-    var yScale = d3.scale.linear()
+                     ;*/
+    var yScale = CreateYScale(postData, ninty_five);
+    /*var yScale = d3.scale.linear()
                      .range([HEIGHT - MARGINS.top-MARGINS.bottom-67, MARGINS.bottom])
-                     .domain(d3.extent(postData, ninty_five));
+                     .domain(d3.extent(postData, ninty_five));*/
 
     //defines a function to be used to append the title to the tooltip.  you can set how you want it to display here.
 
@@ -51,7 +53,7 @@ function createNintyFiveChart(postData,dataGroup, postDataKeys, postDataValues, 
 
      if (vis.selectAll(".xaxis")[0].length < 1 ){
         vis.append("g")
-        .attr("transform", "translate(0," + (HEIGHT - MARGINS.bottom - MARGINS.top - 72 ) + ")")
+        .attr("transform", "translate(0," + (HEIGHT - MARGINS.bottom - MARGINS.top - 69 ) + ")")
         .attr("class","xaxis")
        .call(xAxis)
        .selectAll("text")
@@ -113,6 +115,8 @@ function createNintyFiveChart(postData,dataGroup, postDataKeys, postDataValues, 
          return color(postDataKeys[i]);
       });
 
+
+
     var tooltip = d3.select("body").append("div")
     .attr("class", "tooltip")
     .style("opacity", 0);
@@ -159,25 +163,7 @@ function createNintyFiveChart(postData,dataGroup, postDataKeys, postDataValues, 
        .on("mouseover", function (d,i) { showPopover.call(this, d); })
        .on("mouseout",  function (d,i) { removePopovers(); })
 
-       function removePopovers () {
-          $('.popover').each(function() {
-            $(this).remove();
-          });
-        }
 
-        function showPopover (d) {
-          $(this).popover({
-            title: d.cluster,
-            container: 'body',
-            placement: 'auto top',
-            trigger: 'manual',
-            html : true,
-            content: function() {
-              return "Date: " + d.start_date +
-                     "<br/>95th Percentile: " + d['95th_perc']; }
-                      });
-          $(this).popover('show')
-        }
 
 };
 

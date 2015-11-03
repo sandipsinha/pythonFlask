@@ -76,13 +76,13 @@
     var period;
     var tstype;
     var datepref;
-    var GWIDTH = 700;
+    var GWIDTH = 800;
     var GHEIGHT = 690;
     var GPADDING = 100;
     var GTOP = 20;
     var GBOTTOM = 20;
     var GRIGHT = 20;
-    var GLEFT = 100;
+    var GLEFT = 150;
     $("#main").formcache();
     $( "#period" ).change(function() {
      tsvalue = $("#datesel").val();
@@ -90,7 +90,16 @@
      period = $("#period").val();
      DrawChart(period, tstype, tsvalue);
     });
-
+    $( "#tstype" ).change(function() {
+     tsvalue = $("#datesel").val();
+     tstype = $("#tstype").val();
+     period = $("#period").val();
+     if (period.length == 0) {
+       period = 30;
+       $("#period").val(30);
+     }
+     DrawChart(period, tstype, tsvalue);
+    });
 
 
 

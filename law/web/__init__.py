@@ -90,6 +90,9 @@ secure_blueprints([
     touchbiz.rest.blueprint,
     tracer.views.blueprint,
     tracer.rest.blueprint,
+    touchbiz.views.blueprint,
+    touchbiz.rest.blueprint,
+
 
 ])
 
