@@ -2,6 +2,10 @@
 
 #first-wrap > div{min-height:80px;}
 
+body {
+    background: url('/tracer/static/images/cream_dust.png') repeat 0 0;
+}
+
 #header,
 #footer{
     min-height:150px;
@@ -11,6 +15,12 @@
 #main-wrap,
 #first-wrap{
 overflow:hidden;
+}
+
+h1, h2, h3, h4, h5, h6 {
+    font-family: 'Corben', Georgia, Times, serif;
+    text-align: center;
+    text-transform: capitalize;
 }
 
 #leftcol{
@@ -172,7 +182,7 @@ span {
 .basic-grey .button {
     background: #E27575;
     border: none;
-    padding: 10px 25px 10px 25px;
+    padding: 5px 5px 5px 5px;
     color: #FFF;
     box-shadow: 1px 1px 5px #B6B6B6;
     border-radius: 3px;
@@ -203,7 +213,7 @@ max-width:500px;
 #rightdiv{
 float:right;
 height:70px;
-width:500px;
+width:600px;
 }
 
 div.nextmain {width:100%;
@@ -221,7 +231,7 @@ width:50%;
 #nextmain select  {
     color: #888;
     width: 120px;
-    padding: 0px 0px 5px 5px;
+    padding: 0px 0px 0px 0px;
     border: 1px solid #C5E2FF;
     background: #FBFBFB;
     outline: 0;
@@ -229,14 +239,17 @@ width:50%;
     box-shadow: inset 0px 1px 6px #ECF3F5;
     font: 200 12px/25px Arial, Helvetica, sans-serif;
     height: 25px;
-    line-height:25px;
     margin: 0px 0px 0px 0px;
+    background: #fbfbfb url('down-arrow.png') no-repeat right;
+    background: #fbfbfb url('down-arrow.png') no-repeat right;
+    appearance:none;
+    -moz-appearance: none;
 }
 
  #nextmain input[type="number"] {
     color: #888;
     width: 20%;
-    padding: 0px 0px 5px 5px;
+    padding: 0px 0px 0px 0px;
     border: 1px solid #C5E2FF;
     background: #FBFBFB;
     outline: 0;
@@ -246,9 +259,10 @@ width:50%;
     height: 25px;
     line-height:25px;
     margin: 0px 0px 0px 0px;
+    text-align: center;
 }
 
 #nextmain label{
-padding-left: 5px;}
+padding-left: 10px;}
 
 

@@ -88,8 +88,8 @@ secure_blueprints([
     salesdash.views.blueprint,
     tracer.views.blueprint,
     tracer.rest.blueprint
-   # touchbiz.views.blueprint,
-   # touchbiz.rest.blueprint,
+    touchbiz.views.blueprint,
+    touchbiz.rest.blueprint,
 
 ])
 
