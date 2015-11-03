@@ -10,13 +10,13 @@ function LineColors(){
 function AppendText(vis, texts ){
 return vis.append("text")
             .attr("text-anchor", "middle")  // this makes it easy to centre the text as the transform is applied to the anchor
-            .attr("transform", "translate("+ (window.GPADDING/2 + 20) +","+(window.GHEIGHT/2 - 30)+")rotate(-90)")  // text is drawn off the screen top left, move down and out and rotate
+            .attr("transform", "translate("+ (window.GPADDING/2 ) +","+(window.GHEIGHT/2 - 30)+")rotate(-90)")  // text is drawn off the screen top left, move down and out and rotate
             .text(texts);
 }
 
 function CreateTimeScale(datas){
    return d3.time.scale()
-                     .range([window.GLEFT , window.GWIDTH - window.GRIGHT - window.GLEFT + 90])
+                     .range([window.GLEFT , window.GWIDTH - window.GRIGHT - window.GLEFT + 50])
                      .domain(d3.extent(datas, function(d) { return parseDate(d.start_date); }))
                      ;
 }
