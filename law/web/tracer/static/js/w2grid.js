@@ -60,8 +60,8 @@ $(window).load(function () {
         columns: [
             { field: 'cluster', caption: 'Cluster', size: '9%', sortable: true },
             { field: 'status', caption: 'Status', size: '13%', sortable: true },
-            { field: 'run_start_time', caption: 'Run Start Time', size: '22%', sortable: true},
-            { field: 'run_end_time', caption: 'Run End Time', size: '22%'},
+            { field: 'run_start_time', caption: 'Run Start Time(PST)', size: '22%', sortable: true},
+            { field: 'run_end_time', caption: 'Run End Time(PST)', size: '22%'},
             { field: 'run_secs', caption: 'Run Time(Sec)', size: '15%', sortable: true },
             { field: 'uid', caption: 'Unique ID', size: '19%', sortable: true },
         ],
