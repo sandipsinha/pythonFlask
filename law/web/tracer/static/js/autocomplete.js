@@ -1,5 +1,7 @@
 $(function() {
 
+
+
 $('#cluster').autocomplete({
 	source: function( request, response ) {
   		$.ajax({
@@ -19,13 +21,12 @@ $('#cluster').autocomplete({
 			}
   		});
   	},
-  	autoFocus: true,
-  	minLength: 2,
+  	minLength: 0,
     select: function( event, ui ) {
 		var names = ui.item.data.split("|");
 		$('#cluster').val(names[1]);
     }
-});
+}).bind('click', function(){ $(this).autocomplete("search"); } );
 
 
 });
