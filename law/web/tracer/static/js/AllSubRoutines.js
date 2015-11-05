@@ -35,7 +35,22 @@ function removePopovers () {
           });
         }
 
-function showPopover (d) {
+function showPopover (d, charttype) {
+          var popuptext = '';
+          switch (charttype){
+          case '95':
+            popuptext =  "<br/>95th Percentile: " + d['95th_perc'] ;
+            break;
+          case '98':
+            popuptext =  "<br/>98th Percentile: " + d['98th_perc'] ;
+            break;
+          case '99':
+            popuptext =  "<br/>99th Percentile: " + d['99th_perc'] ;
+            break;
+          case 'pcnt':
+            popuptext =  "<br/>Percentage LT 30: " + d['pcnt_LT30'] ;
+            break;
+          }
           $(this).popover({
             title: d.cluster,
             container: 'body',
@@ -44,7 +59,7 @@ function showPopover (d) {
             html : true,
             content: function() {
               return "Date: " + d.start_date +
-                     "<br/>95th Percentile: " + d['95th_perc']; }
+                     popuptext; }
                       });
           $(this).popover('show')
        }

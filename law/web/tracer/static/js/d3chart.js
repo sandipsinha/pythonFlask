@@ -149,6 +149,7 @@ function createNintyFiveChart(postData,dataGroup, postDataKeys, postDataValues, 
         .attr('fill', 'none')
       });
     vis.selectAll(".linePoint").remove();
+
     vis.selectAll(".linePoint")
        .data(postvarData)
        .enter().append("circle")
@@ -160,7 +161,7 @@ function createNintyFiveChart(postData,dataGroup, postDataKeys, postDataValues, 
        .style("stroke", "grey")
        .style("stroke-width", "1px")
        .style('opacity', 1e-6)//1e-6
-       .on("mouseover", function (d,i) { showPopover.call(this, d); })
+       .on("mouseover", function (d,i) { showPopover.call(this, d, '95'); })
        .on("mouseout",  function (d,i) { removePopovers(); })
 
 

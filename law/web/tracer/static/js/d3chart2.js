@@ -140,7 +140,7 @@ function createNintyNineChart(postData,dataGroup, postDataKeys, postDataValues, 
        .style("stroke", "grey")
        .style("stroke-width", "1px")
        .style('opacity', 1e-6)//1e-6
-       .on("mouseover", function (d,i) { showPopover.call(this, d); })
+       .on("mouseover", function (d,i) { showPopover.call(this, d, '99'); })
        .on("mouseout",  function (d,i) { removePopovers(); })
 
 

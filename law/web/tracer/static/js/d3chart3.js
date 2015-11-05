@@ -141,7 +141,7 @@ function createLessThan30Chart(postData,dataGroup, postDataKeys, postDataValues,
        .style("stroke", "grey")
        .style("stroke-width", "1px")
        .style('opacity', 1e-6)//1e-6
-       .on("mouseover", function (d,i) { showPopover.call(this, d); })
+       .on("mouseover", function (d,i) { showPopover.call(this, d, 'pcnt'); })
        .on("mouseout",  function (d,i) { removePopovers(); })
 
 
