@@ -1,6 +1,6 @@
 __author__ = 'ssinha'
 from flask              import Blueprint, jsonify, request, Response, json
-from law.util.queries   import query_tracer_bullet, get_cluster_names, query_tracer_percentile
+from law.util.queries   import query_tracer_bullet, get_cluster_names, query_tracer_percentile, query_tracer_average
 from datetime           import datetime, timedelta
 from law.util             import touchbiz
 
@@ -46,13 +46,7 @@ def tracer_data():
         tracerqueue['records'] = tracerlist
     return json.dumps(tracerqueue)
 
-@blueprint.route( '/tracerpercentile/', methods = ['GET', 'POST'])
-def tracer_percentile():
-    datas = request.json
-    dateind = datas.get('dateind')
-    period = int(datas.get('periods'))
-    tdate = datetime.strptime(datas['tdate'],'%Y-%m-%d %H:%M:%S')
-
+def calc_start_date(tdate, dateind, period):
     if len(dateind.strip()) == 0:
         dateDiff = timedelta(days = period)
     elif dateind == 'w':
@@ -65,14 +59,12 @@ def tracer_percentile():
         dateDiff = timedelta(weeks = period * 4)
     elif dateind == 'd':
         dateDiff = timedelta(days = period)
-    if (len(datas['tdate']) == 0):
-        fdate = datetime.now() - dateDiff
-    else:
-        fdate = tdate - dateDiff
+    fdate = tdate - dateDiff
 
-    #import ipdb;ipdb.set_trace()
-    clusterchosen = '*' if len(datas['Cluster']) == 0 else datas['Cluster']
-    cperiod = 'week'   #default value is week
+    return fdate
+
+def convert_time_period(dateind):
+    cperiod = 'week'
     if len(dateind) == 0:
         cperiod = 'week'
     elif dateind == 'd':
@@ -85,6 +77,21 @@ def tracer_percentile():
         cperiod = 'rolling30'
     elif dateind == 'rw':
         cperiod = 'rolling7'
+    return cperiod
+
+
+@blueprint.route( '/tracerpercentile/', methods = ['GET', 'POST'])
+def tracer_percentile():
+    datas = request.json
+    dateind = datas.get('dateind')
+    period = int(datas.get('periods'))
+    tdate =  datetime.now() if len(datas['tdate']) == 0 else datetime.strptime(datas['tdate'],'%Y-%m-%d %H:%M:%S')
+
+    fdate = calc_start_date(tdate, dateind, period)
+
+    #import ipdb;ipdb.set_trace()
+    clusterchosen = '*' if len(datas['Cluster']) == 0 else datas['Cluster']
+    cperiod = convert_time_period(dateind)
 
     fdate = fdate.date()
     tdate = tdate.date()
@@ -108,6 +115,32 @@ def tracer_percentile():
             graphlist.append(graphitem)
 
     return json.dumps(graphlist)
+
+
+@blueprint.route( '/traceraverage/', methods = ['GET', 'POST'])
+def tracer_average():
+    datas = request.json
+    dateind = datas.get('dateind')
+    period = int(datas.get('periods'))
+    tdate = datetime.strptime(datas['tdate'],'%Y-%m-%d %H:%M:%S')
+
+    fdate = calc_start_date(tdate, dateind, period)
+
+    #import ipdb;ipdb.set_trace()
+    cperiod = convert_time_period(dateind)
+
+    fdate = fdate.date()
+    tdate = tdate.date()
+    summdata = query_tracer_average(fdate, tdate, cperiod)
+    graphlist = []
+    for rows in summdata:
+        graphitem = {}
+        graphitem['average']   = rows.average
+        graphitem['start_date']  = rows.start_date.strftime('%Y-%m-%d')
+        graphlist.append(graphitem)
+
+    return json.dumps(graphlist)
+
 
 @blueprint.route( '/getclusters', methods=['GET'] )
 def autocomplete():

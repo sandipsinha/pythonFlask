@@ -40,6 +40,10 @@
 
 {% block rightcol %}
 <div id="charts">
+<div id="graph4"  >
+  <span>Percent Less Than 30 secs - All Clusters</span>
+   <svg id="visualisation4"  class="chart"></svg>
+</div>
 <div id="graph" >
 
         <span>Percent where tracer was less than 30 seconds</span>
@@ -47,7 +51,7 @@
   <svg id="visualisation"  class="chart"></svg>
 </div>
 
-<div id="graph1"  >
+<div id="graph1" >
     <span>Tracer latency seconds to 95th Percentile</span>
 
 <svg id="visualisation1"  class="chart"></svg>
@@ -59,8 +63,8 @@
    <svg id="visualisation2"  class="chart"></svg>
 </div>
 
-    <div id="graph3"  >
-<span>Tracer latency seconds to 99th Percentile</span>
+<div id="graph3"  >
+  <span>Tracer latency seconds to 99th Percentile</span>
    <svg id="visualisation3"  class="chart"></svg>
 </div>
 </div>
@@ -100,6 +104,7 @@
      }
      DrawChart(period, tstype, tsvalue);
     });
+
 
 
 

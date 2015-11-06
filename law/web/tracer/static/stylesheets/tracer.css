@@ -79,6 +79,7 @@ float:left;
 height:700px;
 width:100%;
 overflow:auto;
+text-align: center;
 }
 
 .sep{
@@ -91,6 +92,7 @@ height: 695px;
 width:100%;
 padding-top:20px;
 padding-bottom:20px;
+
 }
 
 #grid{
@@ -207,25 +209,35 @@ width:100%;
 }
 #leftdiv {
 float:left;
+display:block;
 height:70px;
-max-width:500px;
+width:50%;
 }
 #rightdiv{
 float:right;
+display:block;
 height:70px;
-width:600px;
+width:50%;
+text-align: center;
+}
+
+#rightdiv,
+#leftdiv{
+overflow:hidden;
 }
 
 div.nextmain {width:100%;
               border:none;
               padding: 10px;
               height: 80px;
-
+              display:block;
+              float:right;
+              text-align:right;
               }
 
 
 #dater{
-width:50%;
+width:30px;
 }
 
 #nextmain select  {
@@ -263,6 +275,29 @@ width:50%;
 }
 
 #nextmain label{
-padding-left: 10px;}
+padding-left: 20px;}
+
+.right-align {
+    text-align: center;
+}
+#graph4,
+#graph,
+#graph3,
+#graph2,
+#graph1 {
+ width:100%;
+ margin: 0 auto;
+}
+
+#graph4 span,
+#graph span,
+#graph3 span,
+#graph2 span,
+#graph1 span{
+text-align:center;
+}
+.strong{
+font-weight: bold;
+}
 
 
