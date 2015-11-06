@@ -11,6 +11,7 @@ function AppendText(vis, texts ){
 return vis.append("text")
             .attr("text-anchor", "middle")  // this makes it easy to centre the text as the transform is applied to the anchor
             .attr("transform", "translate("+ (window.GPADDING/2 ) +","+(window.GHEIGHT/2 - 30)+")rotate(-90)")  // text is drawn off the screen top left, move down and out and rotate
+            .attr("class","strong")
             .text(texts);
 }
 
@@ -49,6 +50,9 @@ function showPopover (d, charttype) {
             break;
           case 'pcnt':
             popuptext =  "<br/>Percentage LT 30: " + d['pcnt_LT30'] ;
+            break;
+          case 'avrg':
+            popuptext =  "<br/>Percentage LT 30(All Clusters): " + d['average'] ;
             break;
           }
           $(this).popover({

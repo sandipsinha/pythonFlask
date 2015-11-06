@@ -82,6 +82,19 @@ def query_tracer_percentile(fromDate, endDate , cluster, period):
         s.expunge_all()
     return datas
 
+def query_tracer_average(fromDate, endDate , period):
+
+    with session_context() as s:
+        q = s.query(TracerPercentiles.start_date,label('average', func.avg(TracerPercentiles.pcnt_LT30)))\
+            .filter(and_(TracerPercentiles.start_date.between(fromDate, endDate )))\
+            .filter(TracerPercentiles.period == period)\
+            .group_by(TracerPercentiles.start_date)
+
+        datas = q.all()
+        s.expunge_all()
+    return datas
+
+
 def get_cluster_names(pref):
     clusterexp = '%' + pref + '%'
     querytorun='select distinct concat(a.cluster, substr(a.index_type,1)) newcluster, concat(a.cluster, substr(a.index_type,1,1)) clusterdata from tracer_percentiles a where ' \

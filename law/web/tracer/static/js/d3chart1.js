@@ -3,7 +3,8 @@ function createNintyEightChart(postData,dataGroup, postDataKeys, postDataValues,
 
 
     //var dataGroups = JSON.parse(JSON.stringify(dataGroup))
-    var vis = d3.select("#visualisation2"),
+    var vis = d3.select("#visualisation2").append("svg")
+    .attr("viewBox","30 0 730 690"),
     WIDTH = window.GWIDTH,
     HEIGHT = window.GHEIGHT,
     PADDING = window.GPADDING,

@@ -1,7 +1,8 @@
 function createLessThan30Chart(postData,dataGroup, postDataKeys, postDataValues, postvarData, tsvalue ) {
 
 
-    var vis = d3.select("#visualisation"),
+    var vis = d3.select("#visualisation").append("svg")
+    .attr("viewBox","30 0 730 690"),
     WIDTH = window.GWIDTH,
     HEIGHT = window.GHEIGHT,
     PADDING = window.GPADDING,

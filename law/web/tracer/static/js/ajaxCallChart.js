@@ -1,6 +1,23 @@
  function DrawChart(period, tstype, griddt){
 
     $.ajax({
+  			url : '/apiv1/tracer/traceraverage/',
+  			contentType: "application/json",
+  			dataType: "json",
+  			type: "POST",
+  			data: JSON.stringify({tdate:endDt, dateind: tstype,periods:period}),
+			success: function( data ) {
+				  var processedData = JSON.parse(JSON.stringify(data));
+				  var dataGroup = processedData;
+                  var postvarData = dataGroup;
+
+				  createAverageChart(processedData,dataGroup, postvarData,tstype);
+
+			}
+  		});
+
+
+    $.ajax({
   			url : '/apiv1/tracer/tracerpercentile/',
   			contentType: "application/json",
   			dataType: "json",
