@@ -1,7 +1,7 @@
 function createNintyNineChart(postData,dataGroup, postDataKeys, postDataValues, postvarData, tsvalue ) {
 
 
-    var vis = d3.select("#visualisation3").append("svg")
+    var vis = d3.select("#visualisation3")
     .attr("viewBox","30 0 730 690"),
     WIDTH = window.GWIDTH,
     HEIGHT = window.GHEIGHT,
