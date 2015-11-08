@@ -5,7 +5,7 @@ function createNintyFiveChart(postData,dataGroup, postDataKeys, postDataValues, 
 
 
 
-    var vis = d3.select("#visualisation1").append("svg")
+    var vis = d3.select("#visualisation1")
     .attr("viewBox","30 0 730 690"),
     WIDTH = window.GWIDTH,
     HEIGHT = window.GHEIGHT,

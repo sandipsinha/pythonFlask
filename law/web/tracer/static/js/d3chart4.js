@@ -1,5 +1,5 @@
 function createAverageChart(postData,dataGroup,postvarData, tsvalue ) {
-  var vis = d3.select("#visualisation4").append("svg")
+  var vis = d3.select("#visualisation4")
     .attr("viewBox","30 0 730 690"),
     WIDTH = window.GWIDTH,
     HEIGHT = window.GHEIGHT,
