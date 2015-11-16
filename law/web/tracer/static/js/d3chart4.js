@@ -1,4 +1,4 @@
-function createAverageChart(postData,dataGroup,postvarData, tsvalue ) {
+function createAverageChart(postData, dataGroup, postvarData, tsvalue ) {
   var vis = d3.select("#visualisation4")
     .attr("viewBox","30 0 730 690"),
     WIDTH = window.GWIDTH,
@@ -11,7 +11,8 @@ function createAverageChart(postData,dataGroup,postvarData, tsvalue ) {
         left: window.GLEFT
     };
 
-    var format = d3.time.format("%Y-%m-%d");
+    //var format = d3.time.format("%Y-%m-%d");
+    var parseDate = d3.time.format("%Y-%m-%d").parse;
     var avgamt = function(d) { return  d['average'] };
     var xScale = CreateTimeScale(postData);
     var yScale = CreateYScale(postData, avgamt);
@@ -32,6 +33,9 @@ function createAverageChart(postData,dataGroup,postvarData, tsvalue ) {
     yAxis = d3.svg.axis()
             .scale(yScale)
             .orient("left");
+
+    var xLabels = postData.map(function (d) { return parseDate(d['start_date']); });
+
 
     if (vis.selectAll(".xaxis")[0].length < 1 ){
        vis.append("g")
@@ -93,6 +97,40 @@ function createAverageChart(postData,dataGroup,postvarData, tsvalue ) {
        .style('opacity', 1e-6)//1e-6
        .on("mouseover", function (d,i) { showPopover.call(this, d, 'avrg'); })
        .on("mouseout",  function (d,i) { removePopovers(); })
+
+    	// get the x and y values for least squares
+		var xSeries = d3.range(1, xLabels.length + 1);
+		var ySeries = postData.map(function(d) {  return  d['average']; });
+
+		var leastSquaresCoeff = leastSquares(xSeries, ySeries);
+
+		// apply the reults of the least squares regression
+		var x1 = xLabels[0];
+		var y1 = leastSquaresCoeff[0] + leastSquaresCoeff[1];
+		var x2 = xLabels[xLabels.length - 1];
+		var y2 = leastSquaresCoeff[0] * xSeries.length + leastSquaresCoeff[1];
+		var trendData = [[x1,y1,x2,y2]];
+
+		vis.selectAll(".trendline").remove();
+
+		var trendline = vis.selectAll(".trendline")
+			.data(trendData);
+
+
+		trendline.enter()
+			.append("line")
+			.attr("class", "trendline")
+			.attr("x1", function(d) { return xScale(d[0]); })
+			.attr("y1", function(d) { return yScale(d[1]); })
+			.attr("x2", function(d) { return xScale(d[0]); })
+			.attr("y2", function(d) { return yScale(d[1]); })
+			.attr("stroke", "black")
+			.style("stroke-dasharray", ("10,3"))
+			.attr("stroke-width", 1)
+			.transition()
+			.duration(1500)
+			.attr({"x2": function(d) { return xScale(d[2]); },"y2": function(d){return yScale(d[3]);}})
+			;
 
 
 };
