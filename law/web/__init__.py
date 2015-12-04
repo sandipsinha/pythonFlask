@@ -13,7 +13,7 @@ from decimal             import Decimal
 from flask               import Flask, url_for
 from flask.json          import JSONEncoder
 from law                 import config
-from law.web             import views, subscription, volumes, salesdash, touchbiz, salesorder, userinfo, tracer
+from law.web             import views, subscription, volumes, salesdash, touchbiz, salesorder, userinfo, tracer, cluster
 from law.util.adb        import Session, AccountState, Tier
 from law.util.lawdb      import db_url, db, security
 from flask.ext.login     import current_user, current_app, login_user
@@ -33,11 +33,13 @@ app.register_blueprint( userinfo.views.blueprint, url_prefix = '/user' )
 app.register_blueprint( touchbiz.views.blueprint, url_prefix = '/touchbiz' )
 app.register_blueprint( salesorder.views.blueprint, url_prefix = '/salesorder' )
 app.register_blueprint( tracer.views.blueprint, url_prefix = '/tracer' )
+app.register_blueprint( cluster.views.blueprint, url_prefix = '/cluster' )
 # API routes
 app.register_blueprint( subscription.rest.blueprint, url_prefix = '/apiv1/subscription' )
 app.register_blueprint( touchbiz.rest.blueprint, url_prefix = '/apiv1/touchbiz' )
 app.register_blueprint( userinfo.rest.blueprint, url_prefix = '/apiv1/clientinfo' )
 app.register_blueprint( tracer.rest.blueprint, url_prefix = '/apiv1/tracer' )
+app.register_blueprint( cluster.rest.blueprint, url_prefix = '/apiv1/cluster' )
 
 # Config items
 app.config['SECRET_KEY']              = config.get( 'flask-security', 'secret_key' )
@@ -92,8 +94,8 @@ secure_blueprints([
     tracer.rest.blueprint,
     touchbiz.views.blueprint,
     touchbiz.rest.blueprint,
-
-
+    cluster.views.blueprint,
+    cluster.rest.blueprint,
 ])
 
 

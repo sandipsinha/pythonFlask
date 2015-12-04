@@ -1,0 +1,33 @@
+
+{% extends 'cluster/actualcontent.html' %}
+{% block leftpage %}
+   <div id="outer" >
+      <div id="inner">
+
+        <label>Cluster :</label>
+            <select name="cluster" width="300px" id="clstrdata">
+              {% for o in option_list %}
+                <option name="{{ o.clusterdata}}" SELECTED>{{ o.clusterdata }}</option>
+               {% endfor %}
+              </select>
+      </div>
+    <div id="content">
+    <div id="grid">
+    </div>
+    </div>
+    </div>
+
+{% endblock %}
+
+{% block rightpage %}
+  <div class="form-style-2 center"><br><br>
+  <div class="form-style-2-heading">Enter a Subdomain to see all the relevant cluster details</div>
+  <form action="" method="post" >
+  <label for="subdomain"><span>Subdomain </span><input type="text" class="subd" name="subdomain" id="subd" value="" /></label>
+  <label for="cluster"><span>Cluster </span><input type="text" class="tel-number-field" name="cluster" id="cluster" value="{{clstr}}" /></label>
+  <label><span>cid</span><input type="text" class="tel-number-field" name="cid" value="" id="cid" /> </label>
+  <label><span>Account ID</span><input type="text" class="tel-number-field" name="acctid" value="" id="acctid"  /> </label>
+
+  </form>
+  </div>
+{% endblock %}

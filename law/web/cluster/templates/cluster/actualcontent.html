@@ -1,0 +1,30 @@
+{% extends 'cluster/base.html' %}
+{% block main %}
+<div id="mainform">
+  <ul id="nav">
+    <li><a href="#tabs-1">Cluster To Subdomain</a></li>
+    <li><a href="#tabs-2">Subdomain To Cluster</a></li>
+  </ul>
+    <div id="tabs-1">
+    {% block leftpage %}{% endblock %}
+  </div>
+  <div id="tabs-2">
+    {% block rightpage %}{% endblock %}
+  </div>
+
+</div>
+
+
+
+<script>
+  $(function() {
+    $( "#mainform" ).tabs({
+  collapsible: true
+});
+  });
+$("#cluster").prop('disabled', true);
+$("#cid").prop('disabled', true);
+$("#acctid").prop('disabled', true);
+
+</script>
+{% endblock %}

@@ -14,7 +14,7 @@ from law.util.timeutil  import Timebucket
 from sqlalchemy.sql import label, text
 from law.util.adb       import session_context, AccountState, Owners, Tier, Users, Status, \
                         UserTracking, AccountProfile, DownGrades, AccountActivity, VolumeAccepted, \
-                        TracerBullet, TracerPercentiles, engine
+                        TracerBullet, TracerPercentiles, ClusterToSubdomain, Account, engine
 from law.util.touchbiz import acct_id_for_subdomain
 from sqlalchemy.orm.exc             import NoResultFound
 
@@ -55,6 +55,16 @@ def query_user_data(s, subdomain):
             .group_by(Users.first_name,Users.last_name, Users.username, Users.email, Users.acct_id, Users.user_id)
 
     return q
+
+def get_subd_names(subd):
+    subdexp = '%' + subd + '%'
+    querytorun='select distinct subdomain from accounts a where subdomain like :subexp limit 12'
+    with session_context() as q:
+        try:
+            q = engine.execute(text(querytorun),subexp = subdexp )
+            return q
+        except NoResultFound as e:
+                return None
 
 def query_tracer_bullet(fdate, tdate, cluster):
 
@@ -105,6 +115,17 @@ def get_cluster_names(pref):
             return q
         except NoResultFound as e:
                 return None
+
+def query_subd_from_cluster(cluster):
+
+    with session_context() as s:
+        q = s.query(ClusterToSubdomain)\
+            .filter(ClusterToSubdomain.cluster_type == cluster)
+
+        datas = q.all()
+        s.expunge_all()
+    return datas
+
 
 def query_user_state( subd ):
     with session_context() as s:
@@ -183,7 +204,14 @@ def get_user_count(subd):
     except NoResultFound:
         return 8
 
+def get_cluster_details(subd):
+    with session_context() as s:
+        q = s.query(ClusterToSubdomain)\
+            .filter(ClusterToSubdomain.subdomain == subd)
 
+        datas = q.one()
+        s.expunge_all()
+    return datas
 
 class QueryOwners(object):
 
@@ -233,6 +261,8 @@ class QueryOwners(object):
             owners[name] = bucket_func( Timebucket( owners[name], 'updated' ) )()
 
         return owners
+
+
 
 
 
