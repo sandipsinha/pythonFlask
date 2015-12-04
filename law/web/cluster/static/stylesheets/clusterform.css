@@ -1,4 +1,6 @@
 
+
+
 .subd input[type="text"] {
   padding: 10px;
   border: solid 1px #fff;
@@ -19,7 +21,7 @@
 .form-style-2-heading{
     font-weight: bold;
     font-style: italic;
-    border-bottom: 2px solid #ddd;
+    border-bottom: none;
     margin-bottom: 20px;
     font-size: 15px;
     padding-bottom: 3px;
@@ -48,22 +50,8 @@
 
 }
 
-.form-style-2 input.input-field,
-.form-style-2 .tel-number-field,
-.form-style-2 .textarea-field,
- .form-style-2 .select-field{
-    box-sizing: border-box;
-    -webkit-box-sizing: border-box;
-    -moz-box-sizing: border-box;
-    border: 1px solid transparent;
 
-}
-.form-style-2 .input-field:focus,
-.form-style-2 .tel-number-field:focus,
-.form-style-2 .textarea-field:focus,
-.form-style-2 .select-field:focus{
-    border: 1px solid #0C0;
-}
+
 .center {
     max-width: 1000px;
     margin: auto;
@@ -92,4 +80,3 @@ input[type="select"]
       -moz-border-radius:5px;
       -webkit-border-radius:5px;
     }
-
