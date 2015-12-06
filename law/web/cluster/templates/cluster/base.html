@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html>
+<head>
+
+   <title>Cluster To Subdomain data</title>
+
+    <script type="text/javascript" src="{{ url_for('userinfo.static', filename='js/jquery-1.11.3.min.js') }}"></script>
+
+    <script type="text/javascript" src="{{ url_for('userinfo.static', filename='js/jquery-ui.js') }}"></script>
+    <link rel='stylesheet' type='text/css' href="{{ url_for('cluster.static', filename='stylesheets/cluster_tabs.css') }}"/>
+
+
+    <!--Grid specific JS Library-->
+     <script type="text/javascript" src="{{ url_for('userinfo.static', filename='js/w2ui-1.4.3.min.js') }}"></script>
+     <link rel="stylesheet" type="text/css" href="{{ url_for('userinfo.static', filename='stylesheets/w2ui-1.4.3.min.css') }}" />
+
+
+
+
+    <script type="text/javascript" src="{{ url_for('tracer.static', filename='js/d3.min.js') }}"></script>
+
+     <!-- Program specific JS Script library -->
+    <script type="text/javascript" src="{{ url_for('cluster.static', filename='js/w2grid.js') }}"></script>
+    <script type="text/javascript" src="{{ url_for('cluster.static', filename='js/autocomplete.js') }}"></script>
+
+
+
+    <!--Grid specific JS Library-->
+
+
+
+    <!--<script type="text/javascript" src="{{ url_for('touchbiz.static', filename='js/anytime512.min.js') }}"></script>
+    <link rel='stylesheet' type='text/css' href="{{ url_for('touchbiz.static', filename='stylesheets/anytime512.min.css') }}"/>
+    <script type="text/javascript" src="{{ url_for('tracer.static', filename='js/index.js') }}"></script>
+
+
+    <link rel="stylesheet" href="//code.jquery.com/ui/1.11.4/themes/smoothness/jquery-ui.css">-->
+
+    <!-- Latest compiled and minified CSS -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css">
+
+
+    <!-- Latest compiled and minified JavaScript -->
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/js/bootstrap.min.js"></script>
+
+
+
+    <!-- Include Required Prerequisites -->
+
+
+
+     <!-- Program specific JS Script library -->
+    <link rel='stylesheet' type='text/css' href="{{ url_for('cluster.static', filename='stylesheets/cluster.css') }}"/>
+    <link rel='stylesheet' type='text/css' href="{{ url_for('cluster.static', filename='stylesheets/clusterform.css') }}"/>
+
+
+</head>
+
+<body >
+
+{% block main %}{% endblock %}
+
+</body>

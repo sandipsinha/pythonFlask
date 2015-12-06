@@ -608,6 +608,28 @@ class TracerPercentiles( Base):
         self.period_secs
         )
 
+
+class ClusterToSubdomain( Base):
+    __tablename__ = 'clustosubd'
+    __table_args__ = {'mysql_engine':'InnoDB'}
+    cid                = Column( Integer, primary_key=True )
+    subdomain          = Column( String(length=100),primary_key=True )
+    acct_id            = Column( MEDIUMINT, primary_key=True )
+    kid                = Column( Integer)
+    clustername        = Column( String(length=100))
+    created_date       = Column( String(length=10))
+    cluster_type      = Column( String(length=14))
+
+    def __repr__(self):
+        return "<ClusterToSubdomain ({}, {}, {}, {}, {}, {}, {}>".format(
+        self.cid,
+        self.subdomain,
+        self.acct_id,
+        self.kid,
+        self.clustername,
+        self.created_date,
+        self.cluster_type
+        )
 @contextmanager
 def session_context():
     """ Because ADB is read only we do not need commit """

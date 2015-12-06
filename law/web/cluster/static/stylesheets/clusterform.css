@@ -1,0 +1,82 @@
+
+
+
+.subd input[type="text"] {
+  padding: 10px;
+  border: solid 1px #fff;
+  box-shadow: inset 1px 1px 2px 0 #707070;
+  transition: box-shadow 0.3s;
+}
+.subd input[type="text"]:focus,
+.subd input[type="text"].focus {
+  box-shadow: inset 1px 1px 2px 0 #c9c9c9;
+}
+
+
+.form-style-2{
+    max-width: 1000px;
+    padding: 20px 12px 10px 20px;
+    font: 13px Arial, Helvetica, sans-serif;
+}
+.form-style-2-heading{
+    font-weight: bold;
+    font-style: italic;
+    border-bottom: none;
+    margin-bottom: 20px;
+    font-size: 15px;
+    padding-bottom: 3px;
+}
+.form-style-2 label{
+    display: block;
+    margin: 0px 0px 15px 0px;
+}
+.form-style-2 label > span{
+    width: 100px;
+    font-weight: bold;
+    float: left;
+    padding-top: 8px;
+    padding-right: 5px;
+}
+.form-style-2 span.required{
+    color:red;
+}
+.form-style-2 .tel-number-field .subd{
+    width: auto;
+    text-align: left;
+    padding: 10px;
+}
+.form-style-2 input.input-field{
+    width: 48%;
+
+}
+
+
+
+.center {
+    max-width: 1000px;
+    margin: auto;
+    left: 1%;
+    right: 1%;
+    position: absolute;
+}
+
+select option {
+    margin:40px;
+    background: rgba(0,0,0,0.3);
+    color:#fff;
+    text-shadow:0 1px 0 rgba(0,0,0,0.4);
+}
+
+select {
+ margin: 0px 0px 15px 0px;
+ padding: 10px;
+ text-align: left;
+}
+
+input[type="text"]
+input[type="select"]
+                 {
+      border-radius:5px;
+      -moz-border-radius:5px;
+      -webkit-border-radius:5px;
+    }

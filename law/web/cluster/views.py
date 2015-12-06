@@ -6,21 +6,24 @@
 "
 """
 from flask                import Blueprint, render_template, request, flash,redirect, json
-from law.util.queries    import query_user_state
-from law.web.tracer    import rest
-from datetime           import datetime
+from law.util.queries    import get_cluster_names, get_cluster_details
+from law.web.cluster    import rest
 
 
 
-blueprint = Blueprint( 'tracer', __name__,
+blueprint = Blueprint( 'cluster', __name__,
                         template_folder = 'templates',
                         static_folder   = 'static' )
 
 
 
 @blueprint.route( '/', methods=['GET'])
-def display_tracer_data():
-    return render_template('tracer/actualcontent.html' )
+def display_cluster_data():
+    clstrdata = get_cluster_names('%')
+    return render_template('cluster/displaypage.html',option_list = clstrdata )
+
+
+
 
 
 

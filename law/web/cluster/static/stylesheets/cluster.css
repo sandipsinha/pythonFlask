@@ -1,0 +1,36 @@
+#nav {
+width:400px;
+margin:0 auto;
+list-style:none;
+}
+#nav li {
+float:left;
+}
+#nav a {
+display:block;
+text-align:center;
+width:auto; /* fixed width */
+text-decoration:none;
+}
+
+#outer {
+  width: 100%;
+  text-align: center;
+}
+
+#inner {
+  display: inline-block;
+}
+
+#grid{
+height: 600px;
+width:100%;
+
+}
+
+#content {
+  width: 700px ;
+  margin-left: auto ;
+  margin-right: auto ;
+}
+
