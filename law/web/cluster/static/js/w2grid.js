@@ -50,7 +50,7 @@ $(window).load(function () {
 
       url =  '/apiv1/cluster/subdgrid/';
       w2ui['grid'].postData  = PostData;
-      w2ui['grid'].reload();
+      w2ui['grid'].load('/apiv1/cluster/subdgrid/');
 
     });
 

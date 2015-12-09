@@ -300,4 +300,9 @@ text-align:center;
 font-weight: bold;
 }
 
-
+.clustr {
+    display: inline-block;
+    width: 40%;
+    float: right;
+    text-align:right;
+}
