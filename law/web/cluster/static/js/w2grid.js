@@ -12,7 +12,6 @@ $(window).load(function () {
     $('#grid').w2grid({
         name: 'grid',
         header: 'List of Subdomains',
-        url: '/apiv1/cluster/subdgrid/',
         show : {
             header         : false,
             toolbar        : true,
@@ -42,7 +41,7 @@ $(window).load(function () {
 
     });
     w2ui['grid'].postData  = PostData;
-
+    w2ui['grid'].load('/apiv1/cluster/subdgrid/');
 
     $('#clstrdata').change(function(event){
       event.preventDefault();
@@ -51,7 +50,7 @@ $(window).load(function () {
 
       url =  '/apiv1/cluster/subdgrid/';
       w2ui['grid'].postData  = PostData;
-      w2ui['grid'].reload();
+      w2ui['grid'].load('/apiv1/cluster/subdgrid/');
 
     });
 
