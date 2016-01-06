@@ -610,7 +610,7 @@ class TracerPercentiles( Base):
 
 
 class ClusterToSubdomain( Base):
-    __tablename__ = 'clustosubd'
+    __tablename__ = 'cluster2subd'
     __table_args__ = {'mysql_engine':'InnoDB'}
     cid                = Column( Integer, primary_key=True )
     subdomain          = Column( String(length=100),primary_key=True )
@@ -618,7 +618,7 @@ class ClusterToSubdomain( Base):
     kid                = Column( Integer)
     clustername        = Column( String(length=100))
     created_date       = Column( String(length=10))
-    cluster_type      = Column( String(length=14))
+    cluster_type       = Column( String(length=14), primary_key=True)
 
     def __repr__(self):
         return "<ClusterToSubdomain ({}, {}, {}, {}, {}, {}, {}>".format(
