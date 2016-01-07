@@ -42,6 +42,7 @@ class Touchbiz( Base ):
     sales_rep_id   = Column( MEDIUMINT(unsigned=True), ForeignKey( 'sales_reps.id' ) )
     created        = Column( DateTime, primary_key=True )
     modified       = Column( DateTime )
+    plan_type      = Column( String(length=20) )
     tier           = Column( String(length=100) )
     retention      = Column( Integer )
     volume         = Column( String(length=50) )
@@ -57,6 +58,8 @@ class Touchbiz( Base ):
             self.acct_id, 
             self.created,
             self.sales_rep_id,
+            self.billing_period,
+            self.plan_type,
         )
 
 class SalesReps( Base ):

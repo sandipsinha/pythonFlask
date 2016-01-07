@@ -48,7 +48,8 @@ FlatTouchbiz = namedtuple( 'FlatTouchbiz', [
     'period', 
     'rate', 
     'owner',
-    'status'] 
+    'status',
+    'plan_type']
 )
 
 def localized_tb( tb_entries, timezone=TIMEZONE ):
@@ -260,7 +261,7 @@ def flatten( row ):
         cols = ['updated', 'tPlan.name', 'tDays', 'tGB', 'billing_period', 'tRate', 'owner.sfdc_alias', 'status']
         flattened = FlatTouchbiz( *[ item[1] for item in as_tuple( row, cols )] )
     elif isinstance( row, Touchbiz ):
-        cols = ['created', 'tier', 'retention', 'volume', 'billing_period', 'sub_rate', 'owner.sfdc_alias', 'status']
+        cols = ['created', 'tier', 'retention', 'volume', 'billing_period', 'sub_rate', 'owner.sfdc_alias', 'status', 'plan_type']
         flattened = FlatTouchbiz( *[ item[1] for item in as_tuple( row, cols )] )
 
     return flattened

@@ -42,6 +42,12 @@
     <div data-key="retention" class="col-xs-2 text-left"></div>
     <div class="col-xs-5"></div>
   </div>
+    <div class='row'>
+    <div class="col-xs-3"></div>
+    <label class="col-xs-2 text-right">Plan Type:</label>
+    <div data-key="plan_type" class="col-xs-2 text-left"></div>
+    <div class="col-xs-5"></div>
+  </div>
   <div class='row'>
     <div class="col-xs-3"></div>
     <label class="col-xs-2 text-right">Bill Period:</label>
@@ -98,6 +104,17 @@
         <span class="input-group-addon">Days</span>
         </div>
         
+    </div>
+    </div>
+        <!-- Select Basic -->
+    <div class="form-group">
+    <label class="col-xs-4 control-label text-right" for="plan_type">Plan Type</label>
+    <div class="col-xs-4">
+        <select id="plan_type" name="plan_type" data-key='plan_type' class="form-control input-sm">
+        <option value="standard">Standard</option>
+        <option value="tru-up">Tru-up</option>
+        <option value="flex">Flex</option>
+        </select>
     </div>
     </div>
     <!-- Select Basic -->

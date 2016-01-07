@@ -18,8 +18,10 @@ class tbrep(Form):
     volume = fields.StringField('Volume', description = "Volume")
     retention = fields.IntegerField('Retention')
     sub_rate = fields.IntegerField('Subscription Rate')
-    billing_period = fields.SelectField('Billing Period',
+    billing_period = fields.SelectField('Billing Period',[validators.InputRequired()],
                                         choices=[('annual','annual'),('monthly','monthly')])
+    plan_type = fields.SelectField('Plan_Type',[validators.InputRequired()],
+                                        choices=[('standard','Standard'),('tru-up','Tru-Up'),('flex','Flex')])
     created  = fields.StringField('Created Date',[validators.InputRequired()])
     rep_name  = fields.StringField('Rep Name')
     acct_id = fields.HiddenField(' ')

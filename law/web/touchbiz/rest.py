@@ -75,6 +75,7 @@ def new( subd ):
             sales_rep_id   = owner_id,
             created        = created,
             modified       = created,
+            plan_type      = request.form['plan_type'],
             tier           = request.form['tier'].lower(),
             retention      = request.form['retention'],
             volume         = request.form['volume'],
@@ -107,7 +108,7 @@ def get_tb_rows(acctid, created):
             with tb_session() as s:
                 q = s.query(label('created',func.max(Touchbiz.created)), Touchbiz.billing_period,
                               Touchbiz.sub_rate, Touchbiz.retention, Touchbiz.tier, Touchbiz.volume,
-                              Touchbiz.tier, Touchbiz.sales_rep_id, Touchbiz.modified).\
+                              Touchbiz.tier, Touchbiz.sales_rep_id, Touchbiz.modified, Touchbiz.plan_type).\
                     filter(and_(Touchbiz.acct_id == acctid))\
                     .group_by(Touchbiz.acct_id).one()
 
