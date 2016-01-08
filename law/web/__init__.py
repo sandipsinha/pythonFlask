@@ -35,7 +35,6 @@ app.register_blueprint( touchbiz.views.blueprint, url_prefix = '/touchbiz' )
 app.register_blueprint( salesorder.views.blueprint, url_prefix = '/salesorder' )
 app.register_blueprint( tracer.views.blueprint, url_prefix = '/tracer' )
 app.register_blueprint( cluster.views.blueprint, url_prefix = '/cluster' )
-app.register_blueprint( flupld.views.blueprint, url_prefix = '/fileupld' )
 
 # API routes
 app.register_blueprint( subscription.rest.blueprint, url_prefix = '/apiv1/subscription' )
