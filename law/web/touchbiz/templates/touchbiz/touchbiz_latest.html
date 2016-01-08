@@ -42,9 +42,15 @@
     <div data-key="retention" class="col-xs-2 text-left"></div>
     <div class="col-xs-5"></div>
   </div>
+    <div class='row'>
+    <div class="col-xs-3"></div>
+    <label class="col-xs-2 text-right">Plan Type:</label>
+    <div data-key="plan_type" class="col-xs-2 text-left"></div>
+    <div class="col-xs-5"></div>
+  </div>
   <div class='row'>
     <div class="col-xs-3"></div>
-    <label class="col-xs-2 text-right">Bill Period:</label>
+    <label class="col-xs-2 text-right">Billing Frequency:</label>
     <div data-key="period" class="col-xs-2 text-left"></div>
     <div class="col-xs-5"></div>
   </div>
@@ -100,9 +106,20 @@
         
     </div>
     </div>
+        <!-- Select Basic -->
+    <div class="form-group">
+    <label class="col-xs-4 control-label text-right" for="plan_type">Plan Type</label>
+    <div class="col-xs-4">
+        <select id="plan_type" name="plan_type" data-key='plan_type' class="form-control input-sm">
+        <option value="standard">Standard</option>
+        <option value="tru-up">Tru-up</option>
+        <option value="flex">Flex</option>
+        </select>
+    </div>
+    </div>
     <!-- Select Basic -->
     <div class="form-group">
-    <label class="col-xs-4 control-label text-right" for="billing_period">Billing Period</label>
+    <label class="col-xs-4 control-label text-right" for="billing_period">Billing Frequency</label>
     <div class="col-xs-4">
         <select id="billing_period" name="billing_period" data-key='period' class="form-control input-sm">
         <option value="monthly">Monthly</option>
