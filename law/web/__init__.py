@@ -14,7 +14,7 @@ from flask               import Flask, url_for
 from flask.json          import JSONEncoder
 from law                 import config
 from law.web             import views, subscription, volumes, salesdash, touchbiz, salesorder, userinfo, tracer, \
-                         cluster 
+                         cluster
 from law.util.adb        import Session, AccountState, Tier
 from law.util.lawdb      import db_url, db, security
 from flask.ext.login     import current_user, current_app, login_user
@@ -77,7 +77,7 @@ def secure_blueprints( blueprints ):
     blueprint to force user authentication prior to serving
     the URL
     """
-    
+
     def bp_login_required():
         if not current_user.is_authenticated():
             return current_app.login_manager.unauthorized()
