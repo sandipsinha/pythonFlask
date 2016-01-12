@@ -258,7 +258,7 @@ def get_sales_rep_details(name):
 
 def flatten( row ):
     if isinstance( row, AccountStateUncompressed ):
-        cols = ['updated', 'tPlan.name', 'tDays', 'tGB', 'billing_period', 'tRate', 'owner.sfdc_alias', 'status']
+        cols = ['updated', 'tPlan.name', 'tDays', 'tGB', 'billing_period', 'tRate', 'owner.sfdc_alias', 'status', 'plan_type']
         flattened = FlatTouchbiz( *[ item[1] for item in as_tuple( row, cols )] )
     elif isinstance( row, Touchbiz ):
         cols = ['created', 'tier', 'retention', 'volume', 'billing_period', 'sub_rate', 'owner.sfdc_alias', 'status', 'plan_type']
