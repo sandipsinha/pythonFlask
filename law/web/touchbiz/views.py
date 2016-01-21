@@ -59,6 +59,7 @@ def re_align( ):
             modestate = 'u'
             tbqueue['tb_created_dt'] = get_tb_data.created
             tbqueue['tb_rep_id'] = get_tb_data.sales_rep_id
+            tbqueue['plan_type'] = get_tb_data.plan_type
 
 
         tbqueue['statemode'] = modestate
@@ -104,6 +105,7 @@ def upserttb():
                 tbrep.volume = tbform.volume.data
                 tbrep.acct_id = tbform.acct_id.data
                 tbrep.billing_period = tbform.billing_period.data
+                tbrep.plan_type = tbform.plan_type.data
                 tbrep.retention = tbform.retention.data
                 tbrep.sub_rate = tbform.sub_rate.data
                 tbrep.tier = tbform.tier.data
@@ -125,6 +127,7 @@ def upserttb():
                     tbrep.volume = tbform.volume.data
                     tbrep.billing_period = tbform.billing_period.data
                     tbrep.retention = tbform.retention.data
+                    tbrep.plan_type = tbform.plan_type.data
                     tbrep.sub_rate = tbform.sub_rate.data
                     tbrep.tier = tbform.tier.data
                     tbrep.created = tbform.created.data

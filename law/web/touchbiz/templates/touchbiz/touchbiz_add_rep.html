@@ -9,7 +9,8 @@
     <div>{{ form.tier.label}}: {{ form.tier(class_="selectfld")}} </div>
     <div>{{ form.retention.label}}: {{ form.retention(class_="selectfld") }} </div>
     <div>{{ form.sub_rate.label}}:  {{ form.sub_rate (class_="selectfld")}} </div>
-    <div>{{ form.billing_period.label}}:  {{ form.billing_period (class_="selectfld")}}</div>
+    <div>{{ form.plan_type.label}}:  {{ form.plan_type (class_="selectfld")}} </div>
+    <div>{{ form.billing_period.label}}:  {{ form.billing_period (class_="selectfld")}} </div>
     <div>{{ form.rep_name.label}}:  {{ form.rep_name (class_="selectfld")}}</div>
 
     {{ form.subdomain }}
@@ -58,12 +59,13 @@ $(function () {
             { field: 'tb_created_dt', hidden: true },
             { field: 'tb_rep_id', hidden: true },
             { field: 'created', caption: 'Created', size: '20%', sortable: true,editable: { type: 'text' }, style:'color:black', attr:"id='created'" },
-            { field: 'tier', caption: 'Tier', size: '13%', sortable: true,editable: { type: 'text' } },
-            { field: 'retention', caption: 'Retention', size: '13%', sortable: true,editable: { type: 'text' }},
-            { field: 'volume', caption: 'Volume', size: '13%',editable: { type: 'text' }},
+            { field: 'tier', caption: 'Tier', size: '11%', sortable: true,editable: { type: 'text' } },
+            { field: 'retention', caption: 'Retention', size: '11%', sortable: true,editable: { type: 'text' }},
+            { field: 'volume', caption: 'Volume', size: '10%',editable: { type: 'text' }},
             { field: 'sub_rate', caption: 'Subscription Rate', size: '13%', sortable: true,editable: { type: 'int' } },
-            { field: 'billing_period', caption: 'Billing Period', size: '13%', sortable: true,editable: { type: 'text' } },
-            { field: 'rep_name', caption: 'Sales Rep Name', size: '15%', sortable: true,editable: { type: 'select' } }
+            { field: 'plan_type', caption: 'Plan Type', size: '11%', sortable: true,editable: { type: 'text' }},
+            { field: 'billing_period', caption: 'Billing Period', size: '11%', sortable: true,editable: { type: 'text' } },
+            { field: 'rep_name', caption: 'Sales Rep Name', size: '13%', sortable: true,editable: { type: 'select' } }
         ],
         postData : {subdomain:{{grid2|tojson|safe}}}
 
@@ -98,6 +100,7 @@ $(function () {
         $("#tier").val(selObj.tier);
         $("#retention").val(selObj.retention);
         $("#sub_rate").val(selObj.sub_rate);
+        $("#plan_type").val(selObj.plan_type);
         $("#rep_name").val(selObj.rep_name);
         fperiod = document.getElementById("billing_period") ;
         fperiod.value = selObj.billing_period;
