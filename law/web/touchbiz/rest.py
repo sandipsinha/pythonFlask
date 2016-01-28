@@ -66,7 +66,7 @@ def new( subd ):
         owner_id = touchbiz.owner_id( current_user.email )
     except:
         raise Exception( 'Unauthorized to add touchbiz entry.' )
-    
+
     created  = iso8601_to_dt( request.form.get( 'created' ) ) if 'created' in request.form else datetime.today() 
 
     with tb_session() as s:
@@ -80,6 +80,7 @@ def new( subd ):
             retention      = request.form['retention'],
             volume         = request.form['volume'],
             sub_rate       = request.form['sub_rate'],
+            payment_method = request.form['payment_method'],
             billing_period = request.form['billing_period'].lower(),
         )
         s.add( entry )
@@ -108,7 +109,7 @@ def get_tb_rows(acctid, created):
             with tb_session() as s:
                 q = s.query(label('created',func.max(Touchbiz.created)), Touchbiz.billing_period,
                               Touchbiz.sub_rate, Touchbiz.retention, Touchbiz.tier, Touchbiz.volume,
-                              Touchbiz.tier, Touchbiz.sales_rep_id, Touchbiz.modified, Touchbiz.plan_type).\
+                              Touchbiz.tier, Touchbiz.sales_rep_id, Touchbiz.modified, Touchbiz.plan_type, Touchbiz.payment_method ).\
                     filter(and_(Touchbiz.acct_id == acctid))\
                     .group_by(Touchbiz.acct_id).one()
 

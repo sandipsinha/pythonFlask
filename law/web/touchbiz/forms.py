@@ -22,6 +22,8 @@ class tbrep(Form):
                                         choices=[('annual','annual'),('monthly','monthly')])
     plan_type = fields.SelectField('Plan_Type',[validators.InputRequired()],
                                         choices=[('standard','Standard'),('tru-up','Tru-Up'),('flex','Flex')])
+    payment_method = fields.SelectField('payment_method',[validators.InputRequired()],
+                                        choices=[('Credit Card','Credit Card'),('Invoice','Invoice'),('Wire Transfer','Wire Transfer')])
     created  = fields.StringField('Created Date',[validators.InputRequired()])
     rep_name  = fields.StringField('Rep Name')
     acct_id = fields.HiddenField(' ')

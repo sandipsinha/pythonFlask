@@ -111,6 +111,7 @@ def upserttb():
                 tbrep.tier = tbform.tier.data
                 tbrep.created = tbform.created.data
                 tbrep.modified = datetime.now()
+                tbrep.payment_method = 'Credit Card'
                 s.add(tbrep)
                 s.commit()
                 s.close
@@ -133,6 +134,7 @@ def upserttb():
                     tbrep.created = tbform.created.data
                     tbrep.acct_id = acct_id
                     tbrep.modified = datetime.now()
+                    tbrep.payment_method = 'Credit Card'
                     s.add(tbrep)
                     s.commit()
                     s.close

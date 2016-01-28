@@ -48,6 +48,12 @@
     <div data-key="plan_type" class="col-xs-2 text-left"></div>
     <div class="col-xs-5"></div>
   </div>
+    <div class='row'>
+    <div class="col-xs-3"></div>
+    <label class="col-xs-2 text-right">Payment Method:</label>
+    <div data-key="payment_method" class="col-xs-2 text-left"></div>
+    <div class="col-xs-5"></div>
+  </div>
   <div class='row'>
     <div class="col-xs-3"></div>
     <label class="col-xs-2 text-right">Billing Frequency:</label>
@@ -114,6 +120,17 @@
         <option value="standard">Standard</option>
         <option value="tru-up">Tru-up</option>
         <option value="flex">Flex</option>
+        </select>
+    </div>
+    </div>
+         <!-- Select Basic -->
+    <div class="form-group">
+    <label class="col-xs-4 control-label text-right" for="payment_method">Payment Method</label>
+    <div class="col-xs-4">
+        <select id="payment_method" name="payment_method" data-key='payment_method' class="form-control input-sm">
+        <option value="Credit Card">Credit Card</option>
+        <option value="Invoice">Invoice</option>
+        <option value="Wire Transfer">Wire Transfer</option>
         </select>
     </div>
     </div>

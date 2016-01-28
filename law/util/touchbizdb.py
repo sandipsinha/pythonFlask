@@ -48,6 +48,7 @@ class Touchbiz( Base ):
     volume         = Column( String(length=50) )
     sub_rate       = Column( Integer )
     billing_period = Column( String(length=50) )
+    payment_method = Column( String(length=30) )
     owner          = relationship(
                         "SalesReps", 
                         lazy='joined',
@@ -60,6 +61,7 @@ class Touchbiz( Base ):
             self.sales_rep_id,
             self.billing_period,
             self.plan_type,
+            self.payment_method
         )
 
 class SalesReps( Base ):
