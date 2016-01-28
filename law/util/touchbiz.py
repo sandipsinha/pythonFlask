@@ -49,7 +49,8 @@ FlatTouchbiz = namedtuple( 'FlatTouchbiz', [
     'rate', 
     'owner',
     'status',
-    'plan_type']
+    'plan_type',
+    'payment_method']
 )
 
 def localized_tb( tb_entries, timezone=TIMEZONE ):
@@ -258,10 +259,10 @@ def get_sales_rep_details(name):
 
 def flatten( row ):
     if isinstance( row, AccountStateUncompressed ):
-        cols = ['updated', 'tPlan.name', 'tDays', 'tGB', 'billing_period', 'tRate', 'owner.sfdc_alias', 'status', 'plan_type']
+        cols = ['updated', 'tPlan.name', 'tDays', 'tGB', 'billing_period', 'tRate', 'owner.sfdc_alias', 'status', 'plan_type','payment_method']
         flattened = FlatTouchbiz( *[ item[1] for item in as_tuple( row, cols )] )
     elif isinstance( row, Touchbiz ):
-        cols = ['created', 'tier', 'retention', 'volume', 'billing_period', 'sub_rate', 'owner.sfdc_alias', 'status', 'plan_type']
+        cols = ['created', 'tier', 'retention', 'volume', 'billing_period', 'sub_rate', 'owner.sfdc_alias', 'status', 'plan_type','payment_method']
         flattened = FlatTouchbiz( *[ item[1] for item in as_tuple( row, cols )] )
 
     return flattened
