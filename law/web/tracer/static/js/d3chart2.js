@@ -80,6 +80,7 @@ function createNintyNineChart(postData,dataGroup, postDataKeys, postDataValues, 
 
 
     var color = LineColors();
+    vis.selectAll(".strong").remove();
     AppendText(vis, "99th Percentile secs");
 
     vis.selectAll(".legend").remove();

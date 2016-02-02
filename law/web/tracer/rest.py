@@ -15,11 +15,9 @@ def tracer_data():
     scluster = request.form.get('cluster')
     fromDate = datetime.strptime(fdate,'%Y-%m-%d %H:%M:%S')
     endDate = datetime.strptime(tdate,'%Y-%m-%d %H:%M:%S')
-
-
+    isithot = request.form.get('isithot')
     clusterchosen = '*' if (scluster is None or len(scluster) == 0) else scluster
-    #import ipdb;ipdb.set_trace()
-    tracers = query_tracer_bullet(fromDate, endDate, clusterchosen)
+    tracers = query_tracer_bullet(fromDate, endDate, clusterchosen, True if isithot == 'true' else False)
     clientdict = {}
     clientdict['bullet'] = tracers
     
@@ -85,17 +83,17 @@ def tracer_percentile():
     datas = request.json
     dateind = datas.get('dateind')
     period = int(datas.get('periods'))
+    isithot = request.form.get('isithot')
     tdate =  datetime.now() if len(datas['tdate']) == 0 else datetime.strptime(datas['tdate'],'%Y-%m-%d %H:%M:%S')
 
     fdate = calc_start_date(tdate, dateind, period)
 
-    #import ipdb;ipdb.set_trace()
     clusterchosen = '*' if len(datas['Cluster']) == 0 else datas['Cluster']
     cperiod = convert_time_period(dateind)
 
     fdate = fdate.date()
     tdate = tdate.date()
-    tiledata = query_tracer_percentile(fdate, tdate, clusterchosen, cperiod)
+    tiledata = query_tracer_percentile(fdate, tdate, clusterchosen, cperiod, True if isithot == 'true'  else False)
     graphlist = []
     for rows in tiledata:
         graphitem = {}
@@ -107,7 +105,7 @@ def tracer_percentile():
         graphitem['98th_perc']   = rows.ninty_eight
         graphitem['min_latency'] = rows.min_latency
         graphitem['max_latency'] = rows.max_latency
-        graphitem['pcnt_LT30']   = rows.pcnt_LT30
+        graphitem['pcnt_LT30']   = float("{0:.4f}".format(rows.pcnt_LT30))
         graphitem['start_date']  = rows.start_date.strftime('%Y-%m-%d')
         if clusterchosen != '*' and clusterchosen != rows.repcluster:
             pass
@@ -122,20 +120,20 @@ def tracer_average():
     datas = request.json
     dateind = datas.get('dateind')
     period = int(datas.get('periods'))
+    isithot = request.form.get('isithot')
     tdate = datetime.strptime(datas['tdate'],'%Y-%m-%d %H:%M:%S')
 
     fdate = calc_start_date(tdate, dateind, period)
 
-    #import ipdb;ipdb.set_trace()
     cperiod = convert_time_period(dateind)
 
     fdate = fdate.date()
     tdate = tdate.date()
-    summdata = query_tracer_average(fdate, tdate, cperiod)
+    summdata = query_tracer_average(fdate, tdate, cperiod, True if isithot == 'true' else False)
     graphlist = []
     for rows in summdata:
         graphitem = {}
-        graphitem['average']   = rows.average
+        graphitem['average']   = float("{0:.4f}".format(rows.average))
         graphitem['start_date']  = rows.start_date.strftime('%Y-%m-%d')
         graphlist.append(graphitem)
 

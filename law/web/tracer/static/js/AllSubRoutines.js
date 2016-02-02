@@ -10,7 +10,7 @@ function LineColors(){
 function AppendText(vis, texts ){
 return vis.append("text")
             .attr("text-anchor", "middle")  // this makes it easy to centre the text as the transform is applied to the anchor
-            .attr("transform", "translate("+ (window.GPADDING/2 ) +","+(window.GHEIGHT/2 - 30)+")rotate(-90)")  // text is drawn off the screen top left, move down and out and rotate
+            .attr("transform", "translate("+ (window.GPADDING/2  ) +","+(window.GHEIGHT/2 - 25)+")rotate(-90)")  // text is drawn off the screen top left, move down and out and rotate
             .attr("class","strong")
             .text(texts);
 }
@@ -36,7 +36,7 @@ function removePopovers () {
           });
         }
 
-function showPopover (d, charttype) {
+function showPopover (d, charttype, isithot) {
           var popuptext = '';
           switch (charttype){
           case '95':
@@ -49,10 +49,22 @@ function showPopover (d, charttype) {
             popuptext =  "<br/>99th Percentile: " + d['99th_perc'] ;
             break;
           case 'pcnt':
-            popuptext =  "<br/>Percentage LT 30: " + d['pcnt_LT30'] ;
+            if (isithot){
+                  popuptext =  "<br/>Percentage LT 30: " + d['pcnt_LT30'] ;
+                  }
+                else{
+                  popuptext =  "<br/>Percentage LT 2: " + d['pcnt_LT30'] ;
+                }
+
             break;
           case 'avrg':
-            popuptext =  "<br/>Percentage LT 30(All Clusters): " + d['average'] ;
+            if (isithot){
+                    popuptext =  "<br/>Percentage LT 30(All Clusters): " + d['average'] ;
+                    }
+                  else{
+                    popuptext =  "<br/>Percentage LT 2(All Clusters): " + d['average'] ;
+                    }
+
             break;
           }
           $(this).popover({

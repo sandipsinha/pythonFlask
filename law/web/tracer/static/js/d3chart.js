@@ -93,11 +93,9 @@ function createNintyFiveChart(postData,dataGroup, postDataKeys, postDataValues, 
     /*var color = d3.scale.ordinal()
       .range(["#0000FF","#FF00FF","#00FF00","#FFFF00","#00FFFF","#845B47","#0080FF","#FF8000","#F4A460","#FFDEAD", "#D2691E","#C71585","#800080","#48D1CC","#006400","#B8860B","#FF4500","#FF6347"]);
 */
+    vis.selectAll(".strong").remove();
     AppendText(vis, "95th percentile secs");
-    /*vis.append("text")
-            .attr("text-anchor", "middle")  // this makes it easy to centre the text as the transform is applied to the anchor
-            .attr("transform", "translate("+ (PADDING/2) +","+(HEIGHT/2)+")rotate(-90)")  // text is drawn off the screen top left, move down and out and rotate
-            .text("95th percentile secs");*/
+
 
     vis.selectAll(".legend").remove();
     var legend = vis.selectAll(".legend")

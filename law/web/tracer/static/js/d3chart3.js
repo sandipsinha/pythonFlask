@@ -1,4 +1,4 @@
-function createLessThan30Chart(postData,dataGroup, postDataKeys, postDataValues, postvarData, tsvalue ) {
+function createLessThan30Chart(postData,dataGroup, postDataKeys, postDataValues, postvarData, tsvalue, isithot ) {
 
 
     var vis = d3.select("#visualisation")
@@ -80,7 +80,17 @@ function createLessThan30Chart(postData,dataGroup, postDataKeys, postDataValues,
 
 
     var color = LineColors();
+
+    vis.selectAll(".strong").remove();
+
+    if (isithot){
     AppendText(vis, "pcnt of period where latency < 30 secs");
+    }
+    else
+    {
+    AppendText(vis, "pcnt of period where latency < 2 secs");
+    }
+
 
 
     vis.selectAll(".legend").remove();
@@ -142,7 +152,7 @@ function createLessThan30Chart(postData,dataGroup, postDataKeys, postDataValues,
        .style("stroke", "grey")
        .style("stroke-width", "1px")
        .style('opacity', 1e-6)//1e-6
-       .on("mouseover", function (d,i) { showPopover.call(this, d, 'pcnt'); })
+       .on("mouseover", function (d,i) { showPopover.call(this, d, 'pcnt', isithot); })
        .on("mouseout",  function (d,i) { removePopovers(); })
 
 
