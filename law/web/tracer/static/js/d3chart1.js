@@ -91,6 +91,7 @@ function createNintyEightChart(postData,dataGroup, postDataKeys, postDataValues,
 
     var color = LineColors();
 
+    vis.selectAll(".strong").remove();
     AppendText(vis, "98th Percentile secs");
 
     /*vis.append("text")

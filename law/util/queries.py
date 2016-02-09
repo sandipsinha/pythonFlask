@@ -14,7 +14,11 @@ from law.util.timeutil  import Timebucket
 from sqlalchemy.sql import label, text
 from law.util.adb       import session_context, AccountState, Owners, Tier, Users, Status, \
                         UserTracking, AccountProfile, DownGrades, AccountActivity, VolumeAccepted, \
-                        TracerBullet, TracerPercentiles, ClusterToSubdomain, Account, engine
+                        ClusterToSubdomain, Account, engine
+
+from law.util.tracerdb  import session_context as tdb
+from law.util.tracerdb  import TracerBullet, TracerPercentiles, engine, TracerPercentilesCold, TracerBulletCold
+
 from law.util.touchbiz import acct_id_for_subdomain
 from sqlalchemy.orm.exc             import NoResultFound
 
@@ -66,40 +70,60 @@ def get_subd_names(subd):
         except NoResultFound as e:
                 return None
 
-def query_tracer_bullet(fdate, tdate, cluster):
+def query_tracer_bullet(fdate, tdate, cluster, isithot):
 
-    with session_context() as s:
-        q = s.query(TracerBullet)\
-            .filter(TracerBullet.applies_start_time.between(fdate, tdate ))
+    with tdb() as s:
+        if isithot:
+            q = s.query(TracerBullet)\
+                .filter(TracerBullet.applies_start_time.between(fdate, tdate ))
 
 
-        if cluster != '*':
-            q.filter(TracerBullet.newcluster == cluster )
+            if cluster != '*':
+                q.filter(TracerBullet.newcluster == cluster )
+        else:
+            q = s.query(TracerBulletCold)\
+                .filter(TracerBulletCold.applies_start_time.between(fdate, tdate ))
+
+
+            if cluster != '*':
+                q.filter(TracerBulletCold.newcluster == cluster )
         datas = q.all()
         s.expunge_all()
     return datas
 
-def query_tracer_percentile(fromDate, endDate , cluster, period):
+def query_tracer_percentile(fromDate, endDate , cluster, period, isithot):
+    with tdb() as s:
+        if isithot:
+            q = s.query(TracerPercentiles) \
+                .filter(and_(TracerPercentiles.start_date.between(fromDate, endDate ))) \
+                .filter(TracerPercentiles.period == period)
+            if cluster != '*':
+                 q.filter(TracerPercentiles.repcluster == cluster )
+        else:
+            q = s.query(TracerPercentilesCold) \
+                .filter(and_(TracerPercentilesCold.start_date.between(fromDate, endDate ))) \
+                .filter(TracerPercentilesCold.period == period)
+            if cluster != '*':
+                 q.filter(TracerPercentilesCold.repcluster == cluster )
 
-    with session_context() as s:
-        q = s.query(TracerPercentiles)\
-            .filter(and_(TracerPercentiles.start_date.between(fromDate, endDate )))\
-            .filter(TracerPercentiles.period == period)\
-
-        if cluster != '*':
-            q.filter(TracerPercentiles.repcluster == cluster )
-        datas = q.all()
-        s.expunge_all()
+    datas = q.all()
+    s.expunge_all()
+    #import ipdb;ipdb.set_trace()
     return datas
 
-def query_tracer_average(fromDate, endDate , period):
+def query_tracer_average(fromDate, endDate , period, isithot):
 
-    with session_context() as s:
-        q = s.query(TracerPercentiles.start_date,label('average', func.avg(TracerPercentiles.pcnt_LT30)))\
-            .filter(and_(TracerPercentiles.start_date.between(fromDate, endDate )))\
-            .filter(TracerPercentiles.period == period)\
-            .group_by(TracerPercentiles.start_date)
-
+    with tdb() as s:
+        if isithot:
+            q = s.query(TracerPercentiles.start_date,label('average', func.avg(TracerPercentiles.pcnt_LT30)))\
+                .filter(and_(TracerPercentiles.start_date.between(fromDate, endDate )))\
+                .filter(TracerPercentiles.period == period)\
+                .group_by(TracerPercentiles.start_date)
+        else:
+            q = s.query(TracerPercentilesCold.start_date,label('average', func.avg(TracerPercentilesCold.pcnt_LT30)))\
+                .filter(and_(TracerPercentilesCold.start_date.between(fromDate, endDate )))\
+                .filter(TracerPercentilesCold.period == period)\
+                .group_by(TracerPercentilesCold.start_date)
         datas = q.all()
         s.expunge_all()
     return datas
@@ -109,7 +133,7 @@ def get_cluster_names(pref):
     clusterexp = '%' + pref + '%'
     querytorun='select distinct concat(a.cluster, substr(a.index_type,1)) newcluster, concat(a.cluster, substr(a.index_type,1,1)) clusterdata from tracer_percentiles a where ' \
                'concat(a.cluster, substr(a.index_type,1,1)) like :clsexp'
-    with session_context() as q:
+    with tdb() as q:
         try:
             q = engine.execute(text(querytorun),clsexp = clusterexp )
             return q

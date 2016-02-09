@@ -1,3 +1,7 @@
+$().ready(function() {
+
+    });
+
 $(window).load(function () {
 
     var sel ;
@@ -8,6 +12,7 @@ $(window).load(function () {
     //var e = document.getElementById("datesel");
     //var tsvalue = e.options[e.selectedIndex].value;
     var tsvalue = $("#datesel").val();
+
     //startDt = '';
     if (!startDt){
        endDt = moment().format('YYYY-MM-DD HH:mm:ss');
@@ -30,8 +35,8 @@ $(window).load(function () {
     tstype = $("#tstype").val();
     var urlx = '/apiv1/tracer/tracergrid/';
 
-
-    var PostData = JSON.parse(JSON.stringify(({'fdate':startDt,'tdate':endDt, 'cluster':$('#cluster').val(),'tstype':tsvalue})))
+    var isithot = $('#isithot').is(':checked');
+    var PostData = JSON.parse(JSON.stringify(({'fdate':startDt,'tdate':endDt, 'cluster':$('#cluster').val(),'tstype':tsvalue,'isithot':isithot})))
 
     $('#grid').w2grid({
         name: 'grid',
@@ -72,7 +77,8 @@ $(window).load(function () {
         w2ui['grid'].load('/apiv1/tracer/tracergrid/');
     }*/
 
-    DrawChart(period, tstype, tsvalue);
+
+    DrawChart(period, tstype, tsvalue, isithot);
 
     $('#submit').click(function(event){
       event.preventDefault();
@@ -80,22 +86,55 @@ $(window).load(function () {
       //e = document.getElementById("datesel");
       //tsvalue = e.options[e.selectedIndex].value;
       tsvalue = $("#datesel").val();
+      switch($( "#datesel" ).val()){
+          case 'last1d':
+             startDt = moment().subtract(1,'d').format('YYYY-MM-DD HH:mm:ss');
+             endDt = moment().format('YYYY-MM-DD HH:mm:ss');
+             break;
+
+          case 'last1w':
+             startDt = moment().subtract(1,'w').format('YYYY-MM-DD HH:mm:ss');
+             endDt = moment().format('YYYY-MM-DD HH:mm:ss');
+             break;
+
+          case 'last1h':
+             startDt = moment().subtract(1,'h').format('YYYY-MM-DD HH:mm:ss');
+             endDt = moment().format('YYYY-MM-DD HH:mm:ss');
+             break;
+          default:
+             break;
+
+      };
+
+
 
       tstype = $("#tstype").val()
+
 
       period = $("#period").val();
       if (period == "" || !$.isNumeric(period)) {
          period = 30;
       }
+      isithot = $('#isithot').is(':checked');
+    if (isithot){
+        document.getElementById("avrg").textContent="Percent Less Than 30 secs - All Clusters";
+        document.getElementById("lt30").textContent="Percent where tracer was less than 30 seconds";
+    }
+    else
+    {
+        document.getElementById("avrg").textContent="Percent Less Than 2 secs - All Clusters";
+        document.getElementById("lt30").textContent="Percent where tracer was less than 2 seconds";
+
+    }
       PostData = JSON.parse(JSON.stringify(({'fdate':startDt,'tdate':endDt,
-            'cluster':$('#cluster').val(),'tstype':tsvalue})))
+            'cluster':$('#cluster').val(),'tstype':tsvalue,'isithot':isithot})))
 
 
       var url =  '/apiv1/tracer/tracergrid/';
       w2ui['grid'].postData  = PostData;
       w2ui['grid'].reload();
 
-      DrawChart(period, tstype, tsvalue);
+      DrawChart(period, tstype, tsvalue, isithot);
 
     });
 

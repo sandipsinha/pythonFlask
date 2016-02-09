@@ -1,4 +1,4 @@
-function createAverageChart(postData, dataGroup, postvarData, tsvalue ) {
+function createAverageChart(postData, dataGroup, postvarData, tsvalue, isithot ) {
   var vis = d3.select("#visualisation4")
     .attr("viewBox","30 0 730 690"),
     WIDTH = window.GWIDTH,
@@ -11,7 +11,7 @@ function createAverageChart(postData, dataGroup, postvarData, tsvalue ) {
         left: window.GLEFT
     };
 
-    //var format = d3.time.format("%Y-%m-%d");
+
     var parseDate = d3.time.format("%Y-%m-%d").parse;
     var avgamt = function(d) { return  d['average'] };
     var xScale = CreateTimeScale(postData);
@@ -74,7 +74,15 @@ function createAverageChart(postData, dataGroup, postvarData, tsvalue ) {
           vis.selectAll(".yaxis").transition().duration(1500).call(yAxis)
         }
 
-    AppendText(vis, "pcnt less than 30 secs - All Customers");
+    vis.selectAll(".strong").remove();
+    if (isithot){
+       AppendText(vis, "pcnt less than 30 secs - All Customers");
+       }
+    else
+       {
+       AppendText(vis, "pcnt less than 2 secs - All Customers");
+       }
+
     vis.selectAll(".line").remove();
     vis.append('svg:path')
       .attr('d', lineGen(postvarData))
@@ -95,7 +103,7 @@ function createAverageChart(postData, dataGroup, postvarData, tsvalue ) {
        .style("stroke", "grey")
        .style("stroke-width", "1px")
        .style('opacity', 1e-6)//1e-6
-       .on("mouseover", function (d,i) { showPopover.call(this, d, 'avrg'); })
+       .on("mouseover", function (d,i) { showPopover.call(this, d, isithot, 'avrg'); })
        .on("mouseout",  function (d,i) { removePopovers(); })
 
     	// get the x and y values for least squares

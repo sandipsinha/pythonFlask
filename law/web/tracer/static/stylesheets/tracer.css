@@ -101,15 +101,7 @@ width:100%;
 
 }
 
-span {
 
-    text-align: center;
-    display: block;
-    line-height:20px;
-    font-weight: bold;
-    height: 20px;
-
-}
 
  /* Elegant Aero */
 .mystic {
@@ -141,9 +133,20 @@ span {
     color: #5E5E5E;
 }
 .mystic label {
-    display: block;
+    display: inline;
     margin: 0px 0px 5px;
+
 }
+.mystic input[type='checkbox'] + label {
+  display: block;
+  text-align:right;
+  width: 20px;
+  padding: 5px 0px 0px 5px;
+}
+.mystic [class="cstm"]{
+width: 20%;
+}
+
 .mystic label>span {
     float: left;
     width: 30%;
@@ -305,4 +308,7 @@ font-weight: bold;
     width: 40%;
     float: right;
     text-align:right;
+}
+.mystic .formfield{
+vertical-align: middle;
 }

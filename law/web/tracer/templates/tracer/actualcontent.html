@@ -4,8 +4,8 @@
 <div id="gridform" >
 <form  class="mystic" id="main" >
 
-
-        <label><span>Date: </span> </label>
+        <p class 'formfield'>
+        <label for="datesel"><span>Date: </span> </label>
             <select id="datesel" name="datesel">
                 <option value="last1h">Last 1 hour</option>
                 <option value="last1d">Last 1 day</option>
@@ -14,14 +14,25 @@
             </select>
 
 
+
             <input id="dater" name="dater" type="text" placeholder="Date Range" class="cstm">
             <i class="glyphicon glyphicon-calendar fa fa-calendar cstm"></i>&nbsp;
               <b class="caret cstm"></b>
+            </p>
 
-            <label>
+            <p class 'formfield'>
+                <label for="cluster">
                 <span>Cluster(e.g. C02S): </span>
-            <input id="cluster" name="cluster" type="text" placeholder="All" class="style10 field-split align-left" >
-            </label>
+                <input id="cluster" name="cluster" type="text" placeholder="All"  >
+                </label>
+
+                <label id="checkbox">
+                Hot ?:
+                <input id="isithot" name="isithot" type="checkbox"  placeholder="All" checked="checked" >
+                </label>
+            </p>
+
+
 
 
 
@@ -41,12 +52,12 @@
 {% block rightcol %}
 <div id="charts">
 <div id="graph4"  >
-  <span>Percent Less Than 30 secs - All Clusters</span>
+  <span id="avrg">Percent Less Than 30 secs - All Clusters</span>
    <svg id="visualisation4"  class="chart"></svg>
 </div>
 <div id="graph" >
 
-        <span>Percent where tracer was less than 30 seconds</span>
+        <span id="lt30">Percent where tracer was less than 30 seconds</span>
 
   <svg id="visualisation"  class="chart"></svg>
 </div>
@@ -84,31 +95,27 @@
     var datepref;
     var GWIDTH = 700;
     var GHEIGHT = 690;
-    var GPADDING = 100;
+    var GPADDING = 70;
     var GTOP = 20;
     var GBOTTOM = 20;
-    var GRIGHT = 20;
+    var GRIGHT = 60;
     var GLEFT = 100;
+    var isithot;
+
+
+    isithot = $('#isithot').is(':checked');
+    if (isithot)
+        {
+        document.getElementById("avrg").textContent="Percent Less Than 30 secs - All Clusters";
+        document.getElementById("lt30").textContent="Percent where tracer was less than 30 seconds";
+        }
+    else
+        {
+        document.getElementById("avrg").textContent="Percent Less Than 2 secs - All Clusters";
+        document.getElementById("lt30").textContent="Percent where tracer was less than 2 seconds";
+       }
+
     $("#main").formcache();
-    $( "#period" ).change(function() {
-     tsvalue = $("#datesel").val();
-     tstype = $("#tstype").val();
-     period = $("#period").val();
-     DrawChart(period, tstype, tsvalue);
-    });
-    $( "#tstype" ).change(function() {
-     tsvalue = $("#datesel").val();
-     tstype = $("#tstype").val();
-     period = $("#period").val();
-     if (period.length == 0) {
-       period = 30;
-       $("#period").val(30);
-     }
-     DrawChart(period, tstype, tsvalue);
-    });
-
-
-
 
 </script>
 {% endblock %}
