@@ -14,7 +14,7 @@ def validate(date_text):
 
 class tbrep(Form):
 
-    tier = fields.SelectField('Tier',choices=[('pro','pro'),('standard','standard'),('lite','lite'),('development','development'),('trial','trial')])
+    tier = fields.SelectField('Tier',choices=[('pro','pro'),('standard','standard'),('lite','lite'),('development','development'),('trial','trial'),('enterprise','enterprise')])
     volume = fields.StringField('Volume', description = "Volume")
     retention = fields.IntegerField('Retention')
     sub_rate = fields.IntegerField('Subscription Rate')
