@@ -81,7 +81,7 @@ def new( subd ):
             volume         = request.form['volume'],
             sub_rate       = request.form['sub_rate'],
             payment_method = request.form['payment_method'],
-            billing_period = request.form['billing_period'].lower(),
+            billing_period = request.form['billing_period'],
         )
         s.add( entry )
 
