@@ -630,6 +630,41 @@ class ClusterToSubdomain( Base):
         self.created_date,
         self.cluster_type
         )
+
+class SnapShots( Base ):
+    __tablename__ = 'period_summs_pt'
+    __table_args__= {'mysql_engine':'InnoDB'}
+    period            = Column( String(length=10), primary_key=True )
+    date_start        = Column( Date, primary_key=True)
+    def __repr__(self):
+        return "<bidash({},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{})>".format(
+                 self.period,
+                 self.date_start,
+                 self.new_trial_val,
+                 self.new_trial_count,
+                 self.new_free_count,
+                 self.net_paid_val,
+                 self.net_paid_count,
+                 self.new_paid_val,
+                 self.new_paid_count,
+                 self.new_std_val,
+                 self.new_std_count,
+                 self.new_pro_val,
+                 self.new_pro_count,
+                 self.paid_lost_val,
+                 self.paid_lost_count,
+                 self.accts_up_val,
+                 self.accts_up_count,
+                 self.accts_down_val,
+                 self.accts_down_count,
+                 self.twp_val,
+                 self.twp_count,
+                 self.twf_val,
+                 self.twf_count,
+                 self.active_trial_count,
+                 self.active_trial_val
+            )
+
 @contextmanager
 def session_context():
     """ Because ADB is read only we do not need commit """
