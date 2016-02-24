@@ -10,6 +10,12 @@
 from law                  import config
 from flask.ext.sqlalchemy import SQLAlchemy
 from flask.ext.security   import Security, SQLAlchemyUserDatastore, UserMixin, RoleMixin
+from sqlalchemy                 import (create_engine, Column,
+                                        Integer, DateTime,
+                                        Boolean, String,
+                                        ForeignKey)
+from contextlib import contextmanager
+from sqlalchemy.orm             import sessionmaker, relationship, backref
 
 db_url = '{dialect}://{user}:{passwd}@{host}:{port}/{dbname}'.format(
     dialect = config.get( 'lawdb', 'dialect' ),
@@ -22,6 +28,7 @@ db_url = '{dialect}://{user}:{passwd}@{host}:{port}/{dbname}'.format(
 
 # We'll bind the app later
 db = SQLAlchemy()
+
 
 roles_users = db.Table('roles_users',
         db.Column('user_id', db.Integer(), db.ForeignKey('user.id')),
@@ -48,3 +55,25 @@ class User( db.Model, UserMixin ):
 
 user_datastore = SQLAlchemyUserDatastore( db, User, Role )
 security       = Security( datastore = user_datastore )
+engine = create_engine(
+            db_url
+         )
+Session = sessionmaker( bind=engine )
+
+@contextmanager
+def session_context():
+    """ Because ADB is read only we do not need commit """
+    session = Session()
+    try:
+        # flask-sqlalchemy patches the session object and enforces
+        # This model changes dict for signaling purposes.  Because
+        # We don't want flask-sqlalchemy dealing with these models
+        # Lets just fake this shit.
+        yield session
+        session.commit()
+    except:
+        session.rollback()
+        raise
+    finally:
+        session.close()
+

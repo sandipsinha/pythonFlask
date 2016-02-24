@@ -120,7 +120,7 @@ def tracer_average():
     datas = request.json
     dateind = datas.get('dateind')
     period = int(datas.get('periods'))
-    isithot = request.form.get('isithot')
+    isithot = datas.get('isithot')
     tdate = datetime.strptime(datas['tdate'],'%Y-%m-%d %H:%M:%S')
 
     fdate = calc_start_date(tdate, dateind, period)
@@ -129,7 +129,7 @@ def tracer_average():
 
     fdate = fdate.date()
     tdate = tdate.date()
-    summdata = query_tracer_average(fdate, tdate, cperiod, True if isithot == 'true' else False)
+    summdata = query_tracer_average(fdate, tdate, cperiod, True if isithot == True else False)
     graphlist = []
     for rows in summdata:
         graphitem = {}

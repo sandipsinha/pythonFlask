@@ -50,7 +50,7 @@
      tsvalue = $("#datesel").val();
      tstype = $("#tstype").val();
      period = $("#period").val();
-     isithot = $('#isithot').val();
+     isithot = $('#isithot').is(':checked');
      if (period.length == 0) {
        period = 30;
        $("#period").val(30);

@@ -5,7 +5,7 @@
   			contentType: "application/json",
   			dataType: "json",
   			type: "POST",
-  			data: JSON.stringify({tdate:endDt, dateind: tstype,periods:period,'isithot':$('#isithot').val()}),
+  			data: JSON.stringify({tdate:endDt, dateind: tstype,periods:period,'isithot':isithot}),
 			success: function( data ) {
 				  var processedData = JSON.parse(JSON.stringify(data));
 				  var dataGroup = processedData;
@@ -22,7 +22,7 @@
   			contentType: "application/json",
   			dataType: "json",
   			type: "POST",
-  			data: JSON.stringify({Cluster:$('#cluster').val(),tdate:endDt, griddateval: griddt, dateind: tstype,periods:period,'isithot':$('#isithot').val()}),
+  			data: JSON.stringify({Cluster:$('#cluster').val(),tdate:endDt, griddateval: griddt, dateind: tstype,periods:period,'isithot':isithot}),
 			success: function( data ) {
 				  var processedData = JSON.parse(JSON.stringify(data));
 				  var dataGroup = d3.nest()
