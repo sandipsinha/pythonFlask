@@ -17,7 +17,8 @@ from law.util.adb       import session_context, AccountState, Owners, Tier, User
                         ClusterToSubdomain, SnapShots, engine
 
 from law.util.tracerdb  import tdb_session_context as tdb
-from law.util.tracerdb  import TracerBullet, TracerPercentiles, engine, TracerPercentilesCold, TracerBulletCold
+from law.util.tracerdb  import TracerBullet, TracerPercentiles,  TracerPercentilesCold, TracerBulletCold
+from law.util.tracerdb import engine as tdengine
 
 from law.util.touchbiz import acct_id_for_subdomain
 from sqlalchemy.orm.exc             import NoResultFound
@@ -133,12 +134,11 @@ def get_cluster_names(pref):
     clusterexp = '%' + pref + '%'
     querytorun='select distinct concat(a.cluster, substr(a.index_type,1)) newcluster, concat(a.cluster, substr(a.index_type,1,1)) clusterdata from tracer_percentiles a where ' \
                'concat(a.cluster, substr(a.index_type,1,1)) like :clsexp'
-    with tdb() as q:
-        try:
-            q = engine.execute(text(querytorun),clsexp = clusterexp )
-            return q
-        except NoResultFound as e:
-                return None
+    try:
+        q = tdengine.execute(text(querytorun),clsexp = clusterexp )
+        return q
+    except NoResultFound as e:
+        return None
 
 def query_subd_from_cluster(cluster):
 
