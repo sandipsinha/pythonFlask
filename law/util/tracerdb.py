@@ -204,7 +204,7 @@ class TracerPercentilesCold( Base):
         )
 
 @contextmanager
-def session_context():
+def tdb_session_context():
     """ Because TracerDB is read only we do not need commit """
     session = Session()
     try:
