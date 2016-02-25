@@ -14,9 +14,9 @@ from law.util.timeutil  import Timebucket
 from sqlalchemy.sql import label, text
 from law.util.adb       import session_context, AccountState, Owners, Tier, Users, Status, \
                         UserTracking, AccountProfile, DownGrades, AccountActivity, VolumeAccepted, \
-                        ClusterToSubdomain, Account, engine
+                        ClusterToSubdomain, SnapShots, engine
 
-from law.util.tracerdb  import session_context as tdb
+from law.util.tracerdb  import tdb_session_context as tdb
 from law.util.tracerdb  import TracerBullet, TracerPercentiles, engine, TracerPercentilesCold, TracerBulletCold
 
 from law.util.touchbiz import acct_id_for_subdomain
@@ -237,6 +237,42 @@ def get_cluster_details(subd):
         s.expunge_all()
     return datas
 
+
+
+def get_cluster_details(subd):
+    with session_context() as s:
+        q = s.query(ClusterToSubdomain)\
+            .filter(ClusterToSubdomain.subdomain == subd)
+
+        datas = q.one()
+        s.expunge_all()
+    return datas
+
+
+def get_clients(category, start_time, timef, periods):
+    with session_context() as s:
+        try:
+            q=s.query(SnapShots).filter(SnapShots.period == periods).filter(SnapShots.date_start == start_time).all()
+            s.expunge_all
+            if category == 'count':
+                piearray = [{'start_date':it.date_start,'new_trial_count':it.new_trial_count,
+                             'new_free_count':it.new_free_count, 'new_std_count':it.new_std_count,
+                             'twp_count':it.twp_count,'paid_lost_count': it.paid_lost_count,
+                             'twp_count':it.twp_count,'paid_lost_count': it.paid_lost_count,
+                             'new_paid_count':it.new_paid_count, 'new_pro_count':it.new_pro_count}
+                            for i, it in enumerate(q) if i <= periods]
+            else:
+                piearray = [{'start_date':it.date_start,'new_trial_val':it.new_trial_val,
+                         'active_trial_val':it.active_trial_val, 'new_std_val':it.new_std_val,
+                         'twp_val':it.twp_val,'paid_lost_val': it.paid_lost_val,
+                         'twp_val':it.twp_val,'paid_lost_val': it.paid_lost_val,
+                         'new_paid_val':it.new_paid_val, 'new_pro_val':it.new_pro_val}
+                        for i, it in enumerate(q) if i <= periods]
+            return piearray
+        except NoResultFound as e:
+                return None
+
+
 class QueryOwners(object):
 
     def __init__( self, states, start, end, owners=None ):
@@ -285,6 +321,7 @@ class QueryOwners(object):
             owners[name] = bucket_func( Timebucket( owners[name], 'updated' ) )()
 
         return owners
+
 
 
 

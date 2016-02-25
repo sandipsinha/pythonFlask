@@ -83,7 +83,7 @@ def tracer_percentile():
     datas = request.json
     dateind = datas.get('dateind')
     period = int(datas.get('periods'))
-    isithot = request.form.get('isithot')
+    isithot = datas.get('isithot')
     tdate =  datetime.now() if len(datas['tdate']) == 0 else datetime.strptime(datas['tdate'],'%Y-%m-%d %H:%M:%S')
 
     fdate = calc_start_date(tdate, dateind, period)
@@ -93,7 +93,7 @@ def tracer_percentile():
 
     fdate = fdate.date()
     tdate = tdate.date()
-    tiledata = query_tracer_percentile(fdate, tdate, clusterchosen, cperiod, True if isithot == 'true'  else False)
+    tiledata = query_tracer_percentile(fdate, tdate, clusterchosen, cperiod, True if isithot == True  else False)
     graphlist = []
     for rows in tiledata:
         graphitem = {}
