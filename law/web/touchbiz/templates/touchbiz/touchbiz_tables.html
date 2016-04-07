@@ -1,0 +1,87 @@
+{% extends 'touchbiz/bases.html' %}
+{% block content %}
+
+<script>
+$(function () {
+    var url =  '/apiv2/touchbiz/subdomain/{{subdomain}}';
+
+    $('#grid').w2grid({
+        name: 'grid',
+        header: 'List of Names',
+        url: url,
+        show : {
+            header         : false,
+            toolbar        : true,
+            footer         : true,
+            columnHeaders  : true,
+            lineNumbers    : true,
+            expandColumn   : false,
+            selectColumn   : false,
+            emptyRecords   : true,
+            toolbarReload  : false,
+            toolbarColumns : true,
+            toolbarSearch  : true,
+            toolbarAdd     : false,
+            toolbarEdit    : false,
+            toolbarDelete  : false,
+            toolbarSave    : true,
+            selectionBorder: true,
+            recordTitles   : true,
+            skipRecords    : false
+        },
+        columns: [
+            { field: 'created', caption: 'Date', size: '16%', sortable: true },
+            { field: 'rate', caption: 'Rate', size: '20%', sortable: true ,editable: { type: 'text' }},
+            { field: 'tier', caption: 'Tier', size: '16%', sortable: true,editable: { type: 'text' }},
+            { field: 'retention', caption: 'Retention', size: '16%', sortable: true ,editable: { type: 'text' }},
+            { field: 'volume', caption: 'Volume(GB)', size: '16%',editable: { type: 'text' }},
+            { field: 'owner', caption: 'Owner', size: '16%', sortable: true , editable: { type: 'combo', items: get_sales_rep(), showAll: true } ,
+         },
+            { field: 'plan_type'},
+            { field: 'period'},
+            { field: 'payment_method'},
+
+        ],
+
+    });
+
+    w2ui['grid'].hideColumn('plan_type','period','payment_method');
+
+
+    var dict = {};
+    var row;
+
+
+    w2ui.grid.on('save', function(event) {
+        // event actions
+        var editObject = w2ui['grid'].getChanges()[0];
+        if (typeof w2ui['grid'].getChanges()[0] === "undefined") {
+        }
+        else
+        {
+
+        row = w2ui['grid'].get(editObject['recid']);
+        $.ajax({
+        url : '/apiv2/touchbiz/subdomain/edit',
+        contentType: "application/json",
+        dataType: "json",
+        type: "POST",
+        data: JSON.stringify({meta:row,subdomain:'{{subdomain}}'}),
+        success: function( data ) {
+
+        }
+        });
+
+        };
+});
+
+});
+
+
+</script>
+<div id="grid" style="width: 100%; height: 150px;">
+
+</div>
+
+
+{% endblock %}

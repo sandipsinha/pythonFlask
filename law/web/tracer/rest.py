@@ -2,7 +2,7 @@ __author__ = 'ssinha'
 from flask              import Blueprint, jsonify, request, Response, json
 from law.util.queries   import query_tracer_bullet, get_cluster_names, query_tracer_percentile, query_tracer_average
 from datetime           import datetime, timedelta
-from law.util             import touchbiz
+
 
 
 

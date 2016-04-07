@@ -17,7 +17,8 @@ from law.util.adb       import session_context, AccountState, Owners, Tier, User
                         ClusterToSubdomain, SnapShots, engine
 
 from law.util.tracerdb  import tdb_session_context as tdb
-from law.util.tracerdb  import TracerBullet, TracerPercentiles, engine, TracerPercentilesCold, TracerBulletCold
+from law.util.tracerdb  import TracerBullet, TracerPercentiles,  TracerPercentilesCold, TracerBulletCold
+from law.util.tracerdb import engine as tdengine
 
 from law.util.touchbiz import acct_id_for_subdomain
 from sqlalchemy.orm.exc             import NoResultFound
@@ -133,12 +134,11 @@ def get_cluster_names(pref):
     clusterexp = '%' + pref + '%'
     querytorun='select distinct concat(a.cluster, substr(a.index_type,1)) newcluster, concat(a.cluster, substr(a.index_type,1,1)) clusterdata from tracer_percentiles a where ' \
                'concat(a.cluster, substr(a.index_type,1,1)) like :clsexp'
-    with tdb() as q:
-        try:
-            q = engine.execute(text(querytorun),clsexp = clusterexp )
-            return q
-        except NoResultFound as e:
-                return None
+    try:
+        q = tdengine.execute(text(querytorun),clsexp = clusterexp )
+        return q
+    except NoResultFound as e:
+        return None
 
 def query_subd_from_cluster(cluster):
 
@@ -249,28 +249,32 @@ def get_cluster_details(subd):
     return datas
 
 
-def get_clients(category, start_time, timef, periods):
-    with session_context() as s:
-        try:
-            q=s.query(SnapShots).filter(SnapShots.period == periods).filter(SnapShots.date_start == start_time).all()
-            s.expunge_all
-            if category == 'count':
-                piearray = [{'start_date':it.date_start,'new_trial_count':it.new_trial_count,
-                             'new_free_count':it.new_free_count, 'new_std_count':it.new_std_count,
-                             'twp_count':it.twp_count,'paid_lost_count': it.paid_lost_count,
-                             'twp_count':it.twp_count,'paid_lost_count': it.paid_lost_count,
-                             'new_paid_count':it.new_paid_count, 'new_pro_count':it.new_pro_count}
-                            for i, it in enumerate(q) if i <= periods]
-            else:
-                piearray = [{'start_date':it.date_start,'new_trial_val':it.new_trial_val,
-                         'active_trial_val':it.active_trial_val, 'new_std_val':it.new_std_val,
-                         'twp_val':it.twp_val,'paid_lost_val': it.paid_lost_val,
-                         'twp_val':it.twp_val,'paid_lost_val': it.paid_lost_val,
-                         'new_paid_val':it.new_paid_val, 'new_pro_val':it.new_pro_val}
-                        for i, it in enumerate(q) if i <= periods]
-            return piearray
-        except NoResultFound as e:
-                return None
+def get_clients(tperiod, start_date, end_date):
+    connection = engine.connect()
+    cmd = 'select period,sum( new_trial_count) new_trial_count ,sum(activations) activations,avg(act_pcnt) ' \
+          'act_pcnt,sum(active_trial_count) active_trial_count,sum(net_paid_val) net_paid_val,sum( net_paid_count) ' \
+          'net_paid_count,sum(delta_paid_val) delta_paid_val,sum(new_paid_val) new_paid_val,' \
+          'sum(accts_up_val) accts_up_val,sum(accts_down_val) accts_down_val,sum(paid_lost_val) paid_lost_val ,' \
+          'sum(new_paid_count) new_paid_count,sum(accts_up_count) accts_up_count,' \
+          'sum(accts_down_count) accts_down_count,sum(paid_lost_count) paid_lost_count,' \
+          'sum( paid_lost_count_pcnt ) paid_lost_count_pcnt,sum(paid_lost_val_pcnt) paid_lost_val_pcnt,' \
+          'sum(net_ent_val) net_ent_val,sum(net_ent_count) net_ent_count,sum(net_pro_val) net_pro_val,' \
+          'sum( net_pro_count) net_pro_count,sum(net_std_val) net_std_val,sum( net_std_count) net_std_count,' \
+          'sum( new_ent_val) new_ent_val,sum(new_ent_count) new_ent_count,sum(new_pro_val) new_pro_val,' \
+          'sum( new_pro_count) new_pro_count,sum(new_std_val) new_std_val,sum(new_std_count) new_std_count,' \
+          'sum(twp_val) twp_val,sum(twp_count) twp_count,sum(twp_count_pcnt) twp_count_pcnt,' \
+          'sum(cpt_val) cpt_val,sum(cpt_count) cpt_count,sum(cpt_avg_days) cpt_avg_days,' \
+          'sum(twf_count) twf_count from period_summs_pt where period = :tperiod and date_start between ' \
+          ':start_dt and :end_dt group by period'
+    client_dtls = connection.execute(text(cmd), tperiod = tperiod, start_dt = start_date, end_dt = end_date)
+
+    amva =  client_dtls.fetchall()
+    c = amva[0]
+
+    # and now, finally...
+    return dict(zip(c.keys(), c.values()))
+
+
 
 
 class QueryOwners(object):

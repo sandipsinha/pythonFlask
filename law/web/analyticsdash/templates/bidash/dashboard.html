@@ -1,0 +1,62 @@
+{% extends 'tracer/base.html' %}
+{% block main %}
+<div id="header">{% block header %}{% endblock %}</div>
+<div id="first-wrap">
+<div id="leftdiv"> </div>
+<div id="rightdiv">
+<form data-persist="garlic" id="nextmain" >
+<div  class="right-align">
+
+            <label>
+            <select id="tstype" >
+              <option value="d">Daily</option>
+              <option value="w">Weekly</option>
+              <option value="m">Monthly</option>
+                <option value="rw">Rolling 7 days</option>
+              <option value="rm">Rolling 30 days</option>
+            </select>
+            </label>
+            <label>Periods:
+            <input id="period" type="number" placeholder="30" min="2">
+            </label>
+
+</div>
+
+
+</form>
+
+</div>
+</div>
+<div id="main-wrap">
+    <div id="leftcol">
+        {% block leftcol %}{% endblock %}
+
+    </div>
+    <div id="rightcol">
+        {% block rightcol %}{% endblock %}
+    </div>
+
+</div>
+
+<script>
+    var isithot = $('#isithot').is(':checked');
+    $( "#period" ).change(function() {
+     tsvalue = $("#datesel").val();
+     tstype = $("#tstype").val();
+     period = $("#period").val();
+     DrawChart(period, tstype, tsvalue, isithot);
+    });
+    $( "#tstype" ).change(function() {
+     tsvalue = $("#datesel").val();
+     tstype = $("#tstype").val();
+     period = $("#period").val();
+     isithot = $('#isithot').is(':checked');
+     if (period.length == 0) {
+       period = 30;
+       $("#period").val(30);
+     }
+     DrawChart(period, tstype, tsvalue, isithot);
+    });
+</script>
+
+{% endblock %}

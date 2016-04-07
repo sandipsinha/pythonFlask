@@ -5,7 +5,7 @@
 "
 """
 from flask                import Blueprint, render_template, request, url_for, json, request, jsonify,flash
-from law.web.touchbiz     import rest
+from law.web.touchbiz     import rest, rest2
 from law.util             import touchbiz
 from datetime import datetime
 import forms
@@ -20,9 +20,16 @@ blueprint = Blueprint( 'touchbiz', __name__,
 
 @blueprint.route( '/<string:subd>/table' )
 def table(subd):
-    data = rest.history( subd )
+    data =  rest.history( subd )
     return render_template( 'touchbiz/touchbiz_table.html', **{
-        'data': data,
+        'subdomain':subd,
+        'data':data
+    })
+
+@blueprint.route( '/<string:subd>/tables' )
+def tables(subd):
+    #data =  rest.history( subd )
+    return render_template( 'touchbiz/touchbiz_tables.html', **{
         'subdomain':subd,
     })
 

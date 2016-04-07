@@ -1,0 +1,70 @@
+{% extends 'bidash/base.html' %}
+{% block main %}
+
+<div class="w3-container" id="headerel">
+
+<form ng-app="myApp" name="myForm" ng-controller="HttpGetController as formCtrl" class="w3-container">
+    <p> Select a period:
+    <select ng-model="selectPeriod" id="selectPeriod">
+    <option value="weekly">Weekly
+    <option value="daily">Daily
+    <option value="monthly">Monthly
+</select>
+    Start Date: <input type="text" name="start_dt" ng-model="start_dt" required id="start_dt" placeholder="yyyy-MM-dd"/>
+    End Date: <input type="text" name="end_dt" ng-model="end_dt" required id="end_dt" placeholder="yyyy-MM-dd"/>
+
+    <button ng-click="SendData()" id="subcls">Submit</button>
+ </p>
+</form>
+</div>
+<div id="upleft">
+   {% block leftcol %}{% endblock %}
+</div>
+
+<div id="upright">
+    {% block rightcol %}{% endblock %}
+</div>
+
+<div id="belows">
+    {% block figbelow %}{% endblock %}
+</div>
+
+<script>
+
+
+    var app = angular.module("myApp", []);
+    app.controller("HttpGetController", function ($scope, $http) {
+        $scope.SendData = function () {
+
+           // use $.param jQuery function to serialize data from JSON
+           if (Date.parse($scope.start_dt) && Date.parse($scope.end_dt)){
+                var data = $.param({
+                    tperiod: $scope.selectPeriod,
+                    start_dt: $scope.start_dt.toString("yyyy-mm-dd"),
+                    end_dt: $scope.end_dt.toString("yyyy-mm-dd")
+                });
+
+                var config = {
+                    headers : {
+                        'Content-Type': 'application/x-www-form-urlencoded;charset=utf-8;'
+                    }
+                }
+
+                $http.post('/apiv1/bidash/getdashdata/', data, config)
+                .success(function (data, status, headers, config) {
+
+                    $scope.PostDataResponse = data['accts_up_val'];
+                })
+                .error(function (data, status, header, config) {
+                    alert('Error');
+                });
+        }
+        else
+        {
+        alert('Invalid Date');
+        }
+
+        };
+    });
+</script>
+{% endblock %}
