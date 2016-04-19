@@ -5,7 +5,7 @@
 "
 """
 from functools             import wraps
-from datetime              import datetime
+from datetime              import datetime, date, timedelta
 
 from flask                 import Blueprint, jsonify, request, url_for, json
 from flask.ext.login       import current_user
@@ -17,6 +17,8 @@ from sqlalchemy         import and_, or_, not_, func, distinct
 from sqlalchemy.sql import label
 
 blueprint = Blueprint( 'rest.touchbiz', __name__ )
+DEFAULT_OWNER = 'loggly'
+TIMEFORMAT = '%Y-%m-%d %H:%M:%S'
 
 def rest_endpoint( route, methods=None ):
     def rest_endpoint_wrap( func ):
@@ -50,11 +52,15 @@ def history( subd ):
     rows = [ touchbiz.flatten( row )._asdict() for row in touchbiz.touchbiz_by_account( subd )]
     return rows
 
+
+
 @rest_endpoint( '/subdomain/<string:subd>/latest', methods=['POST','PUT'] )
 def latest( subd ):
     latest = touchbiz.flatten( touchbiz.touchbiz_by_account( subd )[-1] )._asdict()
 
     return latest
+
+
 
 
 @rest_endpoint( '/subdomain/<string:subd>/new', methods=['POST','PUT'] )
@@ -126,4 +132,7 @@ def autocomplete():
     rowlist = salesrep.all()
     custacct = [items[0] + ',' + items[1] + '|' + items[2] + '|' + str(items[3])  for items in rowlist]
     return json.dumps(custacct)
+
+
+
 

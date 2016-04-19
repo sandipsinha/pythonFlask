@@ -17,10 +17,13 @@ from law.util.touchbizdb    import (loader as tb_loader,
                                     SalesReps,)
 from law.util.adb           import (loader as adb_loader, 
                                     engine as adb_engine,
-                                    AccountStateUncompressed, 
                                     AccountActivity,
                                     AAOwner,
                                     Account,)
+
+from law.util.a2instance    import (loader as a2_loader,
+                                    AccountStateUncompressed
+                                    )
 
 from sqlalchemy.orm.exc             import NoResultFound
 from sqlalchemy import or_
@@ -207,7 +210,7 @@ def apply_touchbiz( sub_entries, tb_entries, initial_entry=None, localize=False,
 def touchbiz_by_account_id( acct_id, localize=True ):
     """ Munges subscription changes with our touchbiz entries"""
 
-    with adb_loader() as l:
+    with a2_loader() as l:
         sub_entries = l.query( AccountStateUncompressed )\
                        .filter( AccountStateUncompressed.acct_id == acct_id )\
                        .all()
