@@ -171,7 +171,6 @@ def change_touchbiz():
     subd = rows.get('subdomain')
     sales_id = touchbiz.get_sales_rep_id(changes.get('owner')) if changes.get('owner') is not None \
         else touchbiz.get_sales_rep_id(tbdata.get('owner'))
-    import ipdb;ipdb.set_trace()
     if changes.get('owner') != DEFAULT_OWNER:
          with tb_session() as s:
             entry = Touchbiz(
