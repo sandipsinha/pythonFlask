@@ -262,6 +262,21 @@ class AccountStateUncompressed( Base ):
             self.updated)
 
 
+class Tier( Base ):
+    __tablename__  = 'subscription_plan'
+    __table_args__ = {'mysql_engine':'InnoDB'}
+
+    id   = Column( Integer, primary_key=True )
+    name = Column( String(length=100) )
+    code = Column( Integer )
+
+    def __repr__(self):
+        return "<Tier({},{},{})>".format(
+            self.id,
+            self.name,
+            self.code)
+    
+
 class Owners( Base ):
     __tablename__  = 'account_owners'
     __table_args__ = {'mysql_engine':'InnoDB'}
