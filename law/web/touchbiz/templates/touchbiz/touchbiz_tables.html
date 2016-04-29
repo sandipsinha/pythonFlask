@@ -30,11 +30,11 @@ $(function () {
             skipRecords    : false
         },
         columns: [
-            { field: 'created', caption: 'Date', size: '16%', sortable: true },
-            { field: 'rate', caption: 'Rate', size: '20%', sortable: true ,editable: { type: 'text' }},
-            { field: 'tier', caption: 'Tier', size: '16%', sortable: true,editable: { type: 'text' }},
+            { field: 'created', caption: 'Date', size: '20%', sortable: true },
+            { field: 'rate', caption: 'Rate', size: '20%', sortable: true ,editable: { type: 'text' },render:'currency'},
+            { field: 'tier', caption: 'Tier', size: '18%', sortable: true,editable: { type: 'text' }},
             { field: 'retention', caption: 'Retention', size: '16%', sortable: true ,editable: { type: 'text' }},
-            { field: 'volume', caption: 'Volume(GB)', size: '16%',editable: { type: 'text' }},
+            { field: 'volume', caption: 'Volume(GB)', size: '10%',editable: { type: 'text' },render:'number:2'},
             { field: 'owner', caption: 'Owner', size: '16%', sortable: true , editable: { type: 'combo', items: get_sales_rep(), showAll: true } ,
          },
             { field: 'plan_type'},

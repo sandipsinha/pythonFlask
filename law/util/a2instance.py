@@ -275,7 +275,7 @@ class Tier( Base ):
             self.id,
             self.name,
             self.code)
-    
+
 
 class Owners( Base ):
     __tablename__  = 'account_owners'
