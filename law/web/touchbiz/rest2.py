@@ -70,9 +70,8 @@ def history( subd ):
         userdat['rate'] = row.get('rate') if row.get('rate') is not None else 0
         userdat['tier'] = row.get('tier') if row.get('tier') is not None else ''
         userdat['retention'] = row.get('retention') if row.get('retention') is not None else ''
-        userdat['volume'] = int(row.get('volume')) if int(row.get('volume')) is not None else 0
-        sales_id = touchbiz.get_sales_rep_id(row.get('owner'))
-        userdat['owner'] = row.get('owner')    if row.get('owner') is not None else 'loggly'
+        userdat['volume'] =  row.get('volume')
+        userdat['owner'] = row.get('owner')  if row.get('owner') is not None else 'loggly'
         userlist.append(userdat)
     if recid > 0:
         userqueue['status'] = 'success'
