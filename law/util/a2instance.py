@@ -408,6 +408,46 @@ class SnapShots( Base ):
                  self.active_trial_val
             )
 
+class UserTracking( Base ):
+    __tablename__  = 'user_tracking'
+    __table_args__ = {'mysql_engine':'InnoDB'}
+
+    user_id         = Column( Integer, primary_key=True )
+    username        = Column( String(length=30) )
+    session_id      = Column( String(length=50), primary_key=True )
+    login           = Column( DateTime)
+    logout          = Column( DateTime)
+    pageviews       = Column( SMALLINT)
+    referer         =   Column(Text)
+    email          = Column( String(length=75) )
+
+
+    def __repr__(self):
+        return "<user_tracking ({})>".format(
+            self.login
+            )
+
+class Users( Base ):
+    __tablename__  = 'user'
+    __table_args__ = {'mysql_engine':'InnoDB'}
+
+    acct_id        = Column( MEDIUMINT, primary_key=True )
+    user_id        = Column( Integer, primary_key=True )
+    username       = Column( String(length=30) )
+    email          = Column( String(length=75) )
+    first_name     = Column( String(length=30) )
+    last_name      = Column( String(length=30) )
+
+
+    def __repr__(self):
+        return "<users({},{},{},{},{},{})>".format(
+            self.acct_id,
+            self.user_id,
+            self.username,
+            self.email,
+            self.first_name,
+            self.last_name)
+
 @contextmanager
 def session_context():
     """ Because ADB is read only we do not need commit """
