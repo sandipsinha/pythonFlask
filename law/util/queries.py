@@ -12,10 +12,11 @@ from operator           import attrgetter
 from sqlalchemy         import and_, or_, not_, func, distinct
 from law.util.timeutil  import Timebucket
 from sqlalchemy.sql import label, text
-from law.util.adb       import session_context, AccountState, Owners, Tier, Users, Status, \
-                        UserTracking, AccountProfile, DownGrades, AccountActivity, VolumeAccepted, \
+from law.util.adb       import session_context, AccountState, Owners, Tier,  \
+                        AccountProfile, DownGrades, AccountActivity, VolumeAccepted, \
                         ClusterToSubdomain, SnapShots, engine
-
+from law.util.a2instance import Users, Status,UserTracking
+from law.util.a2instance import session_context as a2s
 from law.util.tracerdb  import tdb_session_context as tdb
 from law.util.tracerdb  import TracerBullet, TracerPercentiles,  TracerPercentilesCold, TracerBulletCold
 from law.util.tracerdb import engine as tdengine
@@ -152,7 +153,7 @@ def query_subd_from_cluster(cluster):
 
 
 def query_user_state( subd ):
-    with session_context() as s:
+    with  a2s() as s:
         users = query_user_data( s, subd).all()
         s.expunge_all()
     return users
