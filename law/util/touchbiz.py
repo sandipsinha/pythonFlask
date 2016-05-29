@@ -204,7 +204,7 @@ def apply_touchbiz( sub_entries, tb_entries, initial_entry=None, localize=False,
     # If there are touchbiz entries left apply the most recent one 
     # to the returned rows
     if len( tbkeys ) != 0 and with_pending:
-        #tbd[tbkeys[0]].created = PENDING
+        tbd[tbkeys[0]].created = PENDING
         tbd[tbkeys[0]].status  = PENDING
         applied.append( tbd[tbkeys[0]] )
 
