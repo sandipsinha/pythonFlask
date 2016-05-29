@@ -53,7 +53,8 @@ FlatTouchbiz = namedtuple( 'FlatTouchbiz', [
     'owner',
     'status',
     'plan_type',
-    'payment_method']
+    'payment_method',
+    'tb_created']
 )
 
 def localized_tb( tb_entries, timezone=TIMEZONE ):
@@ -69,7 +70,6 @@ def localized_tb( tb_entries, timezone=TIMEZONE ):
     return (localized( tb ) for tb in tb_entries )
 
 def localize_time(date_obj):
-    #import ipdb;ipdb.set_trace()
     localtz = TIMEZONE
     if date_obj.tzinfo is None:
         dt_aware = localtz.localize(date_obj)
@@ -179,6 +179,7 @@ def apply_touchbiz( sub_entries, tb_entries, initial_entry=None, localize=False,
 
         # Owners can expire and be returned to the company after a 
         # certain timeperiod of inactivity.
+
         if ownership_expired( prev_sub, sub, tbd[key] ):
             sub.owner = default.owner
             sub.status = EXPIRED
@@ -189,6 +190,8 @@ def apply_touchbiz( sub_entries, tb_entries, initial_entry=None, localize=False,
             sub.owner = tbd[key].owner
             sub.status = WON
             last_paid = tbd[key] if is_paid_or_upgrade( sub ) else last_paid
+        if initial_entry.created != tbd[key].created:
+            setattr(sub,'tb_created',tbd[key].created)
 
         if with_pending and tbd[key].owner != default.owner and is_pending_applicable( sub, tbd[key] ):
             # Shunt the touchbiz subscription by keeping the current
@@ -201,7 +204,7 @@ def apply_touchbiz( sub_entries, tb_entries, initial_entry=None, localize=False,
     # If there are touchbiz entries left apply the most recent one 
     # to the returned rows
     if len( tbkeys ) != 0 and with_pending:
-        tbd[tbkeys[0]].created = PENDING
+        #tbd[tbkeys[0]].created = PENDING
         tbd[tbkeys[0]].status  = PENDING
         applied.append( tbd[tbkeys[0]] )
 
@@ -262,10 +265,10 @@ def get_sales_rep_details(name):
 
 def flatten( row ):
     if isinstance( row, AccountStateUncompressed ):
-        cols = ['updated', 'tPlan.name', 'tDays', 'tGB', 'billing_period', 'tRate', 'owner.sfdc_alias', 'status', 'plan_type','payment_method']
+        cols = ['updated', 'tPlan.name', 'tDays', 'tGB', 'billing_period', 'tRate', 'owner.sfdc_alias', 'status', 'plan_type','payment_method','tb_created']
         flattened = FlatTouchbiz( *[ item[1] for item in as_tuple( row, cols )] )
     elif isinstance( row, Touchbiz ):
-        cols = ['created', 'tier', 'retention', 'volume', 'billing_period', 'sub_rate', 'owner.sfdc_alias', 'status', 'plan_type','payment_method']
+        cols = ['created', 'tier', 'retention', 'volume', 'billing_period', 'sub_rate', 'owner.sfdc_alias', 'status', 'plan_type','payment_method','tb_created']
         flattened = FlatTouchbiz( *[ item[1] for item in as_tuple( row, cols )] )
 
     return flattened
