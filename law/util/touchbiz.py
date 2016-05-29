@@ -161,7 +161,7 @@ def apply_touchbiz( sub_entries, tb_entries, initial_entry=None, localize=False,
     if localize:
         tb_entries = localized_tb( tb_entries )
 
-    tbd    = {tb.created.strftime('%Y-%m-%d'): tb for tb in tb_entries }
+    tbd    = {tb.created: tb for tb in tb_entries }
     tbkeys = sorted( tbd.keys(), reverse=True )
     subs   = sorted( sub_entries, key=lambda x: x.updated )
 
